@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -21,12 +21,14 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		356F08589331CE5682C079B1 /* Pods_AEPTarget.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C25D5A6C26809EA683183C03 /* Pods_AEPTarget.framework */; };
 		7885141425532281008E6999 /* Target.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7885141325532281008E6999 /* Target.swift */; };
 		78851419255322CB008E6999 /* Target+PublicAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78851418255322CB008E6999 /* Target+PublicAPI.swift */; };
 		7885141E255322D9008E6999 /* Event+Target.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7885141D255322D9008E6999 /* Event+Target.swift */; };
 		78D5030F2551FCCE00966553 /* AEPTarget.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 78D503052551FCCE00966553 /* AEPTarget.framework */; };
 		78D503142551FCCE00966553 /* AEPTargetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D503132551FCCE00966553 /* AEPTargetTests.swift */; };
 		78D503162551FCCE00966553 /* AEPTarget.h in Headers */ = {isa = PBXBuildFile; fileRef = 78D503082551FCCE00966553 /* AEPTarget.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EDAF82AE58875F53935DA352 /* Pods_AEPTargetTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE18F68D21AC04DBA3C71C11 /* Pods_AEPTargetTests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +49,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		068533BC674EC6281D083442 /* Pods-AEPTargetTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPTargetTests.release.xcconfig"; path = "Target Support Files/Pods-AEPTargetTests/Pods-AEPTargetTests.release.xcconfig"; sourceTree = "<group>"; };
+		3671A71DAF9162A75F5E800D /* Pods-AEPTarget.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPTarget.debug.xcconfig"; path = "Target Support Files/Pods-AEPTarget/Pods-AEPTarget.debug.xcconfig"; sourceTree = "<group>"; };
+		7092FE32FA9BACC75551FF6E /* Pods-AEPTarget.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPTarget.release.xcconfig"; path = "Target Support Files/Pods-AEPTarget/Pods-AEPTarget.release.xcconfig"; sourceTree = "<group>"; };
 		7885141325532281008E6999 /* Target.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Target.swift; sourceTree = "<group>"; };
 		78851418255322CB008E6999 /* Target+PublicAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Target+PublicAPI.swift"; sourceTree = "<group>"; };
 		7885141D255322D9008E6999 /* Event+Target.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Event+Target.swift"; sourceTree = "<group>"; };
@@ -56,6 +61,9 @@
 		78D5030E2551FCCE00966553 /* AEPTargetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AEPTargetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		78D503132551FCCE00966553 /* AEPTargetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEPTargetTests.swift; sourceTree = "<group>"; };
 		78D503152551FCCE00966553 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A61A47AC801172A974D0DB0A /* Pods-AEPTargetTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPTargetTests.debug.xcconfig"; path = "Target Support Files/Pods-AEPTargetTests/Pods-AEPTargetTests.debug.xcconfig"; sourceTree = "<group>"; };
+		AE18F68D21AC04DBA3C71C11 /* Pods_AEPTargetTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AEPTargetTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C25D5A6C26809EA683183C03 /* Pods_AEPTarget.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AEPTarget.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				356F08589331CE5682C079B1 /* Pods_AEPTarget.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,12 +80,24 @@
 			buildActionMask = 2147483647;
 			files = (
 				78D5030F2551FCCE00966553 /* AEPTarget.framework in Frameworks */,
+				EDAF82AE58875F53935DA352 /* Pods_AEPTargetTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		348356D57D65A673353331AB /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				3671A71DAF9162A75F5E800D /* Pods-AEPTarget.debug.xcconfig */,
+				7092FE32FA9BACC75551FF6E /* Pods-AEPTarget.release.xcconfig */,
+				A61A47AC801172A974D0DB0A /* Pods-AEPTargetTests.debug.xcconfig */,
+				068533BC674EC6281D083442 /* Pods-AEPTargetTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		788513FC2552087A008E6999 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
@@ -93,8 +114,9 @@
 			isa = PBXGroup;
 			children = (
 				78D503072551FCCE00966553 /* AEPTarget */,
-				78D503122551FCCE00966553 /* Tests */,
 				78D503062551FCCE00966553 /* Products */,
+				348356D57D65A673353331AB /* Pods */,
+				7D730AB381C01A9723D53AB2 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -111,6 +133,7 @@
 			isa = PBXGroup;
 			children = (
 				788513FC2552087A008E6999 /* Sources */,
+				78D503122551FCCE00966553 /* Tests */,
 			);
 			path = AEPTarget;
 			sourceTree = "<group>";
@@ -121,8 +144,16 @@
 				78D503132551FCCE00966553 /* AEPTargetTests.swift */,
 				78D503152551FCCE00966553 /* Info.plist */,
 			);
-			name = Tests;
-			path = AEPTarget/Tests;
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		7D730AB381C01A9723D53AB2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C25D5A6C26809EA683183C03 /* Pods_AEPTarget.framework */,
+				AE18F68D21AC04DBA3C71C11 /* Pods_AEPTargetTests.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,6 +174,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 78D503192551FCCE00966553 /* Build configuration list for PBXNativeTarget "AEPTarget" */;
 			buildPhases = (
+				CF1873A1F1BC72F150A33E08 /* [CP] Check Pods Manifest.lock */,
 				78D503002551FCCE00966553 /* Headers */,
 				78D503012551FCCE00966553 /* Sources */,
 				78D503022551FCCE00966553 /* Frameworks */,
@@ -161,9 +193,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 78D5031C2551FCCE00966553 /* Build configuration list for PBXNativeTarget "AEPTargetTests" */;
 			buildPhases = (
+				D6ACCCE746C497780D89F4BA /* [CP] Check Pods Manifest.lock */,
 				78D5030A2551FCCE00966553 /* Sources */,
 				78D5030B2551FCCE00966553 /* Frameworks */,
 				78D5030C2551FCCE00966553 /* Resources */,
+				7411B22D8D5367E4FA093D90 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -232,6 +266,70 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		7411B22D8D5367E4FA093D90 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AEPTargetTests/Pods-AEPTargetTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AEPTargetTests/Pods-AEPTargetTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AEPTargetTests/Pods-AEPTargetTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CF1873A1F1BC72F150A33E08 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-AEPTarget-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D6ACCCE746C497780D89F4BA /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-AEPTargetTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		78D503012551FCCE00966553 /* Sources */ = {
@@ -410,24 +508,29 @@
 		};
 		78D5031A2551FCCE00966553 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3671A71DAF9162A75F5E800D /* Pods-AEPTarget.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = FKGEE875K4;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = AEPTarget/Info.plist;
+				INFOPLIST_FILE = AEPTarget/Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.AEPTarget;
+				MARKETING_VERSION = 3.0.0.beta.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.aep.userprofile;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -436,24 +539,29 @@
 		};
 		78D5031B2551FCCE00966553 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7092FE32FA9BACC75551FF6E /* Pods-AEPTarget.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = FKGEE875K4;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = AEPTarget/Info.plist;
+				INFOPLIST_FILE = AEPTarget/Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.AEPTarget;
+				MARKETING_VERSION = 3.0.0.beta.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.aep.userprofile;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -461,11 +569,13 @@
 		};
 		78D5031D2551FCCE00966553 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A61A47AC801172A974D0DB0A /* Pods-AEPTargetTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FKGEE875K4;
-				INFOPLIST_FILE = AEPTargetTests/Info.plist;
+				INFOPLIST_FILE = AEPTarget/Tests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -480,11 +590,13 @@
 		};
 		78D5031E2551FCCE00966553 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 068533BC674EC6281D083442 /* Pods-AEPTargetTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FKGEE875K4;
-				INFOPLIST_FILE = AEPTargetTests/Info.plist;
+				INFOPLIST_FILE = AEPTarget/Tests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
