@@ -50,11 +50,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		788513FC2552087A008E6999 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				78D503082551FCCE00966553 /* AEPTarget.h */,
+				78D503092551FCCE00966553 /* Info.plist */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
 		78D502FB2551FCCE00966553 = {
 			isa = PBXGroup;
 			children = (
 				78D503072551FCCE00966553 /* AEPTarget */,
-				78D503122551FCCE00966553 /* AEPTargetTests */,
+				78D503122551FCCE00966553 /* Tests */,
 				78D503062551FCCE00966553 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -71,19 +80,19 @@
 		78D503072551FCCE00966553 /* AEPTarget */ = {
 			isa = PBXGroup;
 			children = (
-				78D503082551FCCE00966553 /* AEPTarget.h */,
-				78D503092551FCCE00966553 /* Info.plist */,
+				788513FC2552087A008E6999 /* Sources */,
 			);
 			path = AEPTarget;
 			sourceTree = "<group>";
 		};
-		78D503122551FCCE00966553 /* AEPTargetTests */ = {
+		78D503122551FCCE00966553 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 				78D503132551FCCE00966553 /* AEPTargetTests.swift */,
 				78D503152551FCCE00966553 /* Info.plist */,
 			);
-			path = AEPTargetTests;
+			name = Tests;
+			path = AEPTarget/Tests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
