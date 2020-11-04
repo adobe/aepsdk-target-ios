@@ -6,13 +6,37 @@
 	objectVersion = 50;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		7885140A25531A41008E6999 /* AEPTargetXCFramework */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 7885140B25531A41008E6999 /* Build configuration list for PBXAggregateTarget "AEPTargetXCFramework" */;
+			buildPhases = (
+			);
+			dependencies = (
+				7885141225531A4B008E6999 /* PBXTargetDependency */,
+			);
+			name = AEPTargetXCFramework;
+			productName = AEPTargetXCFramework;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
+		7885141425532281008E6999 /* Target.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7885141325532281008E6999 /* Target.swift */; };
+		78851419255322CB008E6999 /* Target+PublicAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78851418255322CB008E6999 /* Target+PublicAPI.swift */; };
+		7885141E255322D9008E6999 /* Event+Target.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7885141D255322D9008E6999 /* Event+Target.swift */; };
 		78D5030F2551FCCE00966553 /* AEPTarget.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 78D503052551FCCE00966553 /* AEPTarget.framework */; };
 		78D503142551FCCE00966553 /* AEPTargetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D503132551FCCE00966553 /* AEPTargetTests.swift */; };
 		78D503162551FCCE00966553 /* AEPTarget.h in Headers */ = {isa = PBXBuildFile; fileRef = 78D503082551FCCE00966553 /* AEPTarget.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		7885141125531A4B008E6999 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 78D502FC2551FCCE00966553 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 78D503042551FCCE00966553;
+			remoteInfo = AEPTarget;
+		};
 		78D503102551FCCE00966553 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 78D502FC2551FCCE00966553 /* Project object */;
@@ -23,6 +47,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7885141325532281008E6999 /* Target.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Target.swift; sourceTree = "<group>"; };
+		78851418255322CB008E6999 /* Target+PublicAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Target+PublicAPI.swift"; sourceTree = "<group>"; };
+		7885141D255322D9008E6999 /* Event+Target.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Event+Target.swift"; sourceTree = "<group>"; };
 		78D503052551FCCE00966553 /* AEPTarget.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AEPTarget.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		78D503082551FCCE00966553 /* AEPTarget.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AEPTarget.h; sourceTree = "<group>"; };
 		78D503092551FCCE00966553 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -55,6 +82,9 @@
 			children = (
 				78D503082551FCCE00966553 /* AEPTarget.h */,
 				78D503092551FCCE00966553 /* Info.plist */,
+				7885141325532281008E6999 /* Target.swift */,
+				78851418255322CB008E6999 /* Target+PublicAPI.swift */,
+				7885141D255322D9008E6999 /* Event+Target.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -154,8 +184,12 @@
 				LastSwiftUpdateCheck = 1210;
 				LastUpgradeCheck = 1210;
 				TargetAttributes = {
+					7885140A25531A41008E6999 = {
+						CreatedOnToolsVersion = 12.1;
+					};
 					78D503042551FCCE00966553 = {
 						CreatedOnToolsVersion = 12.1;
+						LastSwiftMigration = 1210;
 					};
 					78D5030D2551FCCE00966553 = {
 						CreatedOnToolsVersion = 12.1;
@@ -177,6 +211,7 @@
 			targets = (
 				78D503042551FCCE00966553 /* AEPTarget */,
 				78D5030D2551FCCE00966553 /* AEPTargetTests */,
+				7885140A25531A41008E6999 /* AEPTargetXCFramework */,
 			);
 		};
 /* End PBXProject section */
@@ -203,6 +238,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				78851419255322CB008E6999 /* Target+PublicAPI.swift in Sources */,
+				7885141425532281008E6999 /* Target.swift in Sources */,
+				7885141E255322D9008E6999 /* Event+Target.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -217,6 +255,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		7885141225531A4B008E6999 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 78D503042551FCCE00966553 /* AEPTarget */;
+			targetProxy = 7885141125531A4B008E6999 /* PBXContainerItemProxy */;
+		};
 		78D503112551FCCE00966553 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 78D503042551FCCE00966553 /* AEPTarget */;
@@ -225,6 +268,24 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		7885140C25531A41008E6999 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = FKGEE875K4;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		7885140D25531A41008E6999 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = FKGEE875K4;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		78D503172551FCCE00966553 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -350,6 +411,7 @@
 		78D5031A2551FCCE00966553 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = FKGEE875K4;
@@ -366,6 +428,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.AEPTarget;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -374,6 +437,7 @@
 		78D5031B2551FCCE00966553 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = FKGEE875K4;
@@ -398,6 +462,7 @@
 		78D5031D2551FCCE00966553 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FKGEE875K4;
 				INFOPLIST_FILE = AEPTargetTests/Info.plist;
@@ -416,6 +481,7 @@
 		78D5031E2551FCCE00966553 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FKGEE875K4;
 				INFOPLIST_FILE = AEPTargetTests/Info.plist;
@@ -434,6 +500,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		7885140B25531A41008E6999 /* Build configuration list for PBXAggregateTarget "AEPTargetXCFramework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7885140C25531A41008E6999 /* Debug */,
+				7885140D25531A41008E6999 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		78D502FF2551FCCE00966553 /* Build configuration list for PBXProject "AEPTarget" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
