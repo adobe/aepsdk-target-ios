@@ -28,6 +28,12 @@
 		78D5030F2551FCCE00966553 /* AEPTarget.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 78D503052551FCCE00966553 /* AEPTarget.framework */; };
 		78D503142551FCCE00966553 /* AEPTargetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D503132551FCCE00966553 /* AEPTargetTests.swift */; };
 		78D503162551FCCE00966553 /* AEPTarget.h in Headers */ = {isa = PBXBuildFile; fileRef = 78D503082551FCCE00966553 /* AEPTarget.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BB47C0082554771800EC6FB5 /* TargetConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00625546E0500EC6FB5 /* TargetConstants.swift */; };
+		BB47C00A25547A2E00EC6FB5 /* TargetParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00925547A2E00EC6FB5 /* TargetParameters.swift */; };
+		BB47C00C25547BE800EC6FB5 /* TargetPrefetchObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00B25547BE800EC6FB5 /* TargetPrefetchObject.swift */; };
+		BB47C00E25547D6400EC6FB5 /* TargetOrder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00D25547D6400EC6FB5 /* TargetOrder.swift */; };
+		BB47C01025547D8300EC6FB5 /* TargetProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00F25547D8300EC6FB5 /* TargetProduct.swift */; };
+		BB47C01225547DAE00EC6FB5 /* TargetRequestObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C01125547DAE00EC6FB5 /* TargetRequestObject.swift */; };
 		EDAF82AE58875F53935DA352 /* Pods_AEPTargetTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE18F68D21AC04DBA3C71C11 /* Pods_AEPTargetTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -63,6 +69,12 @@
 		78D503152551FCCE00966553 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A61A47AC801172A974D0DB0A /* Pods-AEPTargetTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPTargetTests.debug.xcconfig"; path = "Target Support Files/Pods-AEPTargetTests/Pods-AEPTargetTests.debug.xcconfig"; sourceTree = "<group>"; };
 		AE18F68D21AC04DBA3C71C11 /* Pods_AEPTargetTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AEPTargetTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB47C00625546E0500EC6FB5 /* TargetConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetConstants.swift; sourceTree = "<group>"; };
+		BB47C00925547A2E00EC6FB5 /* TargetParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetParameters.swift; sourceTree = "<group>"; };
+		BB47C00B25547BE800EC6FB5 /* TargetPrefetchObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetPrefetchObject.swift; sourceTree = "<group>"; };
+		BB47C00D25547D6400EC6FB5 /* TargetOrder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetOrder.swift; sourceTree = "<group>"; };
+		BB47C00F25547D8300EC6FB5 /* TargetProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetProduct.swift; sourceTree = "<group>"; };
+		BB47C01125547DAE00EC6FB5 /* TargetRequestObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetRequestObject.swift; sourceTree = "<group>"; };
 		C25D5A6C26809EA683183C03 /* Pods_AEPTarget.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AEPTarget.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -106,6 +118,12 @@
 				7885141325532281008E6999 /* Target.swift */,
 				78851418255322CB008E6999 /* Target+PublicAPI.swift */,
 				7885141D255322D9008E6999 /* Event+Target.swift */,
+				BB47C00625546E0500EC6FB5 /* TargetConstants.swift */,
+				BB47C00925547A2E00EC6FB5 /* TargetParameters.swift */,
+				BB47C00B25547BE800EC6FB5 /* TargetPrefetchObject.swift */,
+				BB47C00D25547D6400EC6FB5 /* TargetOrder.swift */,
+				BB47C00F25547D8300EC6FB5 /* TargetProduct.swift */,
+				BB47C01125547DAE00EC6FB5 /* TargetRequestObject.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -179,6 +197,7 @@
 				78D503012551FCCE00966553 /* Sources */,
 				78D503022551FCCE00966553 /* Frameworks */,
 				78D503032551FCCE00966553 /* Resources */,
+				BB47C01325547E6800EC6FB5 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -285,6 +304,23 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AEPTargetTests/Pods-AEPTargetTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		BB47C01325547E6800EC6FB5 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/zsh;
+			shellScript = "cd ${PROJECT_DIR}\nif which swiftformat >/dev/null; then\n   swiftformat .\nelse\necho \"error: SwiftFormat not installed, download from https://github.com/nicklockwood/SwiftFormat\"\nfi\n";
+		};
 		CF1873A1F1BC72F150A33E08 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -336,8 +372,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB47C00A25547A2E00EC6FB5 /* TargetParameters.swift in Sources */,
+				BB47C00C25547BE800EC6FB5 /* TargetPrefetchObject.swift in Sources */,
+				BB47C00E25547D6400EC6FB5 /* TargetOrder.swift in Sources */,
+				BB47C0082554771800EC6FB5 /* TargetConstants.swift in Sources */,
 				78851419255322CB008E6999 /* Target+PublicAPI.swift in Sources */,
+				BB47C01025547D8300EC6FB5 /* TargetProduct.swift in Sources */,
 				7885141425532281008E6999 /* Target.swift in Sources */,
+				BB47C01225547DAE00EC6FB5 /* TargetRequestObject.swift in Sources */,
 				7885141E255322D9008E6999 /* Event+Target.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
