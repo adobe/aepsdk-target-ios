@@ -12,4 +12,4 @@
 import Foundation
 
 @objc(AEPTargetPrefetchObject)
-public class TargetPrefetchObject: NSObject {}
+public class TargetPrefetch: NSObject {}

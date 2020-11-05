@@ -30,10 +30,10 @@
 		78D503162551FCCE00966553 /* AEPTarget.h in Headers */ = {isa = PBXBuildFile; fileRef = 78D503082551FCCE00966553 /* AEPTarget.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB47C0082554771800EC6FB5 /* TargetConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00625546E0500EC6FB5 /* TargetConstants.swift */; };
 		BB47C00A25547A2E00EC6FB5 /* TargetParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00925547A2E00EC6FB5 /* TargetParameters.swift */; };
-		BB47C00C25547BE800EC6FB5 /* TargetPrefetchObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00B25547BE800EC6FB5 /* TargetPrefetchObject.swift */; };
+		BB47C00C25547BE800EC6FB5 /* TargetPrefetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00B25547BE800EC6FB5 /* TargetPrefetch.swift */; };
 		BB47C00E25547D6400EC6FB5 /* TargetOrder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00D25547D6400EC6FB5 /* TargetOrder.swift */; };
 		BB47C01025547D8300EC6FB5 /* TargetProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00F25547D8300EC6FB5 /* TargetProduct.swift */; };
-		BB47C01225547DAE00EC6FB5 /* TargetRequestObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C01125547DAE00EC6FB5 /* TargetRequestObject.swift */; };
+		BB47C01225547DAE00EC6FB5 /* TargetRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C01125547DAE00EC6FB5 /* TargetRequest.swift */; };
 		EDAF82AE58875F53935DA352 /* Pods_AEPTargetTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE18F68D21AC04DBA3C71C11 /* Pods_AEPTargetTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -71,10 +71,10 @@
 		AE18F68D21AC04DBA3C71C11 /* Pods_AEPTargetTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AEPTargetTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB47C00625546E0500EC6FB5 /* TargetConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetConstants.swift; sourceTree = "<group>"; };
 		BB47C00925547A2E00EC6FB5 /* TargetParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetParameters.swift; sourceTree = "<group>"; };
-		BB47C00B25547BE800EC6FB5 /* TargetPrefetchObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetPrefetchObject.swift; sourceTree = "<group>"; };
+		BB47C00B25547BE800EC6FB5 /* TargetPrefetch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetPrefetch.swift; sourceTree = "<group>"; };
 		BB47C00D25547D6400EC6FB5 /* TargetOrder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetOrder.swift; sourceTree = "<group>"; };
 		BB47C00F25547D8300EC6FB5 /* TargetProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetProduct.swift; sourceTree = "<group>"; };
-		BB47C01125547DAE00EC6FB5 /* TargetRequestObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetRequestObject.swift; sourceTree = "<group>"; };
+		BB47C01125547DAE00EC6FB5 /* TargetRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetRequest.swift; sourceTree = "<group>"; };
 		C25D5A6C26809EA683183C03 /* Pods_AEPTarget.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AEPTarget.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -120,10 +120,10 @@
 				7885141D255322D9008E6999 /* Event+Target.swift */,
 				BB47C00625546E0500EC6FB5 /* TargetConstants.swift */,
 				BB47C00925547A2E00EC6FB5 /* TargetParameters.swift */,
-				BB47C00B25547BE800EC6FB5 /* TargetPrefetchObject.swift */,
+				BB47C00B25547BE800EC6FB5 /* TargetPrefetch.swift */,
 				BB47C00D25547D6400EC6FB5 /* TargetOrder.swift */,
 				BB47C00F25547D8300EC6FB5 /* TargetProduct.swift */,
-				BB47C01125547DAE00EC6FB5 /* TargetRequestObject.swift */,
+				BB47C01125547DAE00EC6FB5 /* TargetRequest.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -373,13 +373,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB47C00A25547A2E00EC6FB5 /* TargetParameters.swift in Sources */,
-				BB47C00C25547BE800EC6FB5 /* TargetPrefetchObject.swift in Sources */,
+				BB47C00C25547BE800EC6FB5 /* TargetPrefetch.swift in Sources */,
 				BB47C00E25547D6400EC6FB5 /* TargetOrder.swift in Sources */,
 				BB47C0082554771800EC6FB5 /* TargetConstants.swift in Sources */,
 				78851419255322CB008E6999 /* Target+PublicAPI.swift in Sources */,
 				BB47C01025547D8300EC6FB5 /* TargetProduct.swift in Sources */,
 				7885141425532281008E6999 /* Target.swift in Sources */,
-				BB47C01225547DAE00EC6FB5 /* TargetRequestObject.swift in Sources */,
+				BB47C01225547DAE00EC6FB5 /* TargetRequest.swift in Sources */,
 				7885141E255322D9008E6999 /* Event+Target.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

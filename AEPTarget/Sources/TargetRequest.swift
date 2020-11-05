@@ -12,4 +12,4 @@
 import Foundation
 
 @objc(AEPTargetRequestObject)
-public class TargetRequestObject: NSObject {}
+public class TargetRequest: NSObject {}

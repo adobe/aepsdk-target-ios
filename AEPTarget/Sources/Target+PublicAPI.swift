@@ -25,7 +25,7 @@ import Foundation
     ///   - prefetchObjectArray: an array of ACPTargetPrefetchObject representing the desired mboxes to prefetch
     ///   - targetParameters: a TargetParameters object containing parameters for all the mboxes in the request array
     ///   - completion: the callback `closure` which will be called after the prefetch is complete.  The error parameter in the callback will be nil if the prefetch completed successfully, or will contain error message otherwise
-    static func prefetchContent(prefetchObjectArray _: [TargetPrefetchObject], targetParameters: TargetParameters, completion _: @escaping (AEPError) -> Void) {
+    static func prefetchContent(prefetchObjectArray _: [TargetPrefetch], targetParameters: TargetParameters, completion _: @escaping (AEPError) -> Void) {
         // TODO: need to verify input parameters
         // TODO: need to convert "targetParameters" to [String:Any] array
         let eventData = [TargetConstants.EventDataKeys.TARGET_PARAMETERS: targetParameters]
@@ -43,7 +43,7 @@ import Foundation
     /// - Parameters:
     ///   - requests:  An array of ACPTargetRequestObject objects to retrieve content
     ///   - targetParameters: a TargetParameters object containing parameters for all locations in the requests array
-    static func retrieveLocationContent(requests: [TargetRequestObject], targetParameters: TargetParameters) {
+    static func retrieveLocationContent(requests: [TargetRequest], targetParameters: TargetParameters) {
         // TODO: need to verify input parameters
         // TODO: need to convert "requests" to [String:Any] array
         let eventData = [TargetConstants.EventDataKeys.LOAD_REQUESTS: requests, TargetConstants.EventDataKeys.LOAD_REQUESTS: targetParameters] as [String: Any]
@@ -56,9 +56,9 @@ import Foundation
     /// is saved and restored during the standard application backup process, and is removed at uninstall or
     /// when ACPTarget::resetExperience is called.
     /// - Parameter thirdPartyId: a string pointer containing the value of the third party id (custom visitor id)
-    static func setThirdPartyId(thirdPartyId: String) {
+    static func setThirdPartyId(_ id: String) {
         // TODO: need to verify input parameters
-        let eventData = [TargetConstants.EventDataKeys.THIRD_PARTY_ID: thirdPartyId]
+        let eventData = [TargetConstants.EventDataKeys.THIRD_PARTY_ID: id]
         let event = Event(name: TargetConstants.EventName.REQUEST_IDENTITY, type: EventType.target, source: EventSource.requestIdentity, data: eventData)
         MobileCore.dispatch(event: event)
     }
@@ -106,7 +106,7 @@ import Foundation
     /// Sets the Target preview restart deep link.
     /// Set the Target preview URL to be displayed when the preview mode is restarted.
     /// - Parameter deeplink:  the URL which will be set for preview restart
-    static func setPreviewRestartDeepLink(deeplink: URL) {
+    static func setPreviewRestartDeepLink(_ deeplink: URL) {
         // TODO: need to verify input parameters
         let eventData = [TargetConstants.EventDataKeys.PREVIEW_RESTART_DEEP_LINK: deeplink.absoluteString]
         let event = Event(name: TargetConstants.EventName.SET_PREVIEW_DEEPLINK, type: EventType.target, source: EventSource.requestContent, data: eventData)
