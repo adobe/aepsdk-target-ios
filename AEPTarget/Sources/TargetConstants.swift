@@ -43,5 +43,20 @@ enum TargetConstants {
         static let ORDER_PARAMETERS = "orderparameters"
         static let PRODUCT_PARAMETERS = "productparameters"
         static let PROFILE_PARAMETERS = "profileparams"
+        static let PREVIEW_INITIATED = "ispreviewinitiated"
+    }
+
+    enum PreviewManager {
+        static let PREVIEW_TOKEN = "at_preview_token"
+        static let PREVIEW_PARAMETERS = "at_preview_params"
+        static let PREVIEW_ENDPOINT = "at_preview_endpoint"
+        static let DEEPLINK_SCHEME = "adbinapp"
+        static let DEEPLINK_SCHEME_PATH_CANCEL = "cancel"
+        static let DEEPLINK_SCHEME_PATH_CONFIRM = "confirm"
+        static let DEFAULT_TARGET_PREVIEW_ENDPOINT = "hal.testandtarget.omniture.com"
+    }
+
+    enum NetworkConnection {
+        static let DEFAULT_CONNECTION_TIMEOUT_SEC = TimeInterval(5)
     }
 }
