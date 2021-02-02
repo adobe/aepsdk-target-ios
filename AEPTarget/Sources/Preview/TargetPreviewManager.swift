@@ -164,7 +164,9 @@ class TargetPreviewManager: PreviewManager {
     }
 
     ///
+
     // MARK: - Private helper functions and variables
+
     ///
 
     ///

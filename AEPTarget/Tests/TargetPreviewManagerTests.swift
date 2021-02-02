@@ -33,9 +33,11 @@ class TargetPreviewManagerTests: XCTestCase {
     }
 
     ///
+
     // MARK: - EnterPreviewModeWithDeepLink tests
+
     ///
-    
+
     ///
     /// Tests enterPreviewModeWithDeepLink's happy path
     /// Sets up preview floating button, preview token is set in state, fetchwebview is called with network request
@@ -121,12 +123,13 @@ class TargetPreviewManagerTests: XCTestCase {
         XCTAssertEqual(networkRequest?.connectTimeout, 5)
         XCTAssertTrue(mockNetworkService.connectAsyncCalled)
     }
-    
 
     ///
+
     // MARK: - fetchWebView tests
+
     ///
-    
+
     /// Tests fetchWebView happy path (targetPreviewRequest url is set up, network request is successful)
     /// fullscreen message is shown
     ///
@@ -165,9 +168,11 @@ class TargetPreviewManagerTests: XCTestCase {
         wait(for: [expectation], timeout: 0.5)
         XCTAssertFalse(mockUIDelegate.onShowCalled)
     }
-    
+
     ///
+
     // MARK: - PreviewConfirmedWithUrl Tests
+
     ///
 
     ///
@@ -267,7 +272,9 @@ class TargetPreviewManagerTests: XCTestCase {
     }
 
     ///
+
     // MARK: - Helper functions
+
     ///
     private func setupPreviewMode() {
         let testDeeplink = URL(string: "test://path?at_preview_token=abcd&key1=val1")
