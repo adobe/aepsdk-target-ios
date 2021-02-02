@@ -12,6 +12,9 @@
 
 import AEPServices
 
+///
+/// TargetPreviewManager FloatinButtonDelegate meant to handle FloatingButtonDelegate calls relevant to the TargetPreviewManager
+///
 extension TargetPreviewManager: FloatingButtonDelegate {
     func onShow() {}
 
