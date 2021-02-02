@@ -13,6 +13,9 @@
 import AEPCore
 import AEPServices
 
+///
+/// Preview Manager Manages Target Preview Modes
+///
 protocol PreviewManager {
     ///
     /// Starts the preview mode by parsing the prewview deep link, fetching the webview from target, displaying the preview button and creating a new custom message for the preview view
