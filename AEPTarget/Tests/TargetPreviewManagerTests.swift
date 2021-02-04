@@ -98,6 +98,26 @@ class TargetPreviewManagerTests: XCTestCase {
     }
 
     ///
+    /// Tests enterPreviewModeWithDeepLink without a token in the url
+    /// No preview button is set up, no web view is fetched, and previewParameters should be nil
+    ///
+    func testEnterPreviewModeWithDeepLinkEmptyToken() {
+        guard let urlWithEmptyTokenQuery = URL(string: "https://test?query1=abc&at_preview_token=") else {
+            XCTFail()
+            return
+        }
+        let mockButton = MockFloatingButton()
+        mockUIService.floatingButton = mockButton
+        targetPreviewManager.enterPreviewModeWithDeepLink(clientCode: TargetTestConstants.TEST_CLIENT_CODE, deepLink: urlWithEmptyTokenQuery)
+
+        XCTAssertFalse(mockUIService.createFloatingButtonCalled)
+        XCTAssertFalse(mockButton.showCalled)
+        XCTAssertFalse(mockNetworkService.connectAsyncCalled)
+        XCTAssertNil(mockNetworkService.connectAsyncCalledWithNetworkRequest)
+        XCTAssertNil(targetPreviewManager.previewParameters)
+    }
+
+    ///
     /// Tests enterPreviewModeWithDeepLink with a custom endpoint
     /// Sets up preview floating button, preview token is set in state, fetchwebview is called with network request, and new endpoint is used
     ///

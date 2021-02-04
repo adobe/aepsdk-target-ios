@@ -18,20 +18,20 @@ import AEPServices
 ///
 extension TargetPreviewManager: FullscreenMessageDelegate {
     func onShow(message _: FullscreenMessage) {
-        Log.debug(label: logPrefix, "onShow - Target preview message was displayed")
+        Log.debug(label: LOG_TAG, "onShow - Target preview message was displayed")
     }
 
     func onDismiss(message _: FullscreenMessage) {
-        Log.debug(label: logPrefix, "onDismiss - Target preview message was dismissed")
+        Log.debug(label: LOG_TAG, "onDismiss - Target preview message was dismissed")
     }
 
     func overrideUrlLoad(message: FullscreenMessage, url: String?) -> Bool {
         guard let url = URL(string: url ?? "") else {
-            Log.warning(label: logPrefix, "overrideUrlLoad - URL string was invalid")
+            Log.warning(label: LOG_TAG, "overrideUrlLoad - URL string was invalid")
             return false
         }
 
-        Log.debug(label: logPrefix, "overrideUrlLoad - Target preview override url received: \(url)")
+        Log.debug(label: LOG_TAG, "overrideUrlLoad - Target preview override url received: \(url)")
 
         return previewConfirmedWithUrl(url, message: message, previewLifecycleEventDispatcher: { event in
             MobileCore.dispatch(event: event)

@@ -28,7 +28,7 @@ struct TargetPreviewState {
 class TargetPreviewManager: PreviewManager {
     private var state = TargetPreviewState()
 
-    private static let LOG_TAG = "TargetPreviewManager"
+    let LOG_TAG = "TargetPreviewManager"
     typealias previewManagerConstants = TargetConstants.PreviewManager
     typealias httpResponseConstants = HttpConnectionConstants.ResponseCodes
     typealias httpHeaderConstants = HttpConnectionConstants.Header
@@ -48,16 +48,16 @@ class TargetPreviewManager: PreviewManager {
         state.clientCode = clientCode
 
         if deepLink.absoluteString.isEmpty {
-            Log.debug(label: logPrefix, "Unable to enter preview mode with empty/invalid url")
+            Log.debug(label: LOG_TAG, "Unable to enter preview mode with empty/invalid url")
             return
         }
         guard let queryItemsDict = deepLink.queryItemsDict else {
-            Log.debug(label: logPrefix, "Unable to enter preview mode, URL has no query items")
+            Log.debug(label: LOG_TAG, "Unable to enter preview mode, URL has no query items")
             return
         }
 
-        guard queryItemsDict[previewManagerConstants.PREVIEW_TOKEN] != nil else {
-            Log.debug(label: logPrefix, "Unable to enter preview mode without preview token")
+        guard let token = queryItemsDict[previewManagerConstants.PREVIEW_TOKEN], !token.isEmpty else {
+            Log.debug(label: LOG_TAG, "Unable to enter preview mode without preview token")
             return
         }
 
@@ -81,12 +81,12 @@ class TargetPreviewManager: PreviewManager {
 
     func previewConfirmedWithUrl(_ url: URL, message: FullscreenPresentable, previewLifecycleEventDispatcher: (Event) -> Void) -> Bool {
         guard state.previewButton != nil else {
-            Log.debug(label: logPrefix, "Preview button is nil")
+            Log.debug(label: LOG_TAG, "Preview button is nil")
             return false
         }
 
         guard let deepLinkScheme = url.deepLinkScheme else {
-            Log.debug(label: logPrefix, "Deeplink scheme does not match")
+            Log.debug(label: LOG_TAG, "Deeplink scheme does not match")
             return false
         }
 
@@ -115,17 +115,17 @@ class TargetPreviewManager: PreviewManager {
 
     func fetchWebView() {
         if state.fetchingWebView {
-            Log.debug(label: logPrefix, "Fetching web view already in progress")
+            Log.debug(label: LOG_TAG, "Fetching web view already in progress")
             return
         }
 
         state.fetchingWebView = true
         guard let targetUrl = targetPreviewRequestUrl else {
-            Log.debug(label: logPrefix, "Target preview request url was nil")
+            Log.debug(label: LOG_TAG, "Target preview request url was nil")
             return
         }
 
-        Log.debug(label: logPrefix, "Sending preview request to url: \(targetUrl.absoluteString)")
+        Log.debug(label: LOG_TAG, "Sending preview request to url: \(targetUrl.absoluteString)")
 
         var requestHeaders: [String: String] = [:]
         requestHeaders[httpHeaderConstants.HTTP_HEADER_KEY_ACCEPT] = httpHeaderConstants.HTTP_HEADER_ACCEPT_TEXT_HTML
@@ -134,13 +134,13 @@ class TargetPreviewManager: PreviewManager {
         networkService.connectAsync(networkRequest: networkRequest, completionHandler: { [weak self] httpConnection in
             guard let self = self else { return }
             guard let responseString = httpConnection.responseString, !responseString.isEmpty else {
-                Log.warning(label: self.logPrefix, "Failed to fetch preview webview with connection status \(String(httpConnection.responseCode ?? 0)), response string was nil or empty")
+                Log.warning(label: self.LOG_TAG, "Failed to fetch preview webview with connection status \(String(httpConnection.responseCode ?? 0)), response string was nil or empty")
                 self.state.fetchingWebView = false
                 return
             }
             if httpConnection.responseCode == httpResponseConstants.HTTP_OK {
                 self.state.webViewHtml = responseString
-                Log.debug(label: self.logPrefix, "Successfully fetched webview for preview mode, response body \(responseString)")
+                Log.debug(label: self.LOG_TAG, "Successfully fetched webview for preview mode, response body \(responseString)")
                 self.createAndShowMessage()
             }
             self.state.fetchingWebView = false
@@ -170,7 +170,7 @@ class TargetPreviewManager: PreviewManager {
     ///
     private func createAndShowMessage() {
         guard let webViewHtml = state.webViewHtml else {
-            Log.debug(label: logPrefix, "Unable to create fullscreen message, webhtml is nil")
+            Log.debug(label: LOG_TAG, "Unable to create fullscreen message, webhtml is nil")
             return
         }
 
@@ -204,7 +204,7 @@ class TargetPreviewManager: PreviewManager {
     ///
     private func setupTargetPreviewFloatingButton() {
         if state.previewButton != nil {
-            Log.debug(label: logPrefix, "Setting up the Target preview floating button failed. Preview button already exists")
+            Log.debug(label: LOG_TAG, "Setting up the Target preview floating button failed. Preview button already exists")
             return
         }
 
@@ -222,7 +222,7 @@ class TargetPreviewManager: PreviewManager {
         if let endpoint = parameters[previewManagerConstants.PREVIEW_ENDPOINT] {
             state.endpoint = endpoint.removingPercentEncoding
         } else {
-            Log.debug(label: logPrefix, "Using the default preview endpoint")
+            Log.debug(label: LOG_TAG, "Using the default preview endpoint")
             state.endpoint = previewManagerConstants.DEFAULT_TARGET_PREVIEW_ENDPOINT
         }
     }
