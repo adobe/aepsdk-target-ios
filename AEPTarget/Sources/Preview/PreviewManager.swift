@@ -14,11 +14,11 @@ import AEPCore
 import AEPServices
 
 ///
-/// Preview Manager Manages Target Preview Modes
+/// Preview Manager manages Target Preview Modes
 ///
 protocol PreviewManager {
     ///
-    /// Starts the preview mode by parsing the prewview deep link, fetching the webview from target, displaying the preview button and creating a new custom message for the preview view
+    /// Starts the preview mode by parsing the preview deep link, fetching the webview from target, displaying the preview button and creating a new custom message for the preview view
     /// - Parameters:
     ///     - clientCode: The client code as a `String`
     ///     - deepLink: The deep link `URL`
@@ -41,7 +41,7 @@ protocol PreviewManager {
 
     ///
     /// If there is no other fetching in progress, it initiates a new async request to target.
-    /// If the connection is successfull and a valid response is received, a full screen message will be created and displayed.
+    /// If the connection is successful and a valid response is received, a full screen message will be created and displayed.
     /// This method will be called for preview deeplinks or preview button tap detection
     ///
     func fetchWebView()
@@ -54,7 +54,7 @@ protocol PreviewManager {
 
     ///
     /// The current preview parameters representing the json received from target servers as a string, or
-    /// empty string if preview mode was reset
+    /// nil if preview mode was reset or not started
     ///
     var previewParameters: String? { get }
 

@@ -28,7 +28,7 @@ struct TargetPreviewState {
 class TargetPreviewManager: PreviewManager {
     private var state = TargetPreviewState()
 
-    let logPrefix = TargetConstants.LOG_PREFIX
+    private static let LOG_TAG = "TargetPreviewManager"
     typealias previewManagerConstants = TargetConstants.PreviewManager
     typealias httpResponseConstants = HttpConnectionConstants.ResponseCodes
     typealias httpHeaderConstants = HttpConnectionConstants.Header
