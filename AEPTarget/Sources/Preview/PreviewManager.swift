@@ -37,7 +37,7 @@ protocol PreviewManager {
     ///     - url: `URL` to be processed
     ///     - message: The `FullScreenMessage` to be displayed
     ///     - previewLifecycleEventDispatcher: The event dispatcher closure which handles the preview lifecycle event dispatching
-    func previewConfirmedWithUrl(_ url: URL, message: FullscreenMessage, previewLifecycleEventDispatcher: (Event) -> Void) -> Bool
+    func previewConfirmedWithUrl(_ url: URL, message: FullscreenPresentable, previewLifecycleEventDispatcher: (Event) -> Void) -> Bool
 
     ///
     /// If there is no other fetching in progress, it initiates a new async request to target.

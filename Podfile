@@ -8,13 +8,13 @@ workspace 'AEPTarget'
 project 'AEPTarget.xcodeproj'
 
 target 'AEPTarget' do
-  pod 'AEPCore', :git => 'https://github.com/ravjain-adb/aepsdk-core-ios.git', :branch => 'AddFloatingButton'
-  pod 'AEPServices', :git => 'https://github.com/ravjain-adb/aepsdk-core-ios.git', :branch => 'AddFloatingButton'
+  pod 'AEPCore', :git => 'https://github.com/cdhoffmann/aepsdk-core-ios.git', :branch => 'showableDismissable'
+  pod 'AEPServices', :git => 'https://github.com/cdhoffmann/aepsdk-core-ios.git', :branch => 'showableDismissable'
   pod 'AEPRulesEngine', :git => 'https://github.com/adobe/aepsdk-rulesengine-ios.git', :branch => 'main'
 end
 
 target 'AEPTargetTests' do
-  pod 'AEPCore', :git => 'https://github.com/ravjain-adb/aepsdk-core-ios.git', :branch => 'AddFloatingButton'
-  pod 'AEPServices', :git => 'https://github.com/ravjain-adb/aepsdk-core-ios.git', :branch => 'AddFloatingButton'
+  pod 'AEPCore', :git => 'https://github.com/cdhoffmann/aepsdk-core-ios.git', :branch => 'showableDismissable'
+  pod 'AEPServices', :git => 'https://github.com/cdhoffmann/aepsdk-core-ios.git', :branch => 'showableDismissable'
   pod 'AEPRulesEngine', :git => 'https://github.com/adobe/aepsdk-rulesengine-ios.git', :branch => 'main'
 end

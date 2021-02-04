@@ -14,7 +14,7 @@ import AEPCore
 import AEPServices
 
 ///
-/// TargetPreviewManager FullscreenMessageDelegate meant to handle
+/// TargetPreviewManager FullscreenMessageDelegate meant to handle FullscreenMessage delegate calls
 ///
 extension TargetPreviewManager: FullscreenMessageDelegate {
     func onShow(message _: FullscreenMessage) {

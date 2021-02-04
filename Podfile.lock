@@ -6,37 +6,37 @@ PODS:
   - AEPServices (3.0.0)
 
 DEPENDENCIES:
-  - AEPCore (from `https://github.com/ravjain-adb/aepsdk-core-ios.git`, branch `AddFloatingButton`)
+  - AEPCore (from `https://github.com/cdhoffmann/aepsdk-core-ios.git`, branch `showableDismissable`)
   - AEPRulesEngine (from `https://github.com/adobe/aepsdk-rulesengine-ios.git`, branch `main`)
-  - AEPServices (from `https://github.com/ravjain-adb/aepsdk-core-ios.git`, branch `AddFloatingButton`)
+  - AEPServices (from `https://github.com/cdhoffmann/aepsdk-core-ios.git`, branch `showableDismissable`)
 
 EXTERNAL SOURCES:
   AEPCore:
-    :branch: AddFloatingButton
-    :git: https://github.com/ravjain-adb/aepsdk-core-ios.git
+    :branch: showableDismissable
+    :git: https://github.com/cdhoffmann/aepsdk-core-ios.git
   AEPRulesEngine:
     :branch: main
     :git: https://github.com/adobe/aepsdk-rulesengine-ios.git
   AEPServices:
-    :branch: AddFloatingButton
-    :git: https://github.com/ravjain-adb/aepsdk-core-ios.git
+    :branch: showableDismissable
+    :git: https://github.com/cdhoffmann/aepsdk-core-ios.git
 
 CHECKOUT OPTIONS:
   AEPCore:
-    :commit: d5b34217f342ed8e020bb20952086796c2a60c9a
-    :git: https://github.com/ravjain-adb/aepsdk-core-ios.git
+    :commit: 8cef084ee3faddc46ce08acb91e2428c9472dafe
+    :git: https://github.com/cdhoffmann/aepsdk-core-ios.git
   AEPRulesEngine:
     :commit: 1e270654b330b9f07a6b1ec374e686f2e631e039
     :git: https://github.com/adobe/aepsdk-rulesengine-ios.git
   AEPServices:
-    :commit: d5b34217f342ed8e020bb20952086796c2a60c9a
-    :git: https://github.com/ravjain-adb/aepsdk-core-ios.git
+    :commit: 8cef084ee3faddc46ce08acb91e2428c9472dafe
+    :git: https://github.com/cdhoffmann/aepsdk-core-ios.git
 
 SPEC CHECKSUMS:
   AEPCore: 9ced1f1fddcbfd61517461e548e36aee740bf7c8
   AEPRulesEngine: 8bbc694fce6900cd33b2496c7d4b33ee2eeffc46
   AEPServices: 21ea64149483fdfbd5f88f546b9f5ad7d4987400
 
-PODFILE CHECKSUM: e527a41cef22e12cfec1876be609da9c7259e7e9
+PODFILE CHECKSUM: 1cbc8ae49f5583d4503b9ff0c1f90f03acb9a22d
 
 COCOAPODS: 1.10.1

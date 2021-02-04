@@ -19,17 +19,16 @@ class TargetPreviewManagerTests: XCTestCase {
     var target: Target!
     var targetPreviewManager: TargetPreviewManager!
     let mockNetworkService = TargetNetworkServiceMock()
-    let mockUIDelegate = MockPreviewManagerUIDelegate()
     let mockRuntime = TestableExtensionRuntime()
     let mockUrlOpener = MockUrlOpeningService()
+    let mockUIService = MockUIService()
 
     override func setUp() {
         target = Target(runtime: mockRuntime)
         ServiceProvider.shared.networkService = mockNetworkService
         ServiceProvider.shared.urlService = mockUrlOpener
+        ServiceProvider.shared.uiService = mockUIService
         targetPreviewManager = TargetPreviewManager()
-        targetPreviewManager.floatingButtonDelegate = mockUIDelegate
-        targetPreviewManager.fullscreenMessageDelegate = mockUIDelegate
     }
 
     ///
@@ -45,12 +44,12 @@ class TargetPreviewManagerTests: XCTestCase {
     func testEnterPreviewModeWithDeepLinkHappy() {
         let testToken = "abcd"
         let testDeeplink = URL(string: "test://path?at_preview_token=\(testToken)&key1=val1")
+        let mockButton = MockFloatingButton()
+        mockUIService.floatingButton = mockButton
         let expectedEndpointUrl = "https://" + TargetTestConstants.DEFAULT_TARGET_PREVIEW_ENDPOINT + "/ui/admin/" + TargetTestConstants.TEST_CLIENT_CODE + "/preview?token=abcd"
         targetPreviewManager.enterPreviewModeWithDeepLink(clientCode: TargetTestConstants.TEST_CLIENT_CODE, deepLink: testDeeplink!)
-        let expectation = XCTestExpectation(description: "On show button called expectation")
-        mockUIDelegate.onShowButtonExpectation = expectation
-        wait(for: [expectation], timeout: 0.5)
-        XCTAssertTrue(mockUIDelegate.onShowButtonCalled)
+        XCTAssertTrue(mockUIService.createFloatingButtonCalled)
+        XCTAssertTrue(mockButton.showCalled)
         XCTAssertEqual(targetPreviewManager.previewToken, testToken)
         let networkRequest = mockNetworkService.connectAsyncCalledWithNetworkRequest
         XCTAssertEqual(networkRequest?.url.absoluteString, expectedEndpointUrl)
@@ -68,12 +67,11 @@ class TargetPreviewManagerTests: XCTestCase {
             XCTFail()
             return
         }
+        let mockButton = MockFloatingButton()
+        mockUIService.floatingButton = mockButton
         targetPreviewManager.enterPreviewModeWithDeepLink(clientCode: TargetTestConstants.TEST_CLIENT_CODE, deepLink: urlWithNoQueryItems)
-        let expectation = XCTestExpectation(description: "On show button called expectation")
-        expectation.isInverted = true
-        mockUIDelegate.onShowButtonExpectation = expectation
-        wait(for: [expectation], timeout: 0.5)
-        XCTAssertFalse(mockUIDelegate.onShowButtonCalled)
+        XCTAssertFalse(mockUIService.createFloatingButtonCalled)
+        XCTAssertFalse(mockButton.showCalled)
         XCTAssertFalse(mockNetworkService.connectAsyncCalled)
         XCTAssertNil(mockNetworkService.connectAsyncCalledWithNetworkRequest)
         XCTAssertNil(targetPreviewManager.previewParameters)
@@ -88,14 +86,12 @@ class TargetPreviewManagerTests: XCTestCase {
             XCTFail()
             return
         }
-
+        let mockButton = MockFloatingButton()
+        mockUIService.floatingButton = mockButton
         targetPreviewManager.enterPreviewModeWithDeepLink(clientCode: TargetTestConstants.TEST_CLIENT_CODE, deepLink: urlWithNoTokenQuery)
 
-        let expectation = XCTestExpectation(description: "On show button called expectation")
-        expectation.isInverted = true
-        mockUIDelegate.onShowButtonExpectation = expectation
-        wait(for: [expectation], timeout: 0.5)
-        XCTAssertFalse(mockUIDelegate.onShowButtonCalled)
+        XCTAssertFalse(mockUIService.createFloatingButtonCalled)
+        XCTAssertFalse(mockButton.showCalled)
         XCTAssertFalse(mockNetworkService.connectAsyncCalled)
         XCTAssertNil(mockNetworkService.connectAsyncCalledWithNetworkRequest)
         XCTAssertNil(targetPreviewManager.previewParameters)
@@ -109,12 +105,12 @@ class TargetPreviewManagerTests: XCTestCase {
         let testToken = "abcd"
         let testDeepLink = URL(string: "test://path?at_preview_token=\(testToken)&key1=val1&at_preview_endpoint=awesomeendpoint")
         let expectedUrl = "https://awesomeendpoint/ui/admin/" + TargetTestConstants.TEST_CLIENT_CODE + "/preview?token=\(testToken)"
+        let mockButton = MockFloatingButton()
+        mockUIService.floatingButton = mockButton
         targetPreviewManager.enterPreviewModeWithDeepLink(clientCode: TargetTestConstants.TEST_CLIENT_CODE, deepLink: testDeepLink!)
 
-        let expectation = XCTestExpectation(description: "On show button called expectation")
-        mockUIDelegate.onShowButtonExpectation = expectation
-        wait(for: [expectation], timeout: 0.5)
-        XCTAssertTrue(mockUIDelegate.onShowButtonCalled)
+        XCTAssertTrue(mockUIService.createFloatingButtonCalled)
+        XCTAssertTrue(mockButton.showCalled)
         XCTAssertEqual(targetPreviewManager.previewToken, testToken)
         let networkRequest = mockNetworkService.connectAsyncCalledWithNetworkRequest
         XCTAssertEqual(networkRequest?.url.absoluteString, expectedUrl)
@@ -135,12 +131,12 @@ class TargetPreviewManagerTests: XCTestCase {
     ///
     func testFetchWebViewHappyPath() {
         setupPreviewMode()
+        let mockMessage = MockFullscreenMessage()
+        mockUIService.fullscreenMessage = mockMessage
         targetPreviewManager.fetchWebView()
         XCTAssertTrue(mockNetworkService.connectAsyncCalled)
-        let expectation = XCTestExpectation(description: "Show fullscreen message expectation")
-        mockUIDelegate.onShowExpectation = expectation
-        wait(for: [expectation], timeout: 0.5)
-        XCTAssertTrue(mockUIDelegate.onShowCalled)
+        XCTAssertTrue(mockUIService.createFullscreenMessageCalled)
+        XCTAssertTrue(mockMessage.showCalled)
     }
 
     ///
@@ -160,13 +156,13 @@ class TargetPreviewManagerTests: XCTestCase {
         setupPreviewMode()
         let httpConnectionWithEmptyResponse = HttpConnection(data: nil, response: nil, error: nil)
         mockNetworkService.expectedResponse = httpConnectionWithEmptyResponse
+        let mockMessage = MockFullscreenMessage()
+        mockUIService.fullscreenMessage = mockMessage
         targetPreviewManager.fetchWebView()
         XCTAssertTrue(mockNetworkService.connectAsyncCalled)
-        let expectation = XCTestExpectation(description: "Fullscreen message not shown expectation")
-        expectation.isInverted = true
-        mockUIDelegate.onShowExpectation = expectation
-        wait(for: [expectation], timeout: 0.5)
-        XCTAssertFalse(mockUIDelegate.onShowCalled)
+        // Called once via the setupPreviewMode but not in the fetchWebView call
+        XCTAssertEqual(mockUIService.createFullscreenMessageCallCount, 1)
+        XCTAssertFalse(mockMessage.showCalled)
     }
 
     ///
@@ -180,11 +176,10 @@ class TargetPreviewManagerTests: XCTestCase {
     /// Makes sure that the message is dismissed, previewLifecycle event is dispatched, method returns true, verifies the preview parameters are correct
     func testPreviewConfirmedWithUrlHappyPathConfirm() {
         setupPreviewMode()
-        let fullscreenMessage = FullscreenMessage(payload: "", listener: mockUIDelegate)
+        let fullscreenMessage = MockFullscreenMessage()
+        mockUIService.fullscreenMessage = fullscreenMessage
         let url = URL(string: TargetTestConstants.TEST_CONFIRM_DEEPLINK)
         var eventDispatched = false
-        let expectation = XCTestExpectation(description: "Fullscreen message dismiss called expectation")
-        mockUIDelegate.onDismissExpectation = expectation
         XCTAssertTrue(targetPreviewManager.previewConfirmedWithUrl(url!, message: fullscreenMessage, previewLifecycleEventDispatcher: { event in
             eventDispatched = true
             XCTAssertEqual(event.name, "Target Preview Lifecycle")
@@ -193,8 +188,8 @@ class TargetPreviewManagerTests: XCTestCase {
 
         XCTAssertTrue(eventDispatched)
         verifyQaModeParams(targetPreviewManager.previewParameters ?? "")
-        wait(for: [expectation], timeout: 0.5)
-        XCTAssertTrue(mockUIDelegate.onDismissCalled)
+        XCTAssertTrue(mockUIService.createFullscreenMessageCalled)
+        XCTAssertTrue(fullscreenMessage.dismissCalled)
     }
 
     ///
@@ -202,12 +197,13 @@ class TargetPreviewManagerTests: XCTestCase {
     /// method returns true, event is dispatched with false value for PREVIEW_INITIATED data key, preview parameters are nil, preview token is nil, on dismiss is called
     ///
     func testPreviewConfirmedWithUrlHappyPathCancel() {
+        let fullscreenMessage = MockFullscreenMessage()
+        mockUIService.fullscreenMessage = fullscreenMessage
+        let button = MockFloatingButton()
+        mockUIService.floatingButton = button
         setupPreviewMode()
-        let fullscreenMessage = FullscreenMessage(payload: "", listener: mockUIDelegate)
         let url = URL(string: TargetTestConstants.TEST_CANCEL_DEEPLINK)
         var eventDispatched = false
-        let expectation = XCTestExpectation(description: "Fullscreen message dismiss called expectation")
-        mockUIDelegate.onDismissExpectation = expectation
         XCTAssertTrue(targetPreviewManager.previewConfirmedWithUrl(url!, message: fullscreenMessage, previewLifecycleEventDispatcher: { event in
             eventDispatched = true
             XCTAssertEqual(event.name, "Target Preview Lifecycle")
@@ -218,31 +214,40 @@ class TargetPreviewManagerTests: XCTestCase {
         // Make sure the target preview properties have been reset
         XCTAssertNil(targetPreviewManager.previewParameters)
         XCTAssertNil(targetPreviewManager.previewToken)
-        wait(for: [expectation], timeout: 0.5)
-        XCTAssertTrue(mockUIDelegate.onDismissCalled)
+        XCTAssertTrue(mockUIService.createFullscreenMessageCalled)
+        XCTAssertTrue(fullscreenMessage.dismissCalled)
+        XCTAssertTrue(button.dismissCalled)
     }
 
     ///
     /// Tests enterPreviewModeWithDeeplink exits early when preview button has not been set up
     ///
     func testPreviewConfirmedWithUrlNoPreviewButton() {
-        let fullscreenMessage = FullscreenMessage(payload: "", listener: mockUIDelegate)
+        let fullscreenMessage = MockFullscreenMessage()
+        mockUIService.fullscreenMessage = fullscreenMessage
         let url = URL(string: TargetTestConstants.TEST_CONFIRM_DEEPLINK)
         XCTAssertFalse(targetPreviewManager.previewConfirmedWithUrl(url!, message: fullscreenMessage, previewLifecycleEventDispatcher: { _ in
             XCTFail()
         }))
+        XCTAssertFalse(fullscreenMessage.dismissCalled)
     }
 
     ///
     /// Tests previewConfirmedWithUrl when url has no correct scheme exits early
     ///
     func testPreviewConfirmedWithUrlNoSchemeMatch() {
+        let fullscreenMessage = MockFullscreenMessage()
+        mockUIService.fullscreenMessage = fullscreenMessage
+        let button = MockFloatingButton()
+        mockUIService.floatingButton = button
         setupPreviewMode()
-        let fullscreenMessage = FullscreenMessage(payload: "", listener: mockUIDelegate)
         let incorrectSchemeUrl = URL(string: "bbbinapp://confirm")
         XCTAssertFalse(targetPreviewManager.previewConfirmedWithUrl(incorrectSchemeUrl!, message: fullscreenMessage, previewLifecycleEventDispatcher: { _ in
             XCTFail()
         }))
+
+        XCTAssertFalse(fullscreenMessage.dismissCalled)
+        XCTAssertFalse(button.dismissCalled)
     }
 
     ///
@@ -251,11 +256,10 @@ class TargetPreviewManagerTests: XCTestCase {
     func testPreviewConfirmedWithUrlRestartUrlSet() {
         setupPreviewMode()
         targetPreviewManager.setRestartDeepLink(TargetTestConstants.TEST_RESTART_URL)
-        let fullscreenMessage = FullscreenMessage(payload: "", listener: mockUIDelegate)
+        let fullscreenMessage = MockFullscreenMessage()
+        mockUIService.fullscreenMessage = fullscreenMessage
         let url = URL(string: TargetTestConstants.TEST_CONFIRM_DEEPLINK)
         var eventDispatched = false
-        let expectation = XCTestExpectation(description: "Fullscreen message dismiss called expectation")
-        mockUIDelegate.onDismissExpectation = expectation
         XCTAssertTrue(targetPreviewManager.previewConfirmedWithUrl(url!, message: fullscreenMessage, previewLifecycleEventDispatcher: { event in
             eventDispatched = true
             XCTAssertEqual(event.name, "Target Preview Lifecycle")
@@ -264,8 +268,8 @@ class TargetPreviewManagerTests: XCTestCase {
 
         XCTAssertTrue(eventDispatched)
         verifyQaModeParams(targetPreviewManager.previewParameters ?? "")
-        wait(for: [expectation], timeout: 0.5)
-        XCTAssertTrue(mockUIDelegate.onDismissCalled)
+        XCTAssertTrue(mockUIService.createFullscreenMessageCalled)
+        XCTAssertTrue(fullscreenMessage.dismissCalled)
 
         XCTAssertTrue(mockUrlOpener.openUrlCalled)
         XCTAssertEqual(mockUrlOpener.openUrlParam?.absoluteString, TargetTestConstants.TEST_RESTART_URL)

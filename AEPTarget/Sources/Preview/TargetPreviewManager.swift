@@ -22,7 +22,7 @@ struct TargetPreviewState {
     var webViewHtml: String?
     var restartUrl: URL?
     var fetchingWebView: Bool = false
-    var previewButton: FloatingButton?
+    var previewButton: FloatingButtonPresentable?
 }
 
 class TargetPreviewManager: PreviewManager {
@@ -42,10 +42,6 @@ class TargetPreviewManager: PreviewManager {
 
     private var networkService: Networking {
         ServiceProvider.shared.networkService
-    }
-
-    private var systemInfoService: SystemInfoService {
-        ServiceProvider.shared.systemInfoService
     }
 
     func enterPreviewModeWithDeepLink(clientCode: String, deepLink: URL) {
@@ -78,12 +74,12 @@ class TargetPreviewManager: PreviewManager {
         state.previewQueryParameters = nil
 
         if let previewButton = state.previewButton {
-            previewButton.remove()
+            previewButton.dismiss()
             state.previewButton = nil
         }
     }
 
-    func previewConfirmedWithUrl(_ url: URL, message: FullscreenMessage, previewLifecycleEventDispatcher: (Event) -> Void) -> Bool {
+    func previewConfirmedWithUrl(_ url: URL, message: FullscreenPresentable, previewLifecycleEventDispatcher: (Event) -> Void) -> Bool {
         guard state.previewButton != nil else {
             Log.debug(label: logPrefix, "Preview button is nil")
             return false
@@ -178,7 +174,7 @@ class TargetPreviewManager: PreviewManager {
             return
         }
 
-        let fullscreenMessage = FullscreenMessage(payload: webViewHtml, listener: fullscreenMessageDelegate ?? self)
+        let fullscreenMessage = ServiceProvider.shared.uiService.createFullscreenMessage(payload: webViewHtml, listener: fullscreenMessageDelegate ?? self, isLocalImageUsed: nil)
         fullscreenMessage.show()
     }
 
@@ -212,8 +208,8 @@ class TargetPreviewManager: PreviewManager {
             return
         }
 
-        state.previewButton = FloatingButton(listener: floatingButtonDelegate ?? self)
-        state.previewButton?.display()
+        state.previewButton = ServiceProvider.shared.uiService.createFloatingButton(listener: floatingButtonDelegate ?? self)
+        state.previewButton?.show()
     }
 
     ///
