@@ -12,8 +12,8 @@
 
 import Foundation
 
-internal extension TargetProduct {
-    func convert() -> Product {
+extension TargetProduct {
+    func toInternalProduct() -> Product {
         return Product(id: productId, categoryId: categoryId)
     }
 }

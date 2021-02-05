@@ -15,13 +15,28 @@ import Foundation
 
 /// Represents the state of the `Target` extension
 class TargetState {
-    private(set) var tntId: String?
+    private(set) var tntId: String? {
+        didSet {
+            dataStore.set(key: TargetConstants.DataStoreKeys.TNT_ID, value: tntId)
+        }
+    }
+
+    private(set) var edgeHost: String? {
+        didSet {
+            dataStore.set(key: TargetConstants.DataStoreKeys.EDGE_HOST, value: edgeHost)
+        }
+    }
+
+    private(set) var sessionTimestampInSeconds: Int64? {
+        didSet {
+            dataStore.set(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP, value: sessionTimestampInSeconds)
+        }
+    }
+
     private(set) var thirdPartyId: String?
-    private(set) var edgeHost: String?
     private(set) var clientCode: String?
     private(set) var prefetchedMboxJsonDicts = [String: [String: Any]]()
-    private(set) var sessionTimestamp: Int64?
-    private(set) var sessionTimeout: Int
+    private(set) var sessionTimeoutInSeconds: Int
     private var storedSessionId: String
 
     var sessionId: String {
@@ -34,40 +49,37 @@ class TargetState {
     /// Loads the TNT ID and the edge host string from the data store when initializing the `TargetState` object
     init() {
         dataStore = NamedCollectionDataStore(name: TargetConstants.DATASTORE_NAME)
-        tntId = dataStore.getString(key: TargetConstants.StorageKeys.TNT_ID)
-        edgeHost = dataStore.getString(key: TargetConstants.StorageKeys.EDGE_HOST)
-        sessionTimestamp = dataStore.getLong(key: TargetConstants.StorageKeys.SESSION_TIMESTAMP)
-        storedSessionId = dataStore.getString(key: TargetConstants.StorageKeys.SESSION_ID) ?? UUID().uuidString
-        if let sessionTimeout = dataStore.getInt(key: TargetConstants.StorageKeys.SESSION_TIMEOUT) {
-            self.sessionTimeout = sessionTimeout
+        tntId = dataStore.getString(key: TargetConstants.DataStoreKeys.TNT_ID)
+        edgeHost = dataStore.getString(key: TargetConstants.DataStoreKeys.EDGE_HOST)
+        sessionTimestampInSeconds = dataStore.getLong(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP)
+        storedSessionId = dataStore.getString(key: TargetConstants.DataStoreKeys.SESSION_ID) ?? UUID().uuidString
+        if let sessionTimeout = dataStore.getInt(key: TargetConstants.DataStoreKeys.SESSION_TIMEOUT) {
+            sessionTimeoutInSeconds = sessionTimeout
         } else {
-            sessionTimeout = TargetConstants.DEFAULT_SESSION_TIMEOUT
+            sessionTimeoutInSeconds = TargetConstants.DEFAULT_SESSION_TIMEOUT
         }
     }
 
     /// Updates the session timestamp of the latest target API call in memory and in the data store
     func updateSessionTimestamp() {
-        sessionTimestamp = Date().getUnixTimeInSeconds()
-        dataStore.set(key: TargetConstants.StorageKeys.SESSION_TIMESTAMP, value: sessionTimestamp)
+        sessionTimestampInSeconds = Date().getUnixTimeInSeconds()
     }
 
     /// Updates the TNT ID in memory and in the data store
     func updateTntId(_ tntId: String) {
         self.tntId = tntId
-        dataStore.set(key: TargetConstants.StorageKeys.TNT_ID, value: tntId)
     }
 
     /// Updates the edge host in memory and in the data store
     func updateEdgeHost(_ edgeHost: String) {
         self.edgeHost = edgeHost
-        dataStore.set(key: TargetConstants.StorageKeys.EDGE_HOST, value: edgeHost)
     }
 
     /// Generates a `Target` shared state with the stored TNT ID and third party id.
     func generateSharedState() -> [String: Any] {
         var eventData = [String: Any]()
-        if tntId != nil { eventData[TargetConstants.EventDataKeys.TNT_ID] = tntId }
-        if thirdPartyId != nil { eventData[TargetConstants.EventDataKeys.THIRD_PARTY_ID] = thirdPartyId }
+        if let tntId = tntId { eventData[TargetConstants.EventDataKeys.TNT_ID] = tntId }
+        if let thirdPartyId = thirdPartyId { eventData[TargetConstants.EventDataKeys.THIRD_PARTY_ID] = thirdPartyId }
         return eventData
     }
 
@@ -79,10 +91,10 @@ class TargetState {
     /// Verifies if current target session is expired.
     /// - Returns: whether Target session has expired
     private func isSessionExpired() -> Bool {
-        guard let sessionTimestamp = self.sessionTimestamp else {
+        guard let sessionTimestamp = sessionTimestampInSeconds else {
             return false
         }
         let currentTimestamp = Date().getUnixTimeInSeconds()
-        return (currentTimestamp - sessionTimestamp) > sessionTimeout
+        return (currentTimestamp - sessionTimestamp) > sessionTimeoutInSeconds
     }
 }

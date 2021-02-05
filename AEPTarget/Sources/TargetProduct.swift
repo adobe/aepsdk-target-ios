@@ -13,9 +13,9 @@ import Foundation
 
 @objc(AEPTargetProduct)
 public class TargetProduct: NSObject, Codable {
-    public let productId: String?
+    public let productId: String
     public let categoryId: String?
-    public init(productId: String? = nil, categoryId: String? = nil) {
+    public init(productId: String, categoryId: String? = nil) {
         self.productId = productId
         self.categoryId = categoryId
     }

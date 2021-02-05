@@ -32,23 +32,23 @@ import Foundation
 
         guard !prefetchObjectArray.isEmpty else {
             Log.error(label: Target.LOG_TAG, "Failed to prefetch Target request (the provided request list for mboxes is empty or null)")
-            completion(TargetError(message: "Empty or null prefetch requests list"))
+            completion(TargetError(message: TargetError.ERROR_EMPTY_PREFETCH_LIST))
             return
         }
         var prefetchArray = [[String: Any]]()
         for prefetch in prefetchObjectArray {
-            if let dict = prefetch.toDictionary() {
+            if let dict = prefetch.asDictionary() {
                 prefetchArray.append(dict)
 
             } else {
                 Log.error(label: Target.LOG_TAG, "Failed to prefetch Target request (the provided prefetch object can't be converted to [String: Any] dictionary), prefetch => \(prefetch)")
-                completion(TargetError(message: "Internal error"))
+                completion(TargetError(message: TargetError.ERROR_INVALID_REQUEST))
                 return
             }
         }
 
         var eventData: [String: Any] = [TargetConstants.EventDataKeys.PREFETCH_REQUESTS: prefetchArray]
-        if let targetParametersDict = targetParameters?.toDictionary() {
+        if let targetParametersDict = targetParameters?.asDictionary() {
             eventData[TargetConstants.EventDataKeys.TARGET_PARAMETERS] = targetParametersDict
         }
 
@@ -57,7 +57,7 @@ import Foundation
         MobileCore.dispatch(event: event) { responseEvent in
 
             guard let responseEvent = responseEvent else {
-                completion(TargetError(message: "Prefetch call timeout"))
+                completion(TargetError(message: TargetError.ERROR_TIMEOUT))
                 return
             }
             if let errorMessage = responseEvent.data?[TargetConstants.EventDataKeys.PREFETCH_ERROR] as? String {

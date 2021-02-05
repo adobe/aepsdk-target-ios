@@ -11,8 +11,8 @@
  */
 import Foundation
 
-internal extension TargetOrder {
-    func convert() -> Order {
+extension TargetOrder {
+    func toInternalOrder() -> Order {
         return Order(id: orderId, total: total, purchasedProductIds: purchasedProductIds)
     }
 }

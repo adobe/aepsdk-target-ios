@@ -57,7 +57,7 @@ enum TargetResponseConstants {
         // ---- prefetch -----
 
         // ---- prefetch - mboxes - mbox -----
-        static let MBOXE_NAME = "name"
+        static let MBOX_NAME = "name"
         // ---- prefetch - mboxes - mbox -----
     }
 }

@@ -11,18 +11,11 @@
  */
 import Foundation
 
-internal extension TargetParameters {
-    func toDictionary() -> [String: Any]? {
-        asDictionary()
-    }
-
+extension TargetParameters {
     static func from(dictionary: [String: Any]?) -> TargetParameters? {
-        guard let dictionary = dictionary else {
+        guard let dictionary = dictionary, let jsonData = try? JSONSerialization.data(withJSONObject: dictionary) else {
             return nil
         }
-        if let jsonData = try? JSONSerialization.data(withJSONObject: dictionary), let prefetchObject = try? JSONDecoder().decode(TargetParameters.self, from: jsonData) {
-            return prefetchObject
-        }
-        return nil
+        return try? JSONDecoder().decode(TargetParameters.self, from: jsonData)
     }
 }

@@ -93,7 +93,6 @@ struct AnalyticsInfo: Codable {
 }
 
 enum AnalyticsLogging: String, Codable {
-    case server_side
     case client_side
 }
 
@@ -132,10 +131,10 @@ struct Screen: Codable {
     var colorDepth: Int?
     var width: Int?
     var height: Int?
-    var orientation: AppOrientation?
+    var orientation: DeviceOrientation?
 }
 
-enum AppOrientation: String, Codable {
+enum DeviceOrientation: String, Codable {
     case portrait
     case landscape
 }
@@ -185,7 +184,7 @@ struct Notification: Codable {
 }
 
 struct Product: Codable {
-    var id: String?
+    var id: String
     var categoryId: String?
 }
 
@@ -211,7 +210,7 @@ enum DeliveryRequestBuilder {
     ///   - targetPrefetchArray: an array of ACPTargetPrefetch objects representing the desired mboxes to prefetch
     ///   - targetParameters: a TargetParameters object containing parameters for all the mboxes in the request array
     /// - Returns: a `DeliveryRequest` object
-    static func build(tntId: String?, thirdPartyId: String?, identitySharedState: [String: Any], lifecycleSharedState: [String: Any], targetPrefetchArray: [TargetPrefetch], targetParameters: TargetParameters?) -> DeliveryRequest? {
+    static func build(tntId: String?, thirdPartyId: String?, identitySharedState: [String: Any]?, lifecycleSharedState: [String: Any]?, targetPrefetchArray: [TargetPrefetch], targetParameters: TargetParameters?) -> DeliveryRequest? {
         let targetIDs = generateTargetIDsBy(tntid: tntId, thirdPartyId: thirdPartyId, identitySharedState: identitySharedState)
         let prefetch = generatePrefetchBy(targetPrefetchArray: targetPrefetchArray, lifecycleSharedState: lifecycleSharedState, globalParameters: targetParameters)
         let experienceCloud = generateExperienceCloudInfoBy(identitySharedState: identitySharedState)
@@ -221,29 +220,30 @@ enum DeliveryRequestBuilder {
         return DeliveryRequest(id: targetIDs, context: context, experienceCloud: experienceCloud, prefetch: prefetch)
     }
 
-    private static func generateTargetIDsBy(tntid: String?, thirdPartyId: String?, identitySharedState: [String: Any]) -> TargetIDs? {
-        let customerIds = identitySharedState[TargetConstants.IDENTITY.SharedState.Keys.VISITOR_ID_MID] as? [CustomIdentity]
-        return TargetIDs(tntId: tntid, thirdPartyId: thirdPartyId, marketingCloudVisitorId: identitySharedState[TargetConstants.IDENTITY.SharedState.Keys.VISITOR_ID_MID] as? String, customerIds: CustomerID.from(customIdentities: customerIds))
+    private static func generateTargetIDsBy(tntid: String?, thirdPartyId: String?, identitySharedState: [String: Any]?) -> TargetIDs? {
+        let customerIds = identitySharedState?[TargetConstants.IDENTITY.SharedState.Keys.VISITOR_ID_MID] as? [CustomIdentity]
+        return TargetIDs(tntId: tntid, thirdPartyId: thirdPartyId, marketingCloudVisitorId: identitySharedState?[TargetConstants.IDENTITY.SharedState.Keys.VISITOR_ID_MID] as? String, customerIds: CustomerID.from(customIdentities: customerIds))
     }
 
-    private static func generateExperienceCloudInfoBy(identitySharedState: [String: Any]) -> ExperienceCloudInfo? {
+    private static func generateExperienceCloudInfoBy(identitySharedState: [String: Any]?) -> ExperienceCloudInfo? {
+        guard let identitySharedState = identitySharedState else {
+            return nil
+        }
         let audienceManager = AudienceManagerInfo(blob: identitySharedState[TargetConstants.IDENTITY.SharedState.Keys.VISITOR_ID_BLOB] as? String, locationHint: identitySharedState[TargetConstants.IDENTITY.SharedState.Keys.VISITOR_ID_LOCATION_HINT] as? Int)
         let analytics = AnalyticsInfo(logging: .client_side)
         return ExperienceCloudInfo(audienceManager: audienceManager, analytics: analytics)
     }
 
     private static func generateTargetContextBy() -> TargetContext? {
-        // TODO: systemInfoService.getDeviceType() ??
-        let mobilePlatform = MobilePlatform(deviceName: systemInfoService.getDeviceName(), deviceType: .phone, platformType: .ios)
-        // TODO: systemInfoService.getApplicationPackageName() ???
-        // TODO: systemInfoService.getApplicationVersion() ??
-        let application = AppInfo(id: nil, name: systemInfoService.getApplicationName(), version: nil)
-        // TODO: systemInfoService.getCurrentOrientation() ??
-        let screen = Screen(colorDepth: TargetConstants.TargetRequestValue.COLOR_DEPTH_32, width: systemInfoService.getDisplayInformation().width, height: systemInfoService.getDisplayInformation().height, orientation: nil)
+        let deviceType: DeviceType = systemInfoService.getDeviceType() == AEPServices.DeviceType.PHONE ? .phone : .tablet
+        let mobilePlatform = MobilePlatform(deviceName: systemInfoService.getDeviceName(), deviceType: deviceType, platformType: .ios)
+        let application = AppInfo(id: systemInfoService.getApplicationBundleId(), name: systemInfoService.getApplicationName(), version: systemInfoService.getApplicationVersion())
+        let orientation: DeviceOrientation = systemInfoService.getCurrentOrientation() == AEPServices.DeviceOrientation.LANDSCAPE ? .landscape : .portrait
+        let screen = Screen(colorDepth: TargetConstants.TargetRequestValue.COLOR_DEPTH_32, width: systemInfoService.getDisplayInformation().width, height: systemInfoService.getDisplayInformation().height, orientation: orientation)
         return TargetContext(channel: TargetConstants.TargetRequestValue.CHANNEL_MOBILE, userAgent: systemInfoService.getDefaultUserAgent(), mobilePlatform: mobilePlatform, application: application, screen: screen, timeOffsetInMinutes: Date().getUnixTimeInSeconds())
     }
 
-    private static func generatePrefetchBy(targetPrefetchArray: [TargetPrefetch], lifecycleSharedState: [String: Any], globalParameters: TargetParameters?) -> Prefetch? {
+    private static func generatePrefetchBy(targetPrefetchArray: [TargetPrefetch], lifecycleSharedState: [String: Any]?, globalParameters: TargetParameters?) -> Prefetch? {
         let lifecycleDataDict = lifecycleSharedState as? [String: String]
 
         var mboxes = [Mbox]()
@@ -283,20 +283,20 @@ enum DeliveryRequestBuilder {
 
     private static func findFirstAvailableOrder(order: TargetOrder?, globalOrder: TargetOrder?) -> Order? {
         if let order = order {
-            return order.convert()
+            return order.toInternalOrder()
         }
         if let globalOrder = globalOrder {
-            return globalOrder.convert()
+            return globalOrder.toInternalOrder()
         }
         return nil
     }
 
     private static func findFirstAvailableProduct(product: TargetProduct?, globalProduct: TargetProduct?) -> Product? {
         if let product = product {
-            return product.convert()
+            return product.toInternalProduct()
         }
         if let globalProduct = globalProduct {
-            return globalProduct.convert()
+            return globalProduct.toInternalProduct()
         }
         return nil
     }

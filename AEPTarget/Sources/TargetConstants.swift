@@ -24,7 +24,7 @@ enum TargetConstants {
     static let HEADER_CONTENT_TYPE = "Content-Type"
     static let HEADER_CONTENT_TYPE_JSON = "application/json"
 
-    enum StorageKeys {
+    enum DataStoreKeys {
         static let SESSION_TIMESTAMP = "SESSION_TIMESTAMP"
         static let SESSION_ID = "SESSION_ID"
         static let SESSION_TIMEOUT = "SESSION_TIMEOUT"

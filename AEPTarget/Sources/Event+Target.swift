@@ -15,10 +15,14 @@ import Foundation
 
 extension Event {
     var prefetchObjectArray: [TargetPrefetch]? {
-        return TargetPrefetch.from(dicts: data?[TargetConstants.EventDataKeys.PREFETCH_REQUESTS] as? [[String: Any]])
+        return TargetPrefetch.from(dictionaries: data?[TargetConstants.EventDataKeys.PREFETCH_REQUESTS] as? [[String: Any]])
     }
 
     var targetParameters: TargetParameters? {
         TargetParameters.from(dictionary: data?[TargetConstants.EventDataKeys.TARGET_PARAMETERS] as? [String: Any])
+    }
+
+    var isPrefetchEvent: Bool {
+        return data?[TargetConstants.EventDataKeys.PREFETCH_REQUESTS] as? Bool ?? false
     }
 }

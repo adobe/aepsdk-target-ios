@@ -13,9 +13,9 @@ import Foundation
 
 @objc(AEPTargetPrefetchObject)
 public class TargetPrefetch: NSObject, Codable {
-    public let name: String?
+    public let name: String
     public let targetParameters: TargetParameters?
-    public init(name: String? = nil, targetParameters: TargetParameters? = nil) {
+    public init(name: String, targetParameters: TargetParameters? = nil) {
         self.name = name
         self.targetParameters = targetParameters
     }

@@ -11,11 +11,7 @@
  */
 import Foundation
 
-internal extension TargetPrefetch {
-    func toDictionary() -> [String: Any]? {
-        asDictionary()
-    }
-
+extension TargetPrefetch {
     static func from(dictionary: [String: Any]) -> TargetPrefetch? {
         if let jsonData = try? JSONSerialization.data(withJSONObject: dictionary), let prefetchObject = try? JSONDecoder().decode(TargetPrefetch.self, from: jsonData) {
             return prefetchObject
@@ -23,13 +19,13 @@ internal extension TargetPrefetch {
         return nil
     }
 
-    static func from(dicts: [[String: Any]]?) -> [TargetPrefetch]? {
-        guard let dicts = dicts else {
+    static func from(dictionaries: [[String: Any]]?) -> [TargetPrefetch]? {
+        guard let dictionaries = dictionaries else {
             return nil
         }
         var prefetches = [TargetPrefetch]()
-        for dict in dicts {
-            if let prefetch = TargetPrefetch.from(dictionary: dict) {
+        for dictionary in dictionaries {
+            if let prefetch = TargetPrefetch.from(dictionary: dictionary) {
                 prefetches.append(prefetch)
             }
         }

@@ -46,12 +46,11 @@ public class Target: NSObject, Extension {
 
     public func onRegistered() {
         registerListener(type: EventType.target, source: EventSource.requestContent) { event in
-            switch event.name {
-            case TargetConstants.EventName.PREFETCH_REQUESTS:
+            if event.isPrefetchEvent {
                 self.prefetchContent(event)
-            default:
-                Log.debug(label: Target.LOG_TAG, "Unknown event: \(event)")
+                return
             }
+            Log.debug(label: Target.LOG_TAG, "Unknown event: \(event)")
         }
         registerListener(type: EventType.target, source: EventSource.requestReset, listener: handle)
         registerListener(type: EventType.target, source: EventSource.requestIdentity, listener: handle)
@@ -63,8 +62,6 @@ public class Target: NSObject, Extension {
 
     public func readyForEvent(_ event: Event) -> Bool {
         guard let configuration = getSharedState(extensionName: TargetConstants.CONFIGURATION.EXTENSION_NAME, event: event), configuration.status == .set else { return false }
-        guard getSharedState(extensionName: TargetConstants.LIFECYCLE.EXTENSION_NAME, event: event)?.status == .set else { return false }
-        guard getSharedState(extensionName: TargetConstants.IDENTITY.EXTENSION_NAME, event: event)?.status == .set else { return false }
         guard let clientCode = configuration.value?[TargetConstants.CONFIGURATION.SharedState.Keys.TARGET_CLIENT_CODE] as? String, !clientCode.isEmpty else {
             return false
         }
@@ -95,14 +92,8 @@ public class Target: NSObject, Extension {
             return
         }
 
-        guard let lifecycleSharedState = getSharedState(extensionName: TargetConstants.LIFECYCLE.EXTENSION_NAME, event: event)?.value else {
-            dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Missing shared state - lifecycle")
-            return
-        }
-        guard let identitySharedState = getSharedState(extensionName: TargetConstants.IDENTITY.EXTENSION_NAME, event: event)?.value else {
-            dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Missing shared state - identity")
-            return
-        }
+        let lifecycleSharedState = getSharedState(extensionName: TargetConstants.LIFECYCLE.EXTENSION_NAME, event: event)?.value
+        let identitySharedState = getSharedState(extensionName: TargetConstants.IDENTITY.EXTENSION_NAME, event: event)?.value
 
         guard let privacy = configurationSharedState[TargetConstants.CONFIGURATION.SharedState.Keys.GLOBAL_CONFIG_PRIVACY] as? String, privacy == TargetConstants.CONFIGURATION.SharedState.Values.GLOBAL_CONFIG_PRIVACY_OPT_IN else {
             dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Privacy status is opted out")
@@ -148,7 +139,7 @@ public class Target: NSObject, Extension {
             if let mboxes = response.mboxes {
                 var mboxesDictionary = [String: [String: Any]]()
                 for mbox in mboxes {
-                    if let name = mbox[TargetResponseConstants.JSONKeys.MBOXE_NAME] as? String { mboxesDictionary[name] = mbox }
+                    if let name = mbox[TargetResponseConstants.JSONKeys.MBOX_NAME] as? String { mboxesDictionary[name] = mbox }
                 }
                 if !mboxesDictionary.isEmpty { self.targetState.mergePrefetchedMboxJson(mboxesDictionary: mboxesDictionary) }
             }
