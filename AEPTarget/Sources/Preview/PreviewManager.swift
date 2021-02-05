@@ -26,11 +26,6 @@ protocol PreviewManager {
     func enterPreviewModeWithDeepLink(clientCode: String, deepLink: URL)
 
     ///
-    /// Resets the target preview properties. Should be called when the preview message is closed
-    ///
-    func resetTargetPreviewProperties()
-
-    ///
     /// This will process the given Url. If it is a cancel url, it dismisses the message and exits preview mode.
     /// If it is a confirm url, it dismisses the message, updates preview parameters and starts a new view if preview restart url is set
     /// - Parameters:

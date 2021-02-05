@@ -8,13 +8,13 @@ workspace 'AEPTarget'
 project 'AEPTarget.xcodeproj'
 
 target 'AEPTarget' do
-  pod 'AEPCore', :git => 'https://github.com/cdhoffmann/aepsdk-core-ios.git', :branch => 'showableDismissable'
-  pod 'AEPServices', :git => 'https://github.com/cdhoffmann/aepsdk-core-ios.git', :branch => 'showableDismissable'
+  pod 'AEPCore', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'dev-v3.0.1'
+  pod 'AEPServices', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'dev-v3.0.1'
   pod 'AEPRulesEngine', :git => 'https://github.com/adobe/aepsdk-rulesengine-ios.git', :branch => 'main'
 end
 
 target 'AEPTargetTests' do
-  pod 'AEPCore', :git => 'https://github.com/cdhoffmann/aepsdk-core-ios.git', :branch => 'showableDismissable'
-  pod 'AEPServices', :git => 'https://github.com/cdhoffmann/aepsdk-core-ios.git', :branch => 'showableDismissable'
+  pod 'AEPCore', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'dev-v3.0.1'
+  pod 'AEPServices', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'dev-v3.0.1'
   pod 'AEPRulesEngine', :git => 'https://github.com/adobe/aepsdk-rulesengine-ios.git', :branch => 'main'
 end

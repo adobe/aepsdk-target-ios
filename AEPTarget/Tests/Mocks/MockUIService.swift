@@ -50,7 +50,7 @@ class MockUIService: UIService {
     var createFullscreenMessageCalled = false
     var createFullscreenMessageCallCount = 0
     var fullscreenMessage: FullscreenPresentable?
-    public func createFullscreenMessage(payload _: String, listener _: FullscreenMessageDelegate?, isLocalImageUsed _: Bool?) -> FullscreenPresentable {
+    public func createFullscreenMessage(payload _: String, listener _: FullscreenMessageDelegate?, isLocalImageUsed _: Bool) -> FullscreenPresentable {
         createFullscreenMessageCalled = true
         createFullscreenMessageCallCount += 1
         return fullscreenMessage ?? MockFullscreenMessage()

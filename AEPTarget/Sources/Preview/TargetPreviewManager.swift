@@ -23,6 +23,19 @@ struct TargetPreviewState {
     var restartUrl: URL?
     var fetchingWebView: Bool = false
     var previewButton: FloatingButtonPresentable?
+
+    mutating func reset() {
+        token = nil
+        webViewHtml = nil
+        endpoint = nil
+        restartUrl = nil
+        previewQueryParameters = nil
+
+        if let previewButton = previewButton {
+            previewButton.dismiss()
+            self.previewButton = nil
+        }
+    }
 }
 
 class TargetPreviewManager: PreviewManager {
@@ -66,19 +79,6 @@ class TargetPreviewManager: PreviewManager {
         fetchWebView()
     }
 
-    func resetTargetPreviewProperties() {
-        state.token = nil
-        state.webViewHtml = nil
-        state.endpoint = nil
-        state.restartUrl = nil
-        state.previewQueryParameters = nil
-
-        if let previewButton = state.previewButton {
-            previewButton.dismiss()
-            state.previewButton = nil
-        }
-    }
-
     func previewConfirmedWithUrl(_ url: URL, message: FullscreenPresentable, previewLifecycleEventDispatcher: (Event) -> Void) -> Bool {
         guard state.previewButton != nil else {
             Log.debug(label: LOG_TAG, "Preview button is nil")
@@ -93,7 +93,7 @@ class TargetPreviewManager: PreviewManager {
         switch deepLinkScheme {
         case .cancel:
             message.dismiss()
-            resetTargetPreviewProperties()
+            state.reset()
             previewLifecycleEventDispatcher(createPreviewLifecycleEvent(isPreviewInitiated: false))
         case .confirm:
             if let previewQueryParams = url.queryItemsDict, !previewQueryParams.isEmpty {
@@ -174,7 +174,7 @@ class TargetPreviewManager: PreviewManager {
             return
         }
 
-        let fullscreenMessage = ServiceProvider.shared.uiService.createFullscreenMessage(payload: webViewHtml, listener: fullscreenMessageDelegate ?? self, isLocalImageUsed: nil)
+        let fullscreenMessage = ServiceProvider.shared.uiService.createFullscreenMessage(payload: webViewHtml, listener: fullscreenMessageDelegate ?? self, isLocalImageUsed: false)
         fullscreenMessage.show()
     }
 
