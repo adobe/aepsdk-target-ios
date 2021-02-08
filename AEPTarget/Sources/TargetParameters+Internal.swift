@@ -12,6 +12,10 @@
 import Foundation
 
 extension TargetParameters {
+    
+    /// Constructs a `TargetParameters` object from the event data.
+    /// - Parameter dictionary: the event data used to build a `TargetParameters` object
+    /// - Returns: `TargetParameters` object
     static func from(dictionary: [String: Any]?) -> TargetParameters? {
         guard let dictionary = dictionary, let jsonData = try? JSONSerialization.data(withJSONObject: dictionary) else {
             return nil

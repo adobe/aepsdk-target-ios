@@ -12,13 +12,21 @@
 import Foundation
 
 extension TargetPrefetch {
+    
+    /// Constructs a `TargetPrefetch` object from the event data.
+    /// - Parameter dictionary: the event data used to build a `TargetPrefetch` object
+    /// - Returns: `TargetPrefetch` object
     static func from(dictionary: [String: Any]) -> TargetPrefetch? {
         if let jsonData = try? JSONSerialization.data(withJSONObject: dictionary), let prefetchObject = try? JSONDecoder().decode(TargetPrefetch.self, from: jsonData) {
             return prefetchObject
         }
         return nil
     }
-
+    
+    
+    /// Constructs an array of `TargetPrefetch` objects from the event data.
+    /// - Parameter dictionaries: the event data used to build`TargetPrefetch` objects
+    /// - Returns: an array of `TargetPrefetch` objects
     static func from(dictionaries: [[String: Any]]?) -> [TargetPrefetch]? {
         guard let dictionaries = dictionaries else {
             return nil

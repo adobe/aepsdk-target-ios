@@ -15,7 +15,7 @@ import Foundation
 
 // MARK: - Delivery Request
 
-/// Struct to represent Target Delivery API call JSON request.
+/// Struct to represent Target Delivery API call's JSON request.
 /// For more details refer to https://developers.adobetarget.com/api/delivery-api/#tag/Delivery-API
 struct DeliveryRequest: Codable {
     static let LOG_TAG = "Target"
