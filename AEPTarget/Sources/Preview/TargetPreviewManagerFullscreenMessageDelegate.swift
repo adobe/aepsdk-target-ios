@@ -25,6 +25,10 @@ extension TargetPreviewManager: FullscreenMessageDelegate {
         Log.debug(label: LOG_TAG, "onDismiss - Target preview message was dismissed")
     }
 
+    func onShowFailure() {
+        Log.debug(label: LOG_TAG, "onShowFailure - Target preview message failed to be displayed")
+    }
+
     func overrideUrlLoad(message: FullscreenMessage, url: String?) -> Bool {
         guard let url = URL(string: url ?? "") else {
             Log.warning(label: LOG_TAG, "overrideUrlLoad - URL string was invalid")
