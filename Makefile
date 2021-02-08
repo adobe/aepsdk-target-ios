@@ -24,6 +24,9 @@ generate-lcov:
 pod-install:
 	(pod install --repo-update)
 
+ci-pod-install:
+	(bundle exec pod install --repo-update)
+
 pod-repo-update:
 	(pod repo update)
 
