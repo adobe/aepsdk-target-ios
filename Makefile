@@ -30,6 +30,9 @@ ci-pod-install:
 pod-repo-update:
 	(pod repo update)
 
+install-swiftlint:
+	HOMEBREW_NO_AUTO_UPDATE=1 brew install swiftlint && brew cleanup swiftlint
+
 pod-update: pod-repo-update
 	(pod update)
 
