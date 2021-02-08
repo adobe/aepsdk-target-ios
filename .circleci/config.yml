@@ -55,6 +55,10 @@ jobs:
       - run:
           name: Install SwiftLint
           command: make install-swiftlint
+      
+      - run:
+          name: Install SwiftFormat
+          command: make install-swiftformat
 
       - run:
           name: Lint Source Code
