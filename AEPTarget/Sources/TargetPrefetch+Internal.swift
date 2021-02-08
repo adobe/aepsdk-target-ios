@@ -12,7 +12,6 @@
 import Foundation
 
 extension TargetPrefetch {
-    
     /// Constructs a `TargetPrefetch` object from the event data.
     /// - Parameter dictionary: the event data used to build a `TargetPrefetch` object
     /// - Returns: `TargetPrefetch` object
@@ -22,8 +21,7 @@ extension TargetPrefetch {
         }
         return nil
     }
-    
-    
+
     /// Constructs an array of `TargetPrefetch` objects from the event data.
     /// - Parameter dictionaries: the event data used to build`TargetPrefetch` objects
     /// - Returns: an array of `TargetPrefetch` objects

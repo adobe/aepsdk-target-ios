@@ -12,7 +12,6 @@
 import Foundation
 
 extension TargetParameters {
-    
     /// Constructs a `TargetParameters` object from the event data.
     /// - Parameter dictionary: the event data used to build a `TargetParameters` object
     /// - Returns: `TargetParameters` object

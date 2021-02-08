@@ -13,7 +13,6 @@
 import Foundation
 
 extension TargetProduct {
-    
     /// Converts this object to an internal `Product`
     /// - Returns: `Product` object
     func toInternalProduct() -> Product {

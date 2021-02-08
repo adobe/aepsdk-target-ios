@@ -19,7 +19,7 @@ public class TargetParameters: NSObject, Codable {
     @objc public let profileParameters: [String: String]?
     @objc public let order: TargetOrder?
     @objc public let product: TargetProduct?
-    
+
     /// Initialize a `TargetParameters` with the mbox parameters, the profile parameters, the order parameters and the product parameters.
     /// - Parameters:
     ///   - parameters: the mbox parameters

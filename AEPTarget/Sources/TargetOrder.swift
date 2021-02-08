@@ -17,7 +17,7 @@ public class TargetOrder: NSObject, Codable {
     public let orderId: String
     public let total: Double?
     public let purchasedProductIds: [String]?
-    
+
     /// Initialize a `TargetOrder` with an order `id`, order `total`  and a list of `purchasedProductIds`
     /// - Parameters:
     ///   - id: `String` order id

@@ -16,7 +16,7 @@ import Foundation
 public class TargetPrefetch: NSObject, Codable {
     public let name: String
     public let targetParameters: TargetParameters?
-    
+
     /// Instantiate a `TargetPrefetch` object
     /// - Parameters:
     ///   - name: `String` mbox name for this prefetch

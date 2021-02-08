@@ -16,7 +16,7 @@ import Foundation
 public class TargetProduct: NSObject, Codable {
     public let productId: String
     public let categoryId: String?
-    
+
     /// Initialize a `TargetProduct` with a product  id and a productCategoryId.
     /// - Parameters:
     ///   - productId: product id
