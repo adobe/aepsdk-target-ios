@@ -147,8 +147,8 @@ class TargetPreviewManager: PreviewManager {
         })
     }
 
-    func setRestartDeepLink(_ restartDeepLink: String) {
-        state.restartUrl = URL(string: restartDeepLink)
+    func setRestartDeepLink(_ restartDeepLink: URL) {
+        state.restartUrl = restartDeepLink
     }
 
     var previewParameters: String? {

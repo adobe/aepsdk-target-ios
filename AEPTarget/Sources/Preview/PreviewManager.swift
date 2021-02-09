@@ -43,9 +43,9 @@ protocol PreviewManager {
 
     ///
     /// Sets the restart deeplink
-    /// - Parameter restartDeepLink: The restart deep link url as a string
+    /// - Parameter restartDeepLink: The restart deep link url
     ///
-    func setRestartDeepLink(_ restartDeepLink: String)
+    func setRestartDeepLink(_ restartDeepLink: URL)
 
     ///
     /// The current preview parameters representing the json received from target servers as a string, or

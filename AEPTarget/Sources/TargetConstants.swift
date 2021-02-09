@@ -44,6 +44,12 @@ enum TargetConstants {
         static let PRODUCT_PARAMETERS = "productparameters"
         static let PROFILE_PARAMETERS = "profileparams"
         static let PREVIEW_INITIATED = "ispreviewinitiated"
+        static let DEEPLINK = "deeplink"
+
+        enum Configuration {
+            static let TARGET_CLIENT_CODE = "target.clientCode"
+            static let TARGET_PREVIEW_ENABLED = "target.previewEnabled"
+        }
     }
 
     enum PreviewManager {
@@ -58,5 +64,9 @@ enum TargetConstants {
 
     enum NetworkConnection {
         static let DEFAULT_CONNECTION_TIMEOUT_SEC = TimeInterval(5)
+    }
+
+    enum Configuration {
+        static let EXTENSION_NAME = "com.adobe.module.configuration"
     }
 }

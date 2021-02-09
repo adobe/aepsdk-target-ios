@@ -107,10 +107,7 @@ import Foundation
     /// Set the Target preview URL to be displayed when the preview mode is restarted.
     /// - Parameter deeplink:  the URL which will be set for preview restart
     static func setPreviewRestartDeepLink(_ deeplink: URL) {
-        // TODO: need to verify input parameters
-        let eventData = [TargetConstants.EventDataKeys.PREVIEW_RESTART_DEEP_LINK: deeplink.absoluteString]
-        let event = Event(name: TargetConstants.EventName.SET_PREVIEW_DEEPLINK, type: EventType.target, source: EventSource.requestContent, data: eventData)
-        MobileCore.dispatch(event: event)
+        previewManager.setRestartDeepLink(deeplink)
     }
 
     /// Sends a display notification to Target for given prefetched mboxes. This helps Target record location display events.
