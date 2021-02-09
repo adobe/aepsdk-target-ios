@@ -61,7 +61,7 @@ class TargetPreviewManager: PreviewManager {
         state.clientCode = clientCode
 
         if deepLink.absoluteString.isEmpty {
-            Log.debug(label: LOG_TAG, "Unable to enter preview mode with empty/invalid url")
+            Log.debug(label: LOG_TAG, "Unable to enter preview mode with empty")
             return
         }
         guard let queryItemsDict = deepLink.queryItemsDict else {
