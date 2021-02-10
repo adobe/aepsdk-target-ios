@@ -16,22 +16,54 @@ import Foundation
 
 @objc public extension Target {
     /// Prefetch multiple Target mboxes simultaneously.
-    /// Executes a prefetch request to your configured Target server with the ACPTargetPrefetchObject list provided
+    ///
+    /// Executes a prefetch request to your configured Target server with the TargetPrefetchObject list provided
     /// in the prefetchObjectArray parameter. This prefetch request will use the provided parameters for all of
     /// the prefetches made in this request. The callback will be executed when the prefetch has been completed, returning
     /// an error object, nil if the prefetch was successful or error description if the prefetch was unsuccessful.
     /// The prefetched mboxes are cached in memory for the current application session and returned when requested.
     /// - Parameters:
-    ///   - prefetchObjectArray: an array of ACPTargetPrefetchObject representing the desired mboxes to prefetch
+    ///   - prefetchObjectArray: an array of AEPTargetPrefetch objects representing the desired mboxes to prefetch
     ///   - targetParameters: a TargetParameters object containing parameters for all the mboxes in the request array
-    ///   - completion: the callback `closure` which will be called after the prefetch is complete.  The error parameter in the callback will be nil if the prefetch completed successfully, or will contain error message otherwise
-    static func prefetchContent(prefetchObjectArray _: [TargetPrefetch], targetParameters: TargetParameters, completion _: @escaping (AEPError) -> Void) {
-        // TODO: need to verify input parameters
-        // TODO: need to convert "targetParameters" to [String:Any] array
-        let eventData = [TargetConstants.EventDataKeys.TARGET_PARAMETERS: targetParameters]
+    ///   - completion: the callback `closure` which will be called after the prefetch is complete.  The parameter in the callback will be nil if the prefetch completed successfully, or will contain error message otherwise
+    @objc(prefetchContent:withParameters:callback:)
+    static func prefetchContent(prefetchObjectArray: [TargetPrefetch], targetParameters: TargetParameters?, completion: ((Error?) -> Void)?) {
+        let completion = completion ?? { _ in }
+
+        guard !prefetchObjectArray.isEmpty else {
+            Log.error(label: Target.LOG_TAG, "Failed to prefetch Target request (the provided request list for mboxes is empty or null)")
+            completion(TargetError(message: TargetError.ERROR_EMPTY_PREFETCH_LIST))
+            return
+        }
+        var prefetchArray = [[String: Any]]()
+        for prefetch in prefetchObjectArray {
+            if let dict = prefetch.asDictionary() {
+                prefetchArray.append(dict)
+
+            } else {
+                Log.error(label: Target.LOG_TAG, "Failed to prefetch Target request (the provided prefetch object can't be converted to [String: Any] dictionary), prefetch => \(prefetch)")
+                completion(TargetError(message: TargetError.ERROR_INVALID_REQUEST))
+                return
+            }
+        }
+
+        var eventData: [String: Any] = [TargetConstants.EventDataKeys.PREFETCH_REQUESTS: prefetchArray]
+        if let targetParametersDict = targetParameters?.asDictionary() {
+            eventData[TargetConstants.EventDataKeys.TARGET_PARAMETERS] = targetParametersDict
+        }
+
         let event = Event(name: TargetConstants.EventName.PREFETCH_REQUESTS, type: EventType.target, source: EventSource.requestContent, data: eventData)
-        MobileCore.dispatch(event: event) { _ in
-            // TODO:
+
+        MobileCore.dispatch(event: event) { responseEvent in
+            guard let responseEvent = responseEvent else {
+                completion(TargetError(message: TargetError.ERROR_TIMEOUT))
+                return
+            }
+            if let errorMessage = responseEvent.data?[TargetConstants.EventDataKeys.PREFETCH_ERROR] as? String {
+                completion(TargetError(message: errorMessage))
+                return
+            }
+            completion(.none)
         }
     }
 
@@ -41,7 +73,7 @@ import Foundation
     /// Each object in the array contains a callback function, which will be invoked when content is available for
     /// its given mbox location.
     /// - Parameters:
-    ///   - requests:  An array of ACPTargetRequestObject objects to retrieve content
+    ///   - requests:  An array of AEPTargetRequestObject objects to retrieve content
     ///   - targetParameters: a TargetParameters object containing parameters for all locations in the requests array
     static func retrieveLocationContent(requests: [TargetRequest], targetParameters: TargetParameters) {
         // TODO: need to verify input parameters
@@ -54,7 +86,7 @@ import Foundation
     /// Sets the custom visitor ID for Target.
     /// Sets a custom ID to identify visitors (profiles). This ID is preserved between app upgrades,
     /// is saved and restored during the standard application backup process, and is removed at uninstall or
-    /// when ACPTarget::resetExperience is called.
+    /// when AEPTarget::resetExperience is called.
     /// - Parameter thirdPartyId: a string pointer containing the value of the third party id (custom visitor id)
     static func setThirdPartyId(_ id: String) {
         // TODO: need to verify input parameters
@@ -77,7 +109,7 @@ import Foundation
     /// Mobile SDK after a successful call to prefetch content or load requests.
     ///
     /// This ID is preserved between app upgrades, is saved and restored during the standard application
-    /// backup process, and is removed at uninstall or when ACPTarget::resetExperience is called.
+    /// backup process, and is removed at uninstall or when AEPTarget::resetExperience is called.
     ///
     /// - Parameter completion:  the callback `closure` invoked with the current tnt id or `nil` if no tnt id is set.
     static func getTntId(completion _: (String) -> Void) {
@@ -96,7 +128,7 @@ import Foundation
     }
 
     /// Clears prefetched mboxes.
-    /// Clears the cached prefetched ACPTargetPrefetchObject array.
+    /// Clears the cached prefetched AEPTargetPrefetchObject array.
     static func clearPrefetchCache() {
         let eventData = [TargetConstants.EventDataKeys.CLEAR_PREFETCH_CACHE: true]
         let event = Event(name: TargetConstants.EventName.CLEAR_PREFETCH_CACHE, type: EventType.target, source: EventSource.requestReset, data: eventData)

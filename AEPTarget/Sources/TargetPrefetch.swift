@@ -11,5 +11,18 @@
  */
 import Foundation
 
+/// `TargetPrefetch` class, used for specifying a mbox location.
 @objc(AEPTargetPrefetchObject)
-public class TargetPrefetch: NSObject {}
+public class TargetPrefetch: NSObject, Codable {
+    public let name: String
+    public let targetParameters: TargetParameters?
+
+    /// Instantiate a `TargetPrefetch` object
+    /// - Parameters:
+    ///   - name: `String` mbox name for this prefetch
+    ///   - targetParameters: `TargetParameters` for this prefetch
+    public init(name: String, targetParameters: TargetParameters? = nil) {
+        self.name = name
+        self.targetParameters = targetParameters
+    }
+}

@@ -9,20 +9,13 @@
  OF ANY KIND, either express or implied. See the License for the specific language
  governing permissions and limitations under the License.
  */
+
 import Foundation
 
-/// Class for specifying Target product parameters
-@objc(AEPTargetProduct)
-public class TargetProduct: NSObject, Codable {
-    public let productId: String
-    public let categoryId: String?
-
-    /// Initialize a `TargetProduct` with a product  id and a productCategoryId.
-    /// - Parameters:
-    ///   - productId: product id
-    ///   - categoryId: product category id
-    public init(productId: String, categoryId: String? = nil) {
-        self.productId = productId
-        self.categoryId = categoryId
+extension TargetProduct {
+    /// Converts this object to an internal `Product`
+    /// - Returns: `Product` object
+    func toInternalProduct() -> Product {
+        return Product(id: productId, categoryId: categoryId)
     }
 }

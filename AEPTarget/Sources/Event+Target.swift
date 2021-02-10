@@ -10,4 +10,22 @@
  governing permissions and limitations under the License.
  */
 
+import AEPCore
 import Foundation
+
+extension Event {
+    /// Reads an array`TargetPrefetch` from the event data
+    var prefetchObjectArray: [TargetPrefetch]? {
+        return TargetPrefetch.from(dictionaries: data?[TargetConstants.EventDataKeys.PREFETCH_REQUESTS] as? [[String: Any]])
+    }
+
+    /// Reads the `TargetParameters` from the event data
+    var targetParameters: TargetParameters? {
+        TargetParameters.from(dictionary: data?[TargetConstants.EventDataKeys.TARGET_PARAMETERS] as? [String: Any])
+    }
+
+    /// Returns true if this event is a prefetch request event
+    var isPrefetchEvent: Bool {
+        return data?[TargetConstants.EventDataKeys.PREFETCH_REQUESTS] != nil ? true : false
+    }
+}

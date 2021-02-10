@@ -11,18 +11,14 @@
  */
 import Foundation
 
-/// Class for specifying Target product parameters
-@objc(AEPTargetProduct)
-public class TargetProduct: NSObject, Codable {
-    public let productId: String
-    public let categoryId: String?
-
-    /// Initialize a `TargetProduct` with a product  id and a productCategoryId.
-    /// - Parameters:
-    ///   - productId: product id
-    ///   - categoryId: product category id
-    public init(productId: String, categoryId: String? = nil) {
-        self.productId = productId
-        self.categoryId = categoryId
+extension TargetParameters {
+    /// Constructs a `TargetParameters` object from the event data.
+    /// - Parameter dictionary: the event data used to build a `TargetParameters` object
+    /// - Returns: `TargetParameters` object
+    static func from(dictionary: [String: Any]?) -> TargetParameters? {
+        guard let dictionary = dictionary, let jsonData = try? JSONSerialization.data(withJSONObject: dictionary) else {
+            return nil
+        }
+        return try? JSONDecoder().decode(TargetParameters.self, from: jsonData)
     }
 }

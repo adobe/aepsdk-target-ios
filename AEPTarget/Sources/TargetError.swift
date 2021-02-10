@@ -10,20 +10,19 @@
  governing permissions and limitations under the License.
  */
 
-@testable import AEPTarget
-import XCTest
+import Foundation
 
-class AEPTargetTests: XCTestCase {
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+class TargetError: Error, CustomStringConvertible {
+    private let message: String
+    static let ERROR_EMPTY_PREFETCH_LIST = "Empty or null prefetch requests list"
+    static let ERROR_INVALID_REQUEST = "Invalid request error"
+    static let ERROR_TIMEOUT = "API call timeout"
+
+    init(message: String) {
+        self.message = message
     }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    var description: String {
+        message
     }
 }

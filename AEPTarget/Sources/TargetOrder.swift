@@ -11,5 +11,21 @@
  */
 import Foundation
 
+/// Class for specifying Target order parameters
 @objc(AEPTargetOrder)
-public class TargetOrder: NSObject {}
+public class TargetOrder: NSObject, Codable {
+    public let orderId: String
+    public let total: Double?
+    public let purchasedProductIds: [String]?
+
+    /// Initialize a `TargetOrder` with an order `id`, order `total`  and a list of `purchasedProductIds`
+    /// - Parameters:
+    ///   - id: `String` order id
+    ///   - total: `Double` order total amount
+    ///   - purchasedProductIds: a list of purchased product ids
+    public init(id: String, total: Double? = nil, purchasedProductIds: [String]? = nil) {
+        orderId = id
+        self.total = total
+        self.purchasedProductIds = purchasedProductIds
+    }
+}

@@ -102,7 +102,7 @@ class TargetPreviewManagerTests: XCTestCase {
     /// No preview button is set up, no web view is fetched, and previewParameters should be nil
     ///
     func testEnterPreviewModeWithDeepLinkEmptyToken() {
-guard let urlWithEmptyTokenQuery = URL(string: "https://test?query1=abc&at_preview_token=") else {
+        guard let urlWithEmptyTokenQuery = URL(string: "https://test?query1=abc&at_preview_token=") else {
             XCTFail()
             return
         }
