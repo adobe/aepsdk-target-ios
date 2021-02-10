@@ -61,8 +61,8 @@ public class Target: NSObject, Extension {
     public func onUnregistered() {}
 
     public func readyForEvent(_ event: Event) -> Bool {
-        guard let configuration = getSharedState(extensionName: TargetConstants.CONFIGURATION.EXTENSION_NAME, event: event), configuration.status == .set else { return false }
-        guard let clientCode = configuration.value?[TargetConstants.CONFIGURATION.SharedState.Keys.TARGET_CLIENT_CODE] as? String, !clientCode.isEmpty else {
+        guard let configuration = getSharedState(extensionName: TargetConstants.Configuration.EXTENSION_NAME, event: event), configuration.status == .set else { return false }
+        guard let clientCode = configuration.value?[TargetConstants.Configuration.SharedState.Keys.TARGET_CLIENT_CODE] as? String, !clientCode.isEmpty else {
             return false
         }
         return true
@@ -87,15 +87,15 @@ public class Target: NSObject, Extension {
 
         let targetParameters = event.targetParameters
 
-        guard let configurationSharedState = getSharedState(extensionName: TargetConstants.CONFIGURATION.EXTENSION_NAME, event: event)?.value else {
+        guard let configurationSharedState = getSharedState(extensionName: TargetConstants.Configuration.EXTENSION_NAME, event: event)?.value else {
             dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Missing shared state - configuration")
             return
         }
 
-        let lifecycleSharedState = getSharedState(extensionName: TargetConstants.LIFECYCLE.EXTENSION_NAME, event: event)?.value
-        let identitySharedState = getSharedState(extensionName: TargetConstants.IDENTITY.EXTENSION_NAME, event: event)?.value
+        let lifecycleSharedState = getSharedState(extensionName: TargetConstants.Lifecycle.EXTENSION_NAME, event: event)?.value
+        let identitySharedState = getSharedState(extensionName: TargetConstants.Identity.EXTENSION_NAME, event: event)?.value
 
-        guard let privacy = configurationSharedState[TargetConstants.CONFIGURATION.SharedState.Keys.GLOBAL_CONFIG_PRIVACY] as? String, privacy == TargetConstants.CONFIGURATION.SharedState.Values.GLOBAL_CONFIG_PRIVACY_OPT_IN else {
+        guard let privacy = configurationSharedState[TargetConstants.Configuration.SharedState.Keys.GLOBAL_CONFIG_PRIVACY] as? String, privacy == TargetConstants.Configuration.SharedState.Values.GLOBAL_CONFIG_PRIVACY_OPT_IN else {
             dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Privacy status is opted out")
             return
         }
@@ -106,8 +106,8 @@ public class Target: NSObject, Extension {
         }
         let headers = [TargetConstants.HEADER_CONTENT_TYPE: TargetConstants.HEADER_CONTENT_TYPE_JSON]
 
-        let targetServer = configurationSharedState[TargetConstants.CONFIGURATION.SharedState.Keys.TARGET_SERVER] as? String
-        guard let clientCode = configurationSharedState[TargetConstants.CONFIGURATION.SharedState.Keys.TARGET_CLIENT_CODE] as? String else {
+        let targetServer = configurationSharedState[TargetConstants.Configuration.SharedState.Keys.TARGET_SERVER] as? String
+        guard let clientCode = configurationSharedState[TargetConstants.Configuration.SharedState.Keys.TARGET_CLIENT_CODE] as? String else {
             dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Missing client code")
             return
         }

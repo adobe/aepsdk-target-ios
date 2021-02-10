@@ -18,7 +18,7 @@ import Foundation
 /// Struct to represent Target Delivery API call's JSON request.
 /// For more details refer to https://developers.adobetarget.com/api/delivery-api/#tag/Delivery-API
 struct DeliveryRequest: Codable {
-    static let LOG_TAG = "Target"
+    static let LOG_TAG = "DeliveryRequest"
 
     var id: TargetIDs?
     var context: TargetContext
@@ -214,27 +214,27 @@ enum DeliveryRequestBuilder {
         let targetIDs = generateTargetIDsBy(tntid: tntId, thirdPartyId: thirdPartyId, identitySharedState: identitySharedState)
         let prefetch = generatePrefetchBy(targetPrefetchArray: targetPrefetchArray, lifecycleSharedState: lifecycleSharedState, globalParameters: targetParameters)
         let experienceCloud = generateExperienceCloudInfoBy(identitySharedState: identitySharedState)
-        guard let context = generateTargetContextBy() else {
+        guard let context = generateTargetContext() else {
             return nil
         }
         return DeliveryRequest(id: targetIDs, context: context, experienceCloud: experienceCloud, prefetch: prefetch)
     }
 
     private static func generateTargetIDsBy(tntid: String?, thirdPartyId: String?, identitySharedState: [String: Any]?) -> TargetIDs? {
-        let customerIds = identitySharedState?[TargetConstants.IDENTITY.SharedState.Keys.VISITOR_ID_MID] as? [CustomIdentity]
-        return TargetIDs(tntId: tntid, thirdPartyId: thirdPartyId, marketingCloudVisitorId: identitySharedState?[TargetConstants.IDENTITY.SharedState.Keys.VISITOR_ID_MID] as? String, customerIds: CustomerID.from(customIdentities: customerIds))
+        let customerIds = identitySharedState?[TargetConstants.Identity.SharedState.Keys.VISITOR_ID_MID] as? [CustomIdentity]
+        return TargetIDs(tntId: tntid, thirdPartyId: thirdPartyId, marketingCloudVisitorId: identitySharedState?[TargetConstants.Identity.SharedState.Keys.VISITOR_ID_MID] as? String, customerIds: CustomerID.from(customIdentities: customerIds))
     }
 
     private static func generateExperienceCloudInfoBy(identitySharedState: [String: Any]?) -> ExperienceCloudInfo? {
         guard let identitySharedState = identitySharedState else {
             return nil
         }
-        let audienceManager = AudienceManagerInfo(blob: identitySharedState[TargetConstants.IDENTITY.SharedState.Keys.VISITOR_ID_BLOB] as? String, locationHint: identitySharedState[TargetConstants.IDENTITY.SharedState.Keys.VISITOR_ID_LOCATION_HINT] as? Int)
+        let audienceManager = AudienceManagerInfo(blob: identitySharedState[TargetConstants.Identity.SharedState.Keys.VISITOR_ID_BLOB] as? String, locationHint: identitySharedState[TargetConstants.Identity.SharedState.Keys.VISITOR_ID_LOCATION_HINT] as? Int)
         let analytics = AnalyticsInfo(logging: .client_side)
         return ExperienceCloudInfo(audienceManager: audienceManager, analytics: analytics)
     }
 
-    private static func generateTargetContextBy() -> TargetContext? {
+    private static func generateTargetContext() -> TargetContext? {
         let deviceType: DeviceType = systemInfoService.getDeviceType() == AEPServices.DeviceType.PHONE ? .phone : .tablet
         let mobilePlatform = MobilePlatform(deviceName: systemInfoService.getDeviceName(), deviceType: deviceType, platformType: .ios)
         let application = AppInfo(id: systemInfoService.getApplicationBundleId(), name: systemInfoService.getApplicationName(), version: systemInfoService.getApplicationVersion())

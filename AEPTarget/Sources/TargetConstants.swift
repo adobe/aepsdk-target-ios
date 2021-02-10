@@ -20,7 +20,7 @@ enum TargetConstants {
     static let DATASTORE_NAME = EXTENSION_NAME
     static let DEFAULT_SESSION_TIMEOUT: Int = 30 * 60 // 30 mins
     static let DELIVERY_API_URL_BASE = "https://%@/rest/v1/delivery/?client=%@&sessionId=%@"
-    static let API_URL_HOST_BASE = "%s.tt.omtrdc.net"
+    static let API_URL_HOST_BASE = "%@.tt.omtrdc.net"
     static let HEADER_CONTENT_TYPE = "Content-Type"
     static let HEADER_CONTENT_TYPE_JSON = "application/json"
 
@@ -69,7 +69,7 @@ enum TargetConstants {
         static let TNT_ID = "tntid"
     }
 
-    enum IDENTITY {
+    enum Identity {
         static let EXTENSION_NAME = "com.adobe.module.identity"
         enum SharedState {
             enum Keys {
@@ -82,7 +82,7 @@ enum TargetConstants {
         }
     }
 
-    enum CONFIGURATION {
+    enum Configuration {
         static let EXTENSION_NAME = "com.adobe.module.configuration"
         enum SharedState {
             enum Keys {
@@ -106,7 +106,7 @@ enum TargetConstants {
         }
     }
 
-    enum LIFECYCLE {
+    enum Lifecycle {
         static let EXTENSION_NAME = "com.adobe.module.lifecycle"
     }
 }

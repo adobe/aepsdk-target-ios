@@ -24,8 +24,17 @@ generate-lcov:
 pod-install:
 	(pod install --repo-update)
 
+ci-pod-install:
+	(bundle exec pod install --repo-update)
+
 pod-repo-update:
 	(pod repo update)
+
+install-swiftlint:
+	HOMEBREW_NO_AUTO_UPDATE=1 brew install swiftlint && brew cleanup swiftlint
+
+install-swiftformat:
+	(brew install swiftformat) 
 
 pod-update: pod-repo-update
 	(pod update)

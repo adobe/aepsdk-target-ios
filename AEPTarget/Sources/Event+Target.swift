@@ -26,6 +26,6 @@ extension Event {
 
     /// Returns true if this event is a prefetch request event
     var isPrefetchEvent: Bool {
-        return data?[TargetConstants.EventDataKeys.PREFETCH_REQUESTS] as? Bool ?? false
+        return data?[TargetConstants.EventDataKeys.PREFETCH_REQUESTS] != nil ? true : false
     }
 }
