@@ -32,7 +32,7 @@ import Foundation
 
         guard !prefetchObjectArray.isEmpty else {
             Log.error(label: Target.LOG_TAG, "Failed to prefetch Target request (the provided request list for mboxes is empty or null)")
-            completion(TargetError(message: TargetError.ERROR_EMPTY_PREFETCH_LIST))
+            completion(TargetError.emptyPrefetchListError)
             return
         }
         var prefetchArray = [[String: Any]]()
@@ -42,7 +42,7 @@ import Foundation
 
             } else {
                 Log.error(label: Target.LOG_TAG, "Failed to prefetch Target request (the provided prefetch object can't be converted to [String: Any] dictionary), prefetch => \(prefetch)")
-                completion(TargetError(message: TargetError.ERROR_INVALID_REQUEST))
+                completion(TargetError.invalidRequestError)
                 return
             }
         }
@@ -56,11 +56,11 @@ import Foundation
 
         MobileCore.dispatch(event: event) { responseEvent in
             guard let responseEvent = responseEvent else {
-                completion(TargetError(message: TargetError.ERROR_TIMEOUT))
+                completion(TargetError.timeoutError)
                 return
             }
             if let errorMessage = responseEvent.data?[TargetConstants.EventDataKeys.PREFETCH_ERROR] as? String {
-                completion(TargetError(message: errorMessage))
+                completion(TargetError.custom(errorMessage))
                 return
             }
             completion(.none)
@@ -137,9 +137,11 @@ import Foundation
 
     /// Sets the Target preview restart deep link.
     /// Set the Target preview URL to be displayed when the preview mode is restarted.
-    /// - Parameter deeplink:  the URL which will be set for preview restart
-    static func setPreviewRestartDeepLink(_ deeplink: URL) {
-        previewManager.setRestartDeepLink(deeplink)
+    /// - Parameter deeplink: the deeplink url as a string
+    static func setPreviewRestartDeepLink(_ deeplink: String) {
+        let eventData = [TargetConstants.EventDataKeys.DEEPLINK: deeplink]
+        let event = Event(name: TargetConstants.EventName.SET_PREVIEW_DEEPLINK, type: EventType.target, source: EventSource.requestContent, data: eventData)
+        MobileCore.dispatch(event: event)
     }
 
     /// Sends a display notification to Target for given prefetched mboxes. This helps Target record location display events.

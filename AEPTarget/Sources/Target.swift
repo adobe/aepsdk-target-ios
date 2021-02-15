@@ -38,22 +38,17 @@ public class Target: NSObject, Extension {
 
     public var runtime: ExtensionRuntime
 
-    static var previewManager = TargetPreviewManager()
+    var previewManager: PreviewManager
 
     public required init?(runtime: ExtensionRuntime) {
         self.runtime = runtime
         targetState = TargetState()
+        previewManager = TargetPreviewManager()
         super.init()
     }
 
     public func onRegistered() {
-        registerListener(type: EventType.target, source: EventSource.requestContent) { event in
-            if event.isPrefetchEvent {
-                self.prefetchContent(event)
-                return
-            }
-            Log.debug(label: Target.LOG_TAG, "Unknown event: \(event)")
-        }
+        registerListener(type: EventType.target, source: EventSource.requestContent, listener: handle)
         registerListener(type: EventType.target, source: EventSource.requestReset, listener: handle)
         registerListener(type: EventType.target, source: EventSource.requestIdentity, listener: handle)
         registerListener(type: EventType.configuration, source: EventSource.responseContent, listener: handle)
@@ -73,8 +68,12 @@ public class Target: NSObject, Extension {
     // MARK: - Event Listeners
 
     private func handle(event: Event) {
-        if let restartDeeplink = event.data?[TargetConstants.EventDataKeys.PREVIEW_RESTART_DEEP_LINK] as? String, let restartDeeplinkUrl = URL(string: restartDeeplink) {
-            Target.setPreviewRestartDeepLink(restartDeeplinkUrl)
+        if event.isPrefetchEvent {
+            prefetchContent(event)
+            return
+        }
+        if let restartDeeplink = event.data?[TargetConstants.EventDataKeys.PREVIEW_RESTART_DEEP_LINK] as? String {
+            previewManager.setRestartDeepLink(restartDeeplink)
         }
     }
 
@@ -83,7 +82,6 @@ public class Target: NSObject, Extension {
             processPreviewDeepLink(event: event, deeplink: deeplink)
         }
     }
-    
 
     // MARK: - Event Handlers
 
@@ -93,8 +91,8 @@ public class Target: NSObject, Extension {
             return
         }
 
-        if !prepareForTargetRequest(configSharedState: configSharedState) {
-            Log.warning(label: Target.LOG_TAG, "Target is not enabled, cannot enter in preview mode.")
+        if let error = prepareForTargetRequest(configSharedState: configSharedState) {
+            Log.warning(label: Target.LOG_TAG, "Target is not enabled, cannot enter in preview mode. Error: \(error)")
             return
         }
 
@@ -103,35 +101,19 @@ public class Target: NSObject, Extension {
             return
         }
 
-        // TODO: - Get client code from state once state is merged in.
-        let clientCode = ""
         guard let deeplinkUrl = URL(string: deeplink) else {
             Log.error(label: Target.LOG_TAG, "Deeplink is not a valid url")
             return
         }
 
-        Target.previewManager.enterPreviewModeWithDeepLink(clientCode: clientCode, deepLink: deeplinkUrl)
-    }
-
-    // MARK: - Helpers
-
-    private var isInPreviewMode: Bool {
-        guard let previewParameters = Target.previewManager.previewParameters, !previewParameters.isEmpty else {
-            return false
-        }
-        return true
-    }
-
-    private func prepareForTargetRequest(configSharedState: [String: Any]) -> Bool {
-        guard let clientCode = configSharedState[TargetConstants.EventDataKeys.Configuration.TARGET_CLIENT_CODE] as? String, !clientCode.isEmpty else {
-            Log.warning(label: Target.LOG_TAG, "Target request preparation failed, client code was empty")
-            return false
+        guard let clientCode = targetState.clientCode else {
+            Log.error(label: Target.LOG_TAG, "Client code is nil")
+            return
         }
 
-        // TODO: logic in here. Yansong is adding to his PR
-        return true
+        previewManager.enterPreviewModeWithDeepLink(clientCode: clientCode, deepLink: deeplinkUrl)
     }
-    
+
     /// Handle prefetch content request
     /// - Parameter event: an event of type target and  source request content is dispatched by the `EventHub`
     private func prefetchContent(_ event: Event) {
@@ -228,5 +210,36 @@ public class Target: NSObject, Extension {
         }
 
         return String(format: TargetConstants.DELIVERY_API_URL_BASE, String(format: TargetConstants.API_URL_HOST_BASE, clientCode), clientCode, targetState.sessionId)
+    }
+
+    private var isInPreviewMode: Bool {
+        guard let previewParameters = previewManager.previewParameters, !previewParameters.isEmpty else {
+            return false
+        }
+        return true
+    }
+
+    private func prepareForTargetRequest(configSharedState: [String: Any]) -> TargetError? {
+        guard let clientCode = configSharedState[TargetConstants.EventDataKeys.Configuration.TARGET_CLIENT_CODE] as? String, !clientCode.isEmpty else {
+            Log.warning(label: Target.LOG_TAG, "Target request preparation failed, client code was empty")
+            return .clientCodeEmptyError
+        }
+
+        if targetState.clientCode != clientCode {
+            targetState.updateClientCode(clientCode)
+            targetState.updateEdgeHost("")
+        }
+
+        var newTimeout: Int
+        if let configTimeout = configSharedState[TargetConstants.Configuration.SharedState.Keys.TARGET_SESSION_TIMEOUT] as? Int {
+            // Must not only check if config timeout is not nil, but valid (>= 0)
+            newTimeout = configTimeout >= 0 ? configTimeout : TargetConstants.DEFAULT_SESSION_TIMEOUT
+        } else {
+            newTimeout = TargetConstants.DEFAULT_SESSION_TIMEOUT
+        }
+        targetState.updateSessionTimeout(newTimeout)
+
+        let privacyOpt = configSharedState[TargetConstants.Configuration.SharedState.Keys.GLOBAL_CONFIG_PRIVACY] as? String
+        return privacyOpt == TargetConstants.Configuration.SharedState.Values.GLOBAL_CONFIG_PRIVACY_OPT_IN ? nil : .optedOutError
     }
 }

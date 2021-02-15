@@ -12,17 +12,31 @@
 
 import Foundation
 
-class TargetError: Error, CustomStringConvertible {
-    private let message: String
-    static let ERROR_EMPTY_PREFETCH_LIST = "Empty or null prefetch requests list"
-    static let ERROR_INVALID_REQUEST = "Invalid request error"
-    static let ERROR_TIMEOUT = "API call timeout"
-
-    init(message: String) {
-        self.message = message
-    }
+enum TargetError: Error, CustomStringConvertible {
+    case emptyPrefetchListError
+    case invalidRequestError
+    case timeoutError
+    case configNilError
+    case clientCodeEmptyError
+    case optedOutError
+    case custom(String)
 
     var description: String {
-        message
+        switch self {
+        case .emptyPrefetchListError:
+            return "Empty or nill prefetch requests list"
+        case .invalidRequestError:
+            return "Invalid request error"
+        case .timeoutError:
+            return "API call timeout"
+        case .configNilError:
+            return "Configuration was nil"
+        case .clientCodeEmptyError:
+            return "Client code was nil or empty"
+        case .optedOutError:
+            return "Opted out"
+        case let .custom(message):
+            return message
+        }
     }
 }

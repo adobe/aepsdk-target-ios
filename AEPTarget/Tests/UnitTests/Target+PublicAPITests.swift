@@ -64,7 +64,7 @@ class TargetPublicAPITests: XCTestCase {
             guard let error = error as? TargetError else {
                 return
             }
-            XCTAssertEqual("Empty or null prefetch requests list", error.description)
+            XCTAssertEqual("Empty or nill prefetch requests list", error.description)
             expectation.fulfill()
         }
     }

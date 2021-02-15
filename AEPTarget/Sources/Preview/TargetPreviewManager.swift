@@ -20,7 +20,7 @@ struct TargetPreviewState {
     var token: String?
     var endpoint: String?
     var webViewHtml: String?
-    var restartUrl: URL?
+    var restartUrl: String?
     var fetchingWebView: Bool = false
     var previewButton: FloatingButtonPresentable?
 
@@ -103,7 +103,7 @@ class TargetPreviewManager: PreviewManager {
                 }
             }
 
-            if let restartUrl = state.restartUrl {
+            if let restartUrlString = state.restartUrl, let restartUrl = URL(string: restartUrlString) {
                 urlOpeningService.openUrl(restartUrl)
             }
 
@@ -147,7 +147,7 @@ class TargetPreviewManager: PreviewManager {
         })
     }
 
-    func setRestartDeepLink(_ restartDeepLink: URL) {
+    func setRestartDeepLink(_ restartDeepLink: String) {
         state.restartUrl = restartDeepLink
     }
 

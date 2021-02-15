@@ -59,7 +59,7 @@ class TargetState {
             sessionTimeoutInSeconds = TargetConstants.DEFAULT_SESSION_TIMEOUT
         }
     }
-    
+
     /// Updates the client code in memory
     func updateClientCode(_ clientCode: String) {
         self.clientCode = clientCode
@@ -68,6 +68,10 @@ class TargetState {
     /// Updates the session timestamp of the latest target API call in memory and in the data store
     func updateSessionTimestamp() {
         sessionTimestampInSeconds = Date().getUnixTimeInSeconds()
+    }
+
+    func updateSessionTimeout(_ sessionTimeout: Int) {
+        sessionTimeoutInSeconds = sessionTimeout
     }
 
     /// Updates the TNT ID in memory and in the data store
