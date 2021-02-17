@@ -53,11 +53,7 @@ class TargetState {
         edgeHost = dataStore.getString(key: TargetConstants.DataStoreKeys.EDGE_HOST)
         sessionTimestampInSeconds = dataStore.getLong(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP)
         storedSessionId = dataStore.getString(key: TargetConstants.DataStoreKeys.SESSION_ID) ?? UUID().uuidString
-        if let sessionTimeout = dataStore.getInt(key: TargetConstants.DataStoreKeys.SESSION_TIMEOUT) {
-            sessionTimeoutInSeconds = sessionTimeout
-        } else {
-            sessionTimeoutInSeconds = TargetConstants.DEFAULT_SESSION_TIMEOUT
-        }
+        sessionTimeoutInSeconds = TargetConstants.DEFAULT_SESSION_TIMEOUT
     }
 
     /// Updates the session timestamp of the latest target API call in memory and in the data store

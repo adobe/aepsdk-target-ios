@@ -14,7 +14,7 @@ import Foundation
 
 class TargetError: Error, CustomStringConvertible {
     private let message: String
-    static let ERROR_EMPTY_PREFETCH_LIST = "Empty or null prefetch requests list"
+    static let ERROR_EMPTY_PREFETCH_LIST = "Empty or nil prefetch requests list"
     static let ERROR_INVALID_REQUEST = "Invalid request error"
     static let ERROR_TIMEOUT = "API call timeout"
 

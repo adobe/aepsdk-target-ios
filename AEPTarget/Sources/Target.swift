@@ -154,7 +154,7 @@ public class Target: NSObject, Extension {
     // MARK: - Helpers
 
     private func dispatchPrefetchErrorEvent(triggerEvent: Event, errorMessage: String) {
-        Log.error(label: Target.LOG_TAG, "dispatch prefetch error event")
+        Log.warning(label: Target.LOG_TAG, "dispatch prefetch error event")
         dispatch(event: triggerEvent.createResponseEvent(name: TargetConstants.EventName.PREFETCH_RESPOND, type: EventType.target, source: EventSource.responseContent, data: [TargetConstants.EventDataKeys.PREFETCH_ERROR: errorMessage]))
     }
 

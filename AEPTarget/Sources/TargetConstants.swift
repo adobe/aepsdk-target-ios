@@ -27,7 +27,6 @@ enum TargetConstants {
     enum DataStoreKeys {
         static let SESSION_TIMESTAMP = "SESSION_TIMESTAMP"
         static let SESSION_ID = "SESSION_ID"
-        static let SESSION_TIMEOUT = "SESSION_TIMEOUT"
         static let TNT_ID = "TNT_ID"
         static let EDGE_HOST = "EDGE_HOST"
     }
@@ -39,8 +38,8 @@ enum TargetConstants {
 
     enum EventName {
         static let LOAD_REQUEST = "TargetLoadRequest"
-        static let PREFETCH_REQUESTS = "prefetch"
-        static let PREFETCH_RESPOND = "prefetchRespond"
+        static let PREFETCH_REQUESTS = "TargetPrefetchRequest"
+        static let PREFETCH_RESPOND = "TargetPrefetchResponse"
         static let REQUEST_IDENTITY = "TargetRequestIdentity"
         static let REQUEST_RESET = "TargetRequestReset"
         static let CLEAR_PREFETCH_CACHE = "TargetClearPrefetchCache"
