@@ -70,7 +70,9 @@ public class Target: NSObject, Extension {
 
     // MARK: - Event Listeners
 
-    private func handle(event _: Event) {}
+    private func handle(_ event: Event) {
+        print(event)
+    }
 
     /// Handle prefetch content request
     /// - Parameter event: an event of type target and  source request content is dispatched by the `EventHub`
@@ -134,7 +136,7 @@ public class Target: NSObject, Extension {
 
             if let tntId = response.tntId { self.targetState.updateTntId(tntId) }
             if let edgeHost = response.edgeHost { self.targetState.updateEdgeHost(edgeHost) }
-            self.createSharedState(data: self.targetState.generateSharedState(), event: nil)
+            self.createSharedState(data: self.targetState.generateSharedState(), event: event)
 
             if let mboxes = response.mboxes {
                 var mboxesDictionary = [String: [String: Any]]()

@@ -21,7 +21,7 @@ class DeliveryRequestBuilderTests: XCTestCase {
         let request = DeliveryRequestBuilder.build(
             tntId: "tnt_id_1",
             thirdPartyId: "thirdPartyId_1",
-            identitySharedState: ["mid": "mid_xxxx", "blob": "blob_xxx", "locationhint": 9],
+            identitySharedState: ["mid": "mid_xxxx", "blob": "blob_xxx", "locationhint": "9"],
             lifecycleSharedState: [
                 "a.OSVersion": "iOS 14.2",
                 "a.DaysSinceFirstUse": "0",
@@ -76,7 +76,7 @@ class DeliveryRequestBuilderTests: XCTestCase {
         },
         "audienceManager": {
           "blob": "blob_xxx",
-          "locationHint": 9
+          "locationHint": "9"
         }
       },
       "context": {

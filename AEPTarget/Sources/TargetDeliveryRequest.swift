@@ -17,8 +17,8 @@ import Foundation
 
 /// Struct to represent Target Delivery API call's JSON request.
 /// For more details refer to https://developers.adobetarget.com/api/delivery-api/#tag/Delivery-API
-struct DeliveryRequest: Codable {
-    static let LOG_TAG = "DeliveryRequest"
+struct TargetDeliveryRequest: Codable {
+    static let LOG_TAG = "TargetDeliveryRequest"
 
     var id: TargetIDs?
     var context: TargetContext
@@ -28,7 +28,7 @@ struct DeliveryRequest: Codable {
     func toJSON() -> String? {
         let jsonEncoder = JSONEncoder()
         guard let jsonData = try? jsonEncoder.encode(self) else {
-            Log.error(label: DeliveryRequest.LOG_TAG, "Failed to encode the request object (as JSON): \(self) ")
+            Log.warning(label: TargetDeliveryRequest.LOG_TAG, "Failed to encode the request object (as JSON): \(self) ")
             return nil
         }
         return String(data: jsonData, encoding: .utf8)
@@ -77,9 +77,9 @@ struct ExperienceCloudInfo: Codable {
 
 struct AudienceManagerInfo: Codable {
     var blob: String?
-    var locationHint: Int?
+    var locationHint: String?
 
-    init?(blob: String?, locationHint: Int?) {
+    init?(blob: String?, locationHint: String?) {
         if blob == nil, locationHint == nil {
             return nil
         }
@@ -164,11 +164,11 @@ enum PlatformType: String, Codable {
 // MARK: - Delivery Request - prefetch
 
 struct Prefetch: Codable {
-    var mboxes: [Mbox]?
+    var mboxes: [Mbox]
 }
 
 struct Mbox: Codable {
-    var name: String?
+    var name: String
     var index: Int
     var parameters: [String: String]?
     var profileParameters: [String: String]?
@@ -180,7 +180,7 @@ struct Notification: Codable {
     var id: String
     var timestamp: String
     var type: String
-    var mbox: String?
+    var mbox: String
 }
 
 struct Product: Codable {
@@ -210,28 +210,29 @@ enum DeliveryRequestBuilder {
     ///   - targetPrefetchArray: an array of ACPTargetPrefetch objects representing the desired mboxes to prefetch
     ///   - targetParameters: a TargetParameters object containing parameters for all the mboxes in the request array
     /// - Returns: a `DeliveryRequest` object
-    static func build(tntId: String?, thirdPartyId: String?, identitySharedState: [String: Any]?, lifecycleSharedState: [String: Any]?, targetPrefetchArray: [TargetPrefetch], targetParameters: TargetParameters?) -> DeliveryRequest? {
+    static func build(tntId: String?, thirdPartyId: String?, identitySharedState: [String: Any]?, lifecycleSharedState: [String: Any]?, targetPrefetchArray: [TargetPrefetch], targetParameters: TargetParameters?) -> TargetDeliveryRequest? {
         let targetIDs = generateTargetIDsBy(tntid: tntId, thirdPartyId: thirdPartyId, identitySharedState: identitySharedState)
         let prefetch = generatePrefetchBy(targetPrefetchArray: targetPrefetchArray, lifecycleSharedState: lifecycleSharedState, globalParameters: targetParameters)
         let experienceCloud = generateExperienceCloudInfoBy(identitySharedState: identitySharedState)
         guard let context = generateTargetContext() else {
             return nil
         }
-        return DeliveryRequest(id: targetIDs, context: context, experienceCloud: experienceCloud, prefetch: prefetch)
+        return TargetDeliveryRequest(id: targetIDs, context: context, experienceCloud: experienceCloud, prefetch: prefetch)
     }
 
     private static func generateTargetIDsBy(tntid: String?, thirdPartyId: String?, identitySharedState: [String: Any]?) -> TargetIDs? {
-        let customerIds = identitySharedState?[TargetConstants.Identity.SharedState.Keys.VISITOR_ID_MID] as? [CustomIdentity]
+        let customerIds = identitySharedState?[TargetConstants.Identity.SharedState.Keys.VISITOR_IDS_LIST] as? [CustomIdentity]
         return TargetIDs(tntId: tntid, thirdPartyId: thirdPartyId, marketingCloudVisitorId: identitySharedState?[TargetConstants.Identity.SharedState.Keys.VISITOR_ID_MID] as? String, customerIds: CustomerID.from(customIdentities: customerIds))
     }
 
-    private static func generateExperienceCloudInfoBy(identitySharedState: [String: Any]?) -> ExperienceCloudInfo? {
-        guard let identitySharedState = identitySharedState else {
-            return nil
-        }
-        let audienceManager = AudienceManagerInfo(blob: identitySharedState[TargetConstants.Identity.SharedState.Keys.VISITOR_ID_BLOB] as? String, locationHint: identitySharedState[TargetConstants.Identity.SharedState.Keys.VISITOR_ID_LOCATION_HINT] as? Int)
+    private static func generateExperienceCloudInfoBy(identitySharedState: [String: Any]?) -> ExperienceCloudInfo {
         let analytics = AnalyticsInfo(logging: .client_side)
-        return ExperienceCloudInfo(audienceManager: audienceManager, analytics: analytics)
+        if let identitySharedState = identitySharedState {
+            let audienceManager = AudienceManagerInfo(blob: identitySharedState[TargetConstants.Identity.SharedState.Keys.VISITOR_ID_BLOB] as? String, locationHint: identitySharedState[TargetConstants.Identity.SharedState.Keys.VISITOR_ID_LOCATION_HINT] as? String)
+            return ExperienceCloudInfo(audienceManager: audienceManager, analytics: analytics)
+        }
+
+        return ExperienceCloudInfo(audienceManager: nil, analytics: analytics)
     }
 
     private static func generateTargetContext() -> TargetContext? {
@@ -252,7 +253,7 @@ enum DeliveryRequestBuilder {
             let parameterWithLifecycleData = merge(newDictionary: lifecycleDataDict, to: prefetch.targetParameters?.parameters)
             let parameters = merge(newDictionary: globalParameters?.parameters, to: parameterWithLifecycleData)
             let profileParameters = merge(newDictionary: globalParameters?.profileParameters, to: prefetch.targetParameters?.profileParameters)
-            let order = findFirstAvailableOrder(order: prefetch.targetParameters?.order, globalOrder: globalParameters?.order)
+            let order = findFirstAvailableOrder(globalOrder: globalParameters?.order, order: prefetch.targetParameters?.order)
             let product = findFirstAvailableProduct(product: prefetch.targetParameters?.product, globalProduct: globalParameters?.product)
             let mbox = Mbox(name: prefetch.name, index: index, parameters: parameters, profileParameters: profileParameters, order: order, product: product)
             mboxes.append(mbox)
@@ -266,27 +267,21 @@ enum DeliveryRequestBuilder {
     ///   - dictionary: the original dictionary
     /// - Returns: a new dictionary with combined key-value pairs
     private static func merge(newDictionary: [String: String]?, to dictionary: [String: String]?) -> [String: String]? {
-        if let newDictionary = newDictionary, let dictionary = dictionary {
-            return dictionary.merging(newDictionary) { _, new in new }
-        }
-
-        if let newDictionary = newDictionary {
-            return newDictionary
-        }
-
-        if let dictionary = dictionary {
+        guard let newDictionary = newDictionary else {
             return dictionary
         }
-
-        return nil
+        guard let dictionary = dictionary else {
+            return newDictionary
+        }
+        return dictionary.merging(newDictionary) { _, new in new }
     }
 
-    private static func findFirstAvailableOrder(order: TargetOrder?, globalOrder: TargetOrder?) -> Order? {
-        if let order = order {
-            return order.toInternalOrder()
-        }
+    private static func findFirstAvailableOrder(globalOrder: TargetOrder?, order: TargetOrder?) -> Order? {
         if let globalOrder = globalOrder {
             return globalOrder.toInternalOrder()
+        }
+        if let order = order {
+            return order.toInternalOrder()
         }
         return nil
     }
