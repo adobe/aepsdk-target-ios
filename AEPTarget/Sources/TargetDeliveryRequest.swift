@@ -9,7 +9,6 @@
  OF ANY KIND, either express or implied. See the License for the specific language
  governing permissions and limitations under the License.
  */
-import AEPIdentity
 import AEPServices
 import Foundation
 
@@ -61,24 +60,6 @@ struct CustomerID: Codable {
     var id: String
     var integrationCode: String
     var authenticatedState: AuthenticatedState
-
-    /// Converts a `CustomIdentity` array to a `CustomerID` array
-    /// - Parameter customIdentities: an array of `CustomIdentity` objects
-    /// - Returns: an array of `CustomerID` objects
-    static func from(customIdentities: [CustomIdentity]?) -> [CustomerID]? {
-        guard let customIdentities = customIdentities else {
-            return nil
-        }
-
-        var customerIDs = [CustomerID]()
-        for customIdentity in customIdentities {
-            guard let id = customIdentity.identifier, let code = customIdentity.type else {
-                continue
-            }
-            customerIDs.append(CustomerID(id: id, integrationCode: code, authenticatedState: AuthenticatedState.from(authenticationState: customIdentity.authenticationState)))
-        }
-        return customerIDs
-    }
 }
 
 // MARK: - Delivery Request - experienceCloud
@@ -113,18 +94,14 @@ enum AuthenticatedState: String, Codable {
     case unknown
     case authenticated
     case logged_out
-
-    /// Converts a `MobileVisitorAuthenticationState` object to an `AuthenticatedState` object
-    /// - Parameter authenticationState: a `MobileVisitorAuthenticationState` object
-    /// - Returns: an `AuthenticatedState` object
-    static func from(authenticationState: MobileVisitorAuthenticationState) -> AuthenticatedState {
-        switch authenticationState {
-        case .authenticated:
-            return AuthenticatedState.authenticated
-        case .loggedOut:
-            return AuthenticatedState.logged_out
+    static func from(state: Int) -> AuthenticatedState {
+        switch state {
+        case 1:
+            return .authenticated
+        case 2:
+            return .logged_out
         default:
-            return AuthenticatedState.unknown
+            return .unknown
         }
     }
 }
