@@ -138,6 +138,12 @@ enum DeliveryRequestBuilder {
         return mboxParametersCopy
     }
 
+    /// Creates `TargetIDs` with the given tntId, thirdPartyId and the Identity's shared states
+    /// - Parameters:
+    ///   - tntid: `String` tnt id
+    ///   - thirdPartyId: `String` third party id
+    ///   - identitySharedState: `Identity` context  data
+    /// - Returns: `TargetIDs` object
     static func generateTargetIDsBy(tntid: String?, thirdPartyId: String?, identitySharedState: [String: Any]?) -> TargetIDs? {
         var customerIds: [CustomerID]?
         if let visitorIds = identitySharedState?[TargetConstants.Identity.SharedState.Keys.VISITOR_IDS_LIST] as? [[String: Any]] {

@@ -94,6 +94,10 @@ enum AuthenticatedState: String, Codable {
     case unknown
     case authenticated
     case logged_out
+
+    /// Constructs an `AuthenticatedState` enum using "VisitorAuthenticationState" from the Identity's shared states
+    /// - Parameter state: the value of the "VisitorAuthenticationState" from the Identity's shared states
+    /// - Returns: `AuthenticatedState` enum
     static func from(state: Int) -> AuthenticatedState {
         switch state {
         case 1:
