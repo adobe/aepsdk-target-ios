@@ -10,7 +10,6 @@
  governing permissions and limitations under the License.
  */
 
-import AEPIdentity
 import AEPServices
 import Foundation
 
