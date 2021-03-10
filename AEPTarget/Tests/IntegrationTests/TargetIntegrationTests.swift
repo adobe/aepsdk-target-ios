@@ -20,7 +20,7 @@ import XCTest
 
 class TargetIntegrationTests: XCTestCase {
     private let T_LOG_TAG = "TargetIntegrationTests"
-    private let dispatchQueue = DispatchQueue(label: "")
+    private let dispatchQueue = DispatchQueue(label: "com.adobe.target.test")
     override func setUp() {
         FileManager.default.clear()
         UserDefaults.clear()
@@ -40,19 +40,17 @@ class TargetIntegrationTests: XCTestCase {
 
     private func waitForLatestSettledSharedState(_ extensionName: String, timeout: Double = 1) -> [String: Any]? {
         var sharedState: [String: Any]?
-        let sharedStateExpectation = XCTestExpectation(description: "monitor the latest shared state for \(extensionName)")
+        let sharedStateExpectation = XCTestExpectation(description: "wait for the latest shared state of \(extensionName)")
         sharedStateExpectation.expectedFulfillmentCount = 1
-        let event = Event(name: "name_test", type: "type_test", source: "source_test", data: nil)
-        MobileCore.dispatch(event: event)
         MobileCore.registerEventListener(type: "com.adobe.eventType.hub", source: "com.adobe.eventSource.sharedState") { event in
             if let data = event.data, data["stateowner"] as? String == extensionName {
                 self.dispatchQueue.async {
-                    if let result = EventHub.shared.getSharedState(extensionName: extensionName, event: event), result.status == .set {
+                    let result = EventHub.shared.getSharedState(extensionName: extensionName, event: event)
+                    if let result = result, result.status == .set {
                         sharedState = result.value
                         sharedStateExpectation.fulfill()
                     } else {
-                        Log.error(label: self.T_LOG_TAG, "[\(extensionName)'s shared state: status = \(String(describing: EventHub.shared.getSharedState(extensionName: extensionName, event: event)?.status.rawValue))]")
-                        Log.error(label: self.T_LOG_TAG, "[\(extensionName)'s shared state: value = \(String(describing: EventHub.shared.getSharedState(extensionName: extensionName, event: event)?.value))]")
+                        Log.error(label: self.T_LOG_TAG, "[\(extensionName)'s shared state: \n status = \(String(describing: result?.status.rawValue)) \n value = \(String(describing: result?.value))]")
                     }
                 }
             }
@@ -98,13 +96,6 @@ class TargetIntegrationTests: XCTestCase {
             return " \(eventData as AnyObject)"
         }
         return prettyPrintedString
-    }
-
-    func testMultiple() {
-        for time in 0 ... 100 {
-            print("this test is being invoked: \(time) times")
-            testPrefetch()
-        }
     }
 
     func testPrefetch() {
