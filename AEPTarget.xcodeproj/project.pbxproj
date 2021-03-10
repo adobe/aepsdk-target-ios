@@ -23,7 +23,6 @@
 /* Begin PBXBuildFile section */
 		21BB6EAE22D5AC72C15DB97C /* Pods_AEPTargetTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 639B326C68E1444919C98676 /* Pods_AEPTargetTests.framework */; };
 		54A53C0BFA0D61EF50B9E5C5 /* Pods_AEPTargetDemoApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 45A74BEED420E4145D1D72CC /* Pods_AEPTargetDemoApp.framework */; };
-		356F08589331CE5682C079B1 /* Pods_AEPTarget.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C25D5A6C26809EA683183C03 /* Pods_AEPTarget.framework */; };
 		780DF565258924B70033F107 /* URL+Target.swift in Sources */ = {isa = PBXBuildFile; fileRef = 780DF564258924B70033F107 /* URL+Target.swift */; };
 		780DF56A258924C40033F107 /* TargetPreviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 780DF569258924C40033F107 /* TargetPreviewManager.swift */; };
 		7814B2AE25CB625A00841429 /* MockUIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7814B2AD25CB625A00841429 /* MockUIService.swift */; };
@@ -52,6 +51,7 @@
 		B892108364E7E7655157FEAC /* Pods_AEPTarget.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40940F7A671A68BB370B9F5B /* Pods_AEPTarget.framework */; };
 		BB0C914A2575F72200F635B8 /* TargetState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0C91492575F72200F635B8 /* TargetState.swift */; };
 		BB0C915B25775F1100F635B8 /* TargetError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0C915A25775F1100F635B8 /* TargetError.swift */; };
+		BB106A7425F2E18A0039D493 /* TargetIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB106A7325F2E18A0039D493 /* TargetIntegrationTests.swift */; };
 		BB1DBE9025D22C3D00DDBA15 /* Target+PublicAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1DBE8F25D22C3D00DDBA15 /* Target+PublicAPITests.swift */; };
 		BB1DBE9525D2377600DDBA15 /* MockExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1DBE9425D2377600DDBA15 /* MockExtension.swift */; };
 		BB1DBEA125D2F33D00DDBA15 /* TargetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1DBE9925D2F30400DDBA15 /* TargetTests.swift */; };
@@ -70,6 +70,10 @@
 		BB9C870F25623692007AEF8B /* TargetPrefetch+Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9C870E25623692007AEF8B /* TargetPrefetch+Internal.swift */; };
 		BB9C871A25623723007AEF8B /* TargetOrder+Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9C871925623723007AEF8B /* TargetOrder+Internal.swift */; };
 		BB9C871F256237F2007AEF8B /* TargetProduct+Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9C871E256237F2007AEF8B /* TargetProduct+Internal.swift */; };
+		BBE8F7BA25F7E57D00C1D0E4 /* UserDefaults+clear.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE8F7B925F7E57D00C1D0E4 /* UserDefaults+clear.swift */; };
+		BBE8F7BF25F7E5B800C1D0E4 /* EventHub+reset.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE8F7BE25F7E5B800C1D0E4 /* EventHub+reset.swift */; };
+		BBE8F7D025F7E6DD00C1D0E4 /* FileManager+clear.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE8F7CF25F7E6DD00C1D0E4 /* FileManager+clear.swift */; };
+		BBE8F7ED25F832E200C1D0E4 /* TestableNetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE8F7EC25F832E200C1D0E4 /* TestableNetworkService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -148,6 +152,7 @@
 		B054CCE0C500D72ADAB76D58 /* Pods-AEPTargetTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPTargetTests.debug.xcconfig"; path = "Target Support Files/Pods-AEPTargetTests/Pods-AEPTargetTests.debug.xcconfig"; sourceTree = "<group>"; };
 		BB0C91492575F72200F635B8 /* TargetState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetState.swift; sourceTree = "<group>"; };
 		BB0C915A25775F1100F635B8 /* TargetError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetError.swift; sourceTree = "<group>"; };
+		BB106A7325F2E18A0039D493 /* TargetIntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TargetIntegrationTests.swift; sourceTree = "<group>"; };
 		BB1DBE8F25D22C3D00DDBA15 /* Target+PublicAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Target+PublicAPITests.swift"; sourceTree = "<group>"; };
 		BB1DBE9425D2377600DDBA15 /* MockExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockExtension.swift; sourceTree = "<group>"; };
 		BB1DBE9925D2F30400DDBA15 /* TargetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetTests.swift; sourceTree = "<group>"; };
@@ -166,6 +171,10 @@
 		BB9C870E25623692007AEF8B /* TargetPrefetch+Internal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TargetPrefetch+Internal.swift"; sourceTree = "<group>"; };
 		BB9C871925623723007AEF8B /* TargetOrder+Internal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TargetOrder+Internal.swift"; sourceTree = "<group>"; };
 		BB9C871E256237F2007AEF8B /* TargetProduct+Internal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TargetProduct+Internal.swift"; sourceTree = "<group>"; };
+		BBE8F7B925F7E57D00C1D0E4 /* UserDefaults+clear.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+clear.swift"; sourceTree = "<group>"; };
+		BBE8F7BE25F7E5B800C1D0E4 /* EventHub+reset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EventHub+reset.swift"; sourceTree = "<group>"; };
+		BBE8F7CF25F7E6DD00C1D0E4 /* FileManager+clear.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+clear.swift"; sourceTree = "<group>"; };
+		BBE8F7EC25F832E200C1D0E4 /* TestableNetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestableNetworkService.swift; sourceTree = "<group>"; };
 		DBF5C7242A1D12FEEF9941D8 /* Pods-AEPTargetDemoApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPTargetDemoApp.release.xcconfig"; path = "Target Support Files/Pods-AEPTargetDemoApp/Pods-AEPTargetDemoApp.release.xcconfig"; sourceTree = "<group>"; };
 		F0D5358BA6FE1A780F4C2AA6 /* Pods-AEPTargetTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPTargetTests.release.xcconfig"; path = "Target Support Files/Pods-AEPTargetTests/Pods-AEPTargetTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -297,14 +306,14 @@
 		78D503122551FCCE00966553 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				786C00F625C4A19000F26D34 /* Mocks */,
+				BB106A7225F2E18A0039D493 /* IntegrationTests */,
 				BB1DBEAE25D2F5E700DDBA15 /* TestHelpers */,
 				BB0C91602577640200F635B8 /* UnitTests */,
 				BB0C915F257763E600F635B8 /* FunctionalTests */,
-				78D503132551FCCE00966553 /* AEPTargetTests.swift */,
 				786C006625BA1E8600F26D34 /* TargetPreviewManagerTests.swift */,
 				78D503152551FCCE00966553 /* Info.plist */,
 				786C00E225C35EEB00F26D34 /* TargetTestConstants.swift */,
-				786C00F625C4A19000F26D34 /* Mocks */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -359,11 +368,23 @@
 			path = UnitTests;
 			sourceTree = "<group>";
 		};
+		BB106A7225F2E18A0039D493 /* IntegrationTests */ = {
+			isa = PBXGroup;
+			children = (
+				BB106A7325F2E18A0039D493 /* TargetIntegrationTests.swift */,
+			);
+			path = IntegrationTests;
+			sourceTree = "<group>";
+		};
 		BB1DBEAE25D2F5E700DDBA15 /* TestHelpers */ = {
 			isa = PBXGroup;
 			children = (
 				BB1DBE9425D2377600DDBA15 /* MockExtension.swift */,
 				BB1DBEAF25D2F60800DDBA15 /* TestableExtensionRuntime.swift */,
+				BBE8F7B925F7E57D00C1D0E4 /* UserDefaults+clear.swift */,
+				BBE8F7BE25F7E5B800C1D0E4 /* EventHub+reset.swift */,
+				BBE8F7CF25F7E6DD00C1D0E4 /* FileManager+clear.swift */,
+				BBE8F7EC25F832E200C1D0E4 /* TestableNetworkService.swift */,
 			);
 			path = TestHelpers;
 			sourceTree = "<group>";
@@ -674,7 +695,12 @@
 				BB1DBE9525D2377600DDBA15 /* MockExtension.swift in Sources */,
 				BB1DBE9025D22C3D00DDBA15 /* Target+PublicAPITests.swift in Sources */,
 				BB9C86EF255C9C90007AEF8B /* Event+TargetTests.swift in Sources */,
+				BBE8F7BA25F7E57D00C1D0E4 /* UserDefaults+clear.swift in Sources */,
+				BBE8F7D025F7E6DD00C1D0E4 /* FileManager+clear.swift in Sources */,
+				BB106A7425F2E18A0039D493 /* TargetIntegrationTests.swift in Sources */,
 				BB1DBEB025D2F60800DDBA15 /* TestableExtensionRuntime.swift in Sources */,
+				BBE8F7ED25F832E200C1D0E4 /* TestableNetworkService.swift in Sources */,
+				BBE8F7BF25F7E5B800C1D0E4 /* EventHub+reset.swift in Sources */,
 				BB1DBEB825D30A4A00DDBA15 /* DeliveryRequestBuilderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -688,7 +714,6 @@
 				92C44A8325DB0D39000175FB /* ContentView.swift in Sources */,
 				786C00ED25C35FBD00F26D34 /* TestableExtensionRuntime.swift in Sources */,
 				786C00E325C35EEB00F26D34 /* TargetTestConstants.swift in Sources */,
-				78D503142551FCCE00966553 /* AEPTargetTests.swift in Sources */,
 				786C006725BA1E8600F26D34 /* TargetPreviewManagerTests.swift in Sources */,
 				786C00F225C4A10A00F26D34 /* MockUrlOpeningService.swift in Sources */,
 				786C007725BF40E800F26D34 /* TargetNetworkServiceMock.swift in Sources */,

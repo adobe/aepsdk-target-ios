@@ -41,22 +41,22 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   AEPCore:
-    :commit: 50829b300d513f289fcf4e5e9c94ceca4b3680ec
+    :commit: 7ab4a04ca9855298261e5e18f7a9d315d9da6477
     :git: https://github.com/adobe/aepsdk-core-ios.git
   AEPIdentity:
-    :commit: 50829b300d513f289fcf4e5e9c94ceca4b3680ec
+    :commit: 7ab4a04ca9855298261e5e18f7a9d315d9da6477
     :git: https://github.com/adobe/aepsdk-core-ios.git
   AEPLifecycle:
-    :commit: 50829b300d513f289fcf4e5e9c94ceca4b3680ec
+    :commit: 7ab4a04ca9855298261e5e18f7a9d315d9da6477
     :git: https://github.com/adobe/aepsdk-core-ios.git
   AEPRulesEngine:
     :commit: 1e270654b330b9f07a6b1ec374e686f2e631e039
     :git: https://github.com/adobe/aepsdk-rulesengine-ios.git
   AEPServices:
-    :commit: 50829b300d513f289fcf4e5e9c94ceca4b3680ec
+    :commit: 7ab4a04ca9855298261e5e18f7a9d315d9da6477
     :git: https://github.com/adobe/aepsdk-core-ios.git
   AEPSignal:
-    :commit: 50829b300d513f289fcf4e5e9c94ceca4b3680ec
+    :commit: 7ab4a04ca9855298261e5e18f7a9d315d9da6477
     :git: https://github.com/adobe/aepsdk-core-ios.git
 
 SPEC CHECKSUMS:
@@ -67,6 +67,6 @@ SPEC CHECKSUMS:
   AEPServices: 21ea64149483fdfbd5f88f546b9f5ad7d4987400
   AEPSignal: b4ac5c8e8c68e8902739426d70c01ed3ce229ac9
 
-PODFILE CHECKSUM: ca5b5225f21517ea46386d9ab7001df16123c63b
+PODFILE CHECKSUM: d2afbfb70d1052a34656ebe9f5ba0785e12eb6dc
 
 COCOAPODS: 1.10.1
