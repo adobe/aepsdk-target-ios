@@ -63,11 +63,13 @@
 		BB47C00E25547D6400EC6FB5 /* TargetOrder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00D25547D6400EC6FB5 /* TargetOrder.swift */; };
 		BB47C01025547D8300EC6FB5 /* TargetProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00F25547D8300EC6FB5 /* TargetProduct.swift */; };
 		BB47C01225547DAE00EC6FB5 /* TargetRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C01125547DAE00EC6FB5 /* TargetRequest.swift */; };
+		BB57390925F9AD08008352D2 /* TargetV5Migrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB57390825F9AD08008352D2 /* TargetV5Migrator.swift */; };
 		BB9C86EF255C9C90007AEF8B /* Event+TargetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9C86EE255C9C90007AEF8B /* Event+TargetTests.swift */; };
 		BB9C8707255EF203007AEF8B /* TargetDeliveryRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9C8706255EF202007AEF8B /* TargetDeliveryRequest.swift */; };
 		BB9C870F25623692007AEF8B /* TargetPrefetch+Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9C870E25623692007AEF8B /* TargetPrefetch+Internal.swift */; };
 		BB9C871A25623723007AEF8B /* TargetOrder+Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9C871925623723007AEF8B /* TargetOrder+Internal.swift */; };
 		BB9C871F256237F2007AEF8B /* TargetProduct+Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9C871E256237F2007AEF8B /* TargetProduct+Internal.swift */; };
+		BB9F451A25F9CCB4002A54E7 /* TargetV5MigratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9F451925F9CCB4002A54E7 /* TargetV5MigratorTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -158,11 +160,13 @@
 		BB47C00D25547D6400EC6FB5 /* TargetOrder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetOrder.swift; sourceTree = "<group>"; };
 		BB47C00F25547D8300EC6FB5 /* TargetProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetProduct.swift; sourceTree = "<group>"; };
 		BB47C01125547DAE00EC6FB5 /* TargetRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetRequest.swift; sourceTree = "<group>"; };
+		BB57390825F9AD08008352D2 /* TargetV5Migrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetV5Migrator.swift; sourceTree = "<group>"; };
 		BB9C86EE255C9C90007AEF8B /* Event+TargetTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Event+TargetTests.swift"; sourceTree = "<group>"; };
 		BB9C8706255EF202007AEF8B /* TargetDeliveryRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetDeliveryRequest.swift; sourceTree = "<group>"; };
 		BB9C870E25623692007AEF8B /* TargetPrefetch+Internal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TargetPrefetch+Internal.swift"; sourceTree = "<group>"; };
 		BB9C871925623723007AEF8B /* TargetOrder+Internal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TargetOrder+Internal.swift"; sourceTree = "<group>"; };
 		BB9C871E256237F2007AEF8B /* TargetProduct+Internal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TargetProduct+Internal.swift"; sourceTree = "<group>"; };
+		BB9F451925F9CCB4002A54E7 /* TargetV5MigratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetV5MigratorTests.swift; sourceTree = "<group>"; };
 		DBF5C7242A1D12FEEF9941D8 /* Pods-AEPTargetDemoApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPTargetDemoApp.release.xcconfig"; path = "Target Support Files/Pods-AEPTargetDemoApp/Pods-AEPTargetDemoApp.release.xcconfig"; sourceTree = "<group>"; };
 		F0D5358BA6FE1A780F4C2AA6 /* Pods-AEPTargetTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPTargetTests.release.xcconfig"; path = "Target Support Files/Pods-AEPTargetTests/Pods-AEPTargetTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -234,6 +238,7 @@
 				BB0C91492575F72200F635B8 /* TargetState.swift */,
 				BB0C915A25775F1100F635B8 /* TargetError.swift */,
 				780DF564258924B70033F107 /* URL+Target.swift */,
+				BB57390825F9AD08008352D2 /* TargetV5Migrator.swift */,
 				78B36A5D25C87B3500D6D25F /* Preview */,
 			);
 			path = Sources;
@@ -331,6 +336,7 @@
 				BB1DBE8F25D22C3D00DDBA15 /* Target+PublicAPITests.swift */,
 				BB1DBE9925D2F30400DDBA15 /* TargetTests.swift */,
 				BB1DBEB725D30A4A00DDBA15 /* DeliveryRequestBuilderTests.swift */,
+				BB9F451925F9CCB4002A54E7 /* TargetV5MigratorTests.swift */,
 			);
 			path = UnitTests;
 			sourceTree = "<group>";
@@ -635,6 +641,7 @@
 				BB0C915B25775F1100F635B8 /* TargetError.swift in Sources */,
 				7885141425532281008E6999 /* Target.swift in Sources */,
 				BB9C871A25623723007AEF8B /* TargetOrder+Internal.swift in Sources */,
+				BB57390925F9AD08008352D2 /* TargetV5Migrator.swift in Sources */,
 				780DF56A258924C40033F107 /* TargetPreviewManager.swift in Sources */,
 				786C00DE25C1D95300F26D34 /* TargetPreviewManagerFloatingButtonDelegate.swift in Sources */,
 				BB47C01225547DAE00EC6FB5 /* TargetRequest.swift in Sources */,
@@ -653,6 +660,7 @@
 				92BF53FB25F362E600403FCD /* TargetNetworkServiceMock.swift in Sources */,
 				BB1DBEA125D2F33D00DDBA15 /* TargetTests.swift in Sources */,
 				BB1DBE9525D2377600DDBA15 /* MockExtension.swift in Sources */,
+				BB9F451A25F9CCB4002A54E7 /* TargetV5MigratorTests.swift in Sources */,
 				92BF53E625F362B700403FCD /* TargetPreviewManagerTests.swift in Sources */,
 				BB1DBE9025D22C3D00DDBA15 /* Target+PublicAPITests.swift in Sources */,
 				BB9C86EF255C9C90007AEF8B /* Event+TargetTests.swift in Sources */,

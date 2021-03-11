@@ -30,6 +30,27 @@ class TargetTests: XCTestCase {
         target = Target(runtime: mockRuntime)
     }
 
+    private func cleanUserDefaults() {
+        ServiceProvider.shared.namedKeyValueService.setAppGroup(nil)
+        for _ in 0 ... 5 {
+            for key in UserDefaults.standard.dictionaryRepresentation().keys {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
+        }
+    }
+
+    private func getTargetDataStore() -> NamedCollectionDataStore {
+        return NamedCollectionDataStore(name: "com.adobe.module.target")
+    }
+
+    private func getUserDefaultV5() -> UserDefaults {
+        if let v5AppGroup = ServiceProvider.shared.namedKeyValueService.getAppGroup(), !v5AppGroup.isEmpty {
+            return UserDefaults(suiteName: v5AppGroup) ?? UserDefaults.standard
+        }
+
+        return UserDefaults.standard
+    }
+
     func testRegisterExtension_registersWithoutAnyErrorOrCrash() {
         XCTAssertNoThrow(MobileCore.registerExtensions([Target.self]))
     }
@@ -37,6 +58,23 @@ class TargetTests: XCTestCase {
     func testRegisterExtension() {
         target.onRegistered()
         XCTAssertEqual(5, mockRuntime.listeners.count)
+    }
+
+    func testTargetInitWithDataMigration() {
+        let userDefaultsV5 = getUserDefaultV5()
+        let targetDataStore = getTargetDataStore()
+        cleanUserDefaults()
+        XCTAssertEqual(nil, targetDataStore.getBool(key: "v5.migration.complete"))
+
+        userDefaultsV5.set("edge.host.com", forKey: "Adobe.ADOBEMOBILE_TARGET.EDGE_HOST")
+        userDefaultsV5.set("id_1", forKey: "Adobe.ADOBEMOBILE_TARGET.TNT_ID")
+        userDefaultsV5.set("id_2", forKey: "Adobe.ADOBEMOBILE_TARGET.THIRD_PARTY_ID")
+        userDefaultsV5.set("E621E1F8-C36C-495A-93FC-0C247A3E6E5F", forKey: "Adobe.ADOBEMOBILE_TARGET.SESSION_ID")
+        userDefaultsV5.set(1_615_436_587, forKey: "Adobe.ADOBEMOBILE_TARGET.SESSION_TIMESTAMP")
+
+        let target = Target(runtime: mockRuntime)
+        XCTAssertEqual(true, targetDataStore.getBool(key: "v5.migration.complete"))
+        XCTAssertEqual("id_1", target?.targetState.tntId)
     }
 
     func testReadyForEvent() {
