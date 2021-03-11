@@ -13,8 +13,9 @@
 import AEPServices
 import Foundation
 
+/// Provides functionality for migrating stored data from c++ V5 to Swift V5
 enum TargetV5Migrator {
-    private static func getUserDefault() -> UserDefaults {
+    private static func getUserDefaultV5() -> UserDefaults {
         if let v5AppGroup = ServiceProvider.shared.namedKeyValueService.getAppGroup(), !v5AppGroup.isEmpty {
             return UserDefaults(suiteName: v5AppGroup) ?? UserDefaults.standard
         }
@@ -22,10 +23,9 @@ enum TargetV5Migrator {
         return UserDefaults.standard
     }
 
+    /// Migrates the c++ V5 Target values into the Swift V5 Target data store
     static func migrate() {
-        /// Migrates the c++ V5 Target values into the Swift V5 Target data store
-
-        let userDefaultV5 = getUserDefault()
+        let userDefaultV5 = getUserDefaultV5()
         let targetDataStore = NamedCollectionDataStore(name: TargetConstants.DATASTORE_NAME)
 
         guard targetDataStore.getBool(key: TargetConstants.DataStoreKeys.V5_MIGRATION_COMPLETE) == nil else {
