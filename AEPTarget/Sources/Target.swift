@@ -77,15 +77,27 @@ public class Target: NSObject, Extension {
     }
 
     private func handleConfigurationResponseContent(_ event: Event) {
-        guard let configurationSharedState = getSharedState(extensionName: TargetConstants.Configuration.EXTENSION_NAME, event: event)?.value else {
+        guard let configurationSharedState = retrieveLatestConfigurationAndUpdateTargetState(event) else {
             Log.warning(label: Target.LOG_TAG, "Missing shared state - configuration")
             return
         }
-        if let privacy = configurationSharedState[TargetConstants.Configuration.SharedState.Keys.GLOBAL_CONFIG_PRIVACY] as? String, privacy == TargetConstants.Configuration.SharedState.Values.GLOBAL_CONFIG_PRIVACY_OPT_OUT {
+
+        if targetState.privacyStatusIsOptOut {
             resetIdentity(configurationSharedState: configurationSharedState)
             createSharedState(data: targetState.generateSharedState(), event: event)
             return
         }
+    }
+
+    private func retrieveLatestConfigurationAndUpdateTargetState(_ event: Event) -> [String: Any]? {
+        guard let result = getSharedState(extensionName: TargetConstants.Configuration.EXTENSION_NAME, event: event), let configurationSharedState = result.value else {
+            return nil
+        }
+        if result.status != .pending {
+            targetState.updateSessionTimeoutInSeconds(configurationSharedState[TargetConstants.Configuration.SharedState.Keys.TARGET_SESSION_TIMEOUT] as? Int)
+            targetState.updatePrivacyStatus(configurationSharedState[TargetConstants.Configuration.SharedState.Keys.GLOBAL_CONFIG_PRIVACY] as? String)
+        }
+        return configurationSharedState
     }
 
     private func handleReset(_ event: Event) {
@@ -145,13 +157,10 @@ public class Target: NSObject, Extension {
 
         let targetParameters = event.targetParameters
 
-        guard let configurationSharedState = getSharedState(extensionName: TargetConstants.Configuration.EXTENSION_NAME, event: event)?.value else {
-            dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Missing shared state - configuration")
+        guard let configurationSharedState = retrieveLatestConfigurationAndUpdateTargetState(event) else {
+            Log.warning(label: Target.LOG_TAG, "Missing shared state - configuration")
             return
         }
-
-        // Update session timeout
-        updateSessionTimeout(configuration: configurationSharedState)
 
         let lifecycleSharedState = getSharedState(extensionName: TargetConstants.Lifecycle.EXTENSION_NAME, event: event)?.value
         let identitySharedState = getSharedState(extensionName: TargetConstants.Identity.EXTENSION_NAME, event: event)?.value
@@ -278,14 +287,10 @@ public class Target: NSObject, Extension {
 
         Log.trace(label: Target.LOG_TAG, "Handling Locations Displayed - event \(event.name) type: \(event.type) source: \(event.source) ")
 
-        // Get the configuration shared state
-        guard let configuration = getSharedState(extensionName: TargetConstants.Configuration.EXTENSION_NAME, event: event)?.value else {
-            Log.warning(label: Target.LOG_TAG, "Location displayed unsuccessful, configuration is nil")
+        guard let configuration = retrieveLatestConfigurationAndUpdateTargetState(event) else {
+            Log.warning(label: Target.LOG_TAG, "Missing shared state - configuration")
             return
         }
-
-        // Update session timeout
-        updateSessionTimeout(configuration: configuration)
 
         // Check whether request can be sent
         if let error = prepareForTargetRequest(configData: configuration) {
@@ -386,13 +391,10 @@ public class Target: NSObject, Extension {
         }
 
         // Get the configuration shared state
-        guard let configuration = getSharedState(extensionName: TargetConstants.Configuration.EXTENSION_NAME, event: event)?.value else {
-            Log.warning(label: Target.LOG_TAG, "Target location clicked notification can't be sent, configuration is nil")
+        guard let configuration = retrieveLatestConfigurationAndUpdateTargetState(event) else {
+            Log.warning(label: Target.LOG_TAG, "Missing shared state - configuration")
             return
         }
-
-        // Update session timeout
-        updateSessionTimeout(configuration: configuration)
 
         // bail out if the target configuration is not available or if the privacy is opted-out
         if let error = prepareForTargetRequest(configData: configuration) {
@@ -762,10 +764,6 @@ public class Target: NSObject, Extension {
         }
 
         return false
-    }
-
-    private func updateSessionTimeout(configuration: [String: Any]) {
-        targetState.sessionTimeoutInSeconds = configuration[TargetConstants.Configuration.SharedState.Keys.TARGET_SESSION_TIMEOUT] as? Int ?? TargetConstants.DEFAULT_SESSION_TIMEOUT
     }
 
     /// Runs the default callback for each of the request in the list.

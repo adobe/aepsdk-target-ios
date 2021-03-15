@@ -22,11 +22,17 @@ class TargetState {
     private(set) var prefetchedMboxJsonDicts = [String: [String: Any]]()
     private(set) var loadedMboxJsonDicts = [String: [String: Any]]()
     private(set) var notifications = [Notification]()
-    var sessionTimeoutInSeconds: Int
+    private(set) var sessionTimeoutInSeconds: Int
 
     private var storedSessionId: String
 
     private let LOADED_MBOX_ACCEPTED_KEYS = [TargetConstants.TargetJson.Mbox.NAME, TargetConstants.TargetJson.METRICS]
+
+    private(set) var privacyStatus: String = TargetConstants.Configuration.SharedState.Values.GLOBAL_CONFIG_PRIVACY_OPT_UNKNOWN
+
+    var privacyStatusIsOptOut: Bool {
+        return privacyStatus == TargetConstants.Configuration.SharedState.Values.GLOBAL_CONFIG_PRIVACY_OPT_OUT
+    }
 
     var sessionId: String {
         if storedSessionId.isEmpty || isSessionExpired() {
@@ -57,8 +63,10 @@ class TargetState {
         sessionTimeoutInSeconds = TargetConstants.DEFAULT_SESSION_TIMEOUT
     }
 
-    func updateSessionTimeoutInSeconds(timeout: Int) {
-        sessionTimeoutInSeconds = timeout
+    func updateSessionTimeoutInSeconds(_ timeout: Int?) {
+        if let timeout = timeout {
+            sessionTimeoutInSeconds = timeout
+        }
     }
 
     /// Updates the session timestamp of the latest target API call in memory and in the data store
@@ -99,6 +107,12 @@ class TargetState {
             dataStore.set(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID, value: thirdPartyId)
         } else {
             dataStore.remove(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID)
+        }
+    }
+
+    func updatePrivacyStatus(_ status: String?) {
+        if let status = status {
+            privacyStatus = status
         }
     }
 

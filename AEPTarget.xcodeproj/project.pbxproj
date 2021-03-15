@@ -34,12 +34,12 @@
 		78D5030F2551FCCE00966553 /* AEPTarget.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 78D503052551FCCE00966553 /* AEPTarget.framework */; };
 		78D503162551FCCE00966553 /* AEPTarget.h in Headers */ = {isa = PBXBuildFile; fileRef = 78D503082551FCCE00966553 /* AEPTarget.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		926694C025E206B2006D2E9F /* TargetRequest+Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926694BF25E206B2006D2E9F /* TargetRequest+Internal.swift */; };
+		92AE6D0B25D8E31700F46C59 /* TargetDeliveryRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92AE6D0A25D8E31700F46C59 /* TargetDeliveryRequestBuilder.swift */; };
 		92BF53E625F362B700403FCD /* TargetPreviewManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786C006625BA1E8600F26D34 /* TargetPreviewManagerTests.swift */; };
 		92BF53ED25F362BC00403FCD /* TargetTestConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786C00E225C35EEB00F26D34 /* TargetTestConstants.swift */; };
 		92BF53F425F362E100403FCD /* MockUIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7814B2AD25CB625A00841429 /* MockUIService.swift */; };
 		92BF53FB25F362E600403FCD /* TargetNetworkServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786C007625BF40E800F26D34 /* TargetNetworkServiceMock.swift */; };
 		92BF53FC25F362E600403FCD /* MockUrlOpeningService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786C00F125C4A10A00F26D34 /* MockUrlOpeningService.swift */; };
-		92AE6D0B25D8E31700F46C59 /* TargetDeliveryRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92AE6D0A25D8E31700F46C59 /* TargetDeliveryRequestBuilder.swift */; };
 		92C44A7F25DB0D39000175FB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C44A7E25DB0D39000175FB /* AppDelegate.swift */; };
 		92C44A8125DB0D39000175FB /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C44A8025DB0D39000175FB /* SceneDelegate.swift */; };
 		92C44A8325DB0D39000175FB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C44A8225DB0D39000175FB /* ContentView.swift */; };
@@ -218,6 +218,7 @@
 				78D503082551FCCE00966553 /* AEPTarget.h */,
 				78D503092551FCCE00966553 /* Info.plist */,
 				7885141325532281008E6999 /* Target.swift */,
+				BB0C91492575F72200F635B8 /* TargetState.swift */,
 				78851418255322CB008E6999 /* Target+PublicAPI.swift */,
 				7885141D255322D9008E6999 /* Event+Target.swift */,
 				BB47C00625546E0500EC6FB5 /* TargetConstants.swift */,
@@ -234,7 +235,6 @@
 				BB9C8706255EF202007AEF8B /* TargetDeliveryRequest.swift */,
 				92AE6D0A25D8E31700F46C59 /* TargetDeliveryRequestBuilder.swift */,
 				BB1E55A02575BC4B006632E4 /* TargetDeliveryResponse.swift */,
-				BB0C91492575F72200F635B8 /* TargetState.swift */,
 				BB0C915A25775F1100F635B8 /* TargetError.swift */,
 				780DF564258924B70033F107 /* URL+Target.swift */,
 				78B36A5D25C87B3500D6D25F /* Preview */,
