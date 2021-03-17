@@ -13,7 +13,7 @@
 import AEPServices
 import Foundation
 
-enum DeliveryRequestBuilder {
+enum TargetDeliveryRequestBuilder {
     private static var systemInfoService: SystemInfoService {
         ServiceProvider.shared.systemInfoService
     }
@@ -30,23 +30,31 @@ enum DeliveryRequestBuilder {
     ///   - environmentId: target environmentId
     ///   - propertyToken: String to be passed for all requests
     /// - Returns: a `DeliveryRequest` object
-    static func build(tntId: String?, thirdPartyId: String?, identitySharedState: [String: Any]?, lifecycleSharedState: [String: Any]?, targetPrefetchArray: [TargetPrefetch]? = nil, targetParameters: TargetParameters? = nil, notifications: [Notification]? = nil, environmentId _: Int64 = 0, propertyToken _: String? = nil) -> TargetDeliveryRequest? {
-        let targetIDs = generateTargetIDsBy(tntid: tntId, thirdPartyId: thirdPartyId, identitySharedState: identitySharedState)
-        let experienceCloud = generateExperienceCloudInfoBy(identitySharedState: identitySharedState)
-        guard let context = generateTargetContext() else {
+    static func build(tntId: String?, thirdPartyId: String?, identitySharedState: [String: Any]?, lifecycleSharedState: [String: Any]?, targetPrefetchArray: [TargetPrefetch]? = nil, targetRequestArray: [TargetRequest]? = nil, targetParameters: TargetParameters? = nil, notifications: [Notification]? = nil, environmentId _: Int64 = 0, propertyToken: String? = nil) -> TargetDeliveryRequest? {
+        let targetIDs = getTargetIDs(tntid: tntId, thirdPartyId: thirdPartyId, identitySharedState: identitySharedState)
+        let experienceCloud = getExperienceCloudInfo(identitySharedState: identitySharedState)
+        guard let context = getTargetContext() else {
             return nil
         }
 
         // prefetch
-        var prefetch: Prefetch?
+        var prefetch: Mboxes?
         if let tpArray: [TargetPrefetch] = targetPrefetchArray {
-            prefetch = generatePrefetchBy(targetPrefetchArray: tpArray, lifecycleSharedState: lifecycleSharedState, globalParameters: targetParameters) ?? nil
+            prefetch = getPrefetch(targetPrefetchArray: tpArray, lifecycleSharedState: lifecycleSharedState, globalParameters: targetParameters) ?? nil
         }
 
-        // TODO: removeATPropertyFromParameters
-        // TODO: Add property token
+        // prefetch
+        var execute: Mboxes?
+        if let trArray: [TargetRequest] = targetRequestArray {
+            execute = getBatch(targetRequestArray: trArray, lifecycleSharedState: lifecycleSharedState, globalParameters: targetParameters) ?? nil
+        }
 
-        return TargetDeliveryRequest(id: targetIDs, context: context, experienceCloud: experienceCloud, prefetch: prefetch, notifications: notifications)
+        var property: Property?
+        if let propertyToken = propertyToken, !propertyToken.isEmpty {
+            property = Property(token: propertyToken)
+        }
+
+        return TargetDeliveryRequest(id: targetIDs, context: context, experienceCloud: experienceCloud, prefetch: prefetch, execute: execute, notifications: notifications, property: property)
     }
 
     /// Creates the display notification object
@@ -57,24 +65,24 @@ enum DeliveryRequestBuilder {
     ///  - timestamp: timestamp associated with the event
     ///  - lifecycleContextData: payload for notification
     /// - Returns: Notification object
-    static func getDisplayNotification(mboxName: String, cachedMboxJson: [String: Any]?, parameters: TargetParameters?, timestamp: Int64, lifecycleContextData: [String: String]?) -> Notification? {
+    static func getDisplayNotification(mboxName: String, cachedMboxJson: [String: Any]?, targetParameters: TargetParameters?, timestamp: Int64, lifecycleContextData: [String: String]?) -> Notification? {
         let id = UUID().uuidString
 
         // Set parameters: getMboxParameters
-        let mBoxParameters: [String: String] = getMboxParameters(mboxParameters: parameters?.parameters, lifecycleContextData: lifecycleContextData)
+        let mboxParameters = getMboxParameters(mboxParameters: targetParameters?.parameters, lifecycleContextData: lifecycleContextData)
 
-        // Set mBox
+        // Set mbox
         guard let mboxState = cachedMboxJson?[TargetConstants.TargetJson.Mbox.STATE] as? String, !mboxState.isEmpty else {
             Log.debug(label: TargetDeliveryRequest.LOG_TAG, "Unable to get display notification, mbox state is invalid")
             return nil
         }
-        let mBox = Mbox(name: mboxName, state: mboxState)
+        let mbox = Mbox(name: mboxName, state: mboxState)
 
         // set token
         var tokens: [String] = []
         if let optionsArray = cachedMboxJson?[TargetConstants.TargetJson.OPTIONS] as? [[String: Any?]?] {
             for option in optionsArray {
-                guard let optionEventToken: String = option?[TargetConstants.TargetJson.Metric.EVENT_TOKEN] as? String else {
+                guard let optionEventToken = option?[TargetConstants.TargetJson.Metric.EVENT_TOKEN] as? String else {
                     continue
                 }
                 tokens.append(optionEventToken)
@@ -86,23 +94,23 @@ enum DeliveryRequestBuilder {
             return nil
         }
 
-        let notification = Notification(id: id, timestamp: timestamp, type: TargetConstants.TargetJson.MetricType.DISPLAY, mbox: mBox, tokens: tokens, parameters: mBoxParameters, profileParameters: parameters?.profileParameters, order: parameters?.order?.toInternalOrder(), product: parameters?.product?.toInternalProduct())
+        let notification = Notification(id: id, timestamp: timestamp, type: TargetConstants.TargetJson.MetricType.DISPLAY, mbox: mbox, tokens: tokens, parameters: mboxParameters, profileParameters: targetParameters?.profileParameters, order: targetParameters?.order?.toInternalOrder(), product: targetParameters?.product?.toInternalProduct())
 
         return notification
     }
 
-    static func getClickedNotification(cachedMboxJson: [String: Any?], parameters: TargetParameters?, timestamp: Int64, lifecycleContextData: [String: String]?) -> Notification? {
+    static func getClickedNotification(cachedMboxJson: [String: Any?], targetParameters: TargetParameters?, timestamp: Int64, lifecycleContextData: [String: String]?) -> Notification? {
         let id = UUID().uuidString
 
         // Set parameters: getMboxParameters
-        let mBoxparameters: [String: String] = getMboxParameters(mboxParameters: parameters?.parameters, lifecycleContextData: lifecycleContextData)
+        let mboxparameters = getMboxParameters(mboxParameters: targetParameters?.parameters, lifecycleContextData: lifecycleContextData)
 
         let mboxName = cachedMboxJson[TargetConstants.TargetJson.Mbox.NAME] as? String ?? ""
 
-        let mBox = Mbox(name: mboxName)
+        let mbox = Mbox(name: mboxName)
 
         guard let metrics = cachedMboxJson[TargetConstants.TargetJson.METRICS] as? [Any?] else {
-            return Notification(id: id, timestamp: timestamp, type: TargetConstants.TargetJson.MetricType.CLICK, mbox: mBox, parameters: mBoxparameters, profileParameters: parameters?.profileParameters, order: parameters?.order?.toInternalOrder(), product: parameters?.product?.toInternalProduct())
+            return Notification(id: id, timestamp: timestamp, type: TargetConstants.TargetJson.MetricType.CLICK, mbox: mbox, parameters: mboxparameters, profileParameters: targetParameters?.profileParameters, order: targetParameters?.order?.toInternalOrder(), product: targetParameters?.product?.toInternalProduct())
         }
 
         // set token
@@ -120,7 +128,7 @@ enum DeliveryRequestBuilder {
             return nil
         }
 
-        return Notification(id: id, timestamp: timestamp, type: TargetConstants.TargetJson.MetricType.CLICK, mbox: mBox, tokens: tokens, parameters: mBoxparameters, profileParameters: parameters?.profileParameters, order: parameters?.order?.toInternalOrder(), product: parameters?.product?.toInternalProduct())
+        return Notification(id: id, timestamp: timestamp, type: TargetConstants.TargetJson.MetricType.CLICK, mbox: mbox, tokens: tokens, parameters: mboxparameters, profileParameters: targetParameters?.profileParameters, order: targetParameters?.order?.toInternalOrder(), product: targetParameters?.product?.toInternalProduct())
     }
 
     /// Creates the mbox parameters with the provided lifecycle data.
@@ -129,7 +137,7 @@ enum DeliveryRequestBuilder {
     ///     - lifecycleContextData: Lifecycle context  data
     /// - Returns: a dictionary [String: String]
     private static func getMboxParameters(mboxParameters: [String: String]?, lifecycleContextData: [String: Any]?) -> [String: String] {
-        var mboxParametersCopy: [String: String] = mboxParameters ?? [:]
+        var mboxParametersCopy = mboxParameters ?? [:]
 
         let l = lifecycleContextData as? [String: String]
         mboxParametersCopy = merge(newDictionary: l, to: mboxParametersCopy) ?? [:]
@@ -143,7 +151,7 @@ enum DeliveryRequestBuilder {
     ///   - thirdPartyId: `String` third party id
     ///   - identitySharedState: `Identity` context  data
     /// - Returns: `TargetIDs` object
-    static func generateTargetIDsBy(tntid: String?, thirdPartyId: String?, identitySharedState: [String: Any]?) -> TargetIDs? {
+    static func getTargetIDs(tntid: String?, thirdPartyId: String?, identitySharedState: [String: Any]?) -> TargetIDs {
         var customerIds: [CustomerID]?
         if let visitorIds = identitySharedState?[TargetConstants.Identity.SharedState.Keys.VISITOR_IDS_LIST] as? [[String: Any]] {
             for visitorId in visitorIds {
@@ -159,7 +167,7 @@ enum DeliveryRequestBuilder {
         return TargetIDs(tntId: tntid, thirdPartyId: thirdPartyId, marketingCloudVisitorId: identitySharedState?[TargetConstants.Identity.SharedState.Keys.VISITOR_ID_MID] as? String, customerIds: customerIds)
     }
 
-    private static func generateExperienceCloudInfoBy(identitySharedState: [String: Any]?) -> ExperienceCloudInfo {
+    private static func getExperienceCloudInfo(identitySharedState: [String: Any]?) -> ExperienceCloudInfo {
         let analytics = AnalyticsInfo(logging: .client_side)
         if let identitySharedState = identitySharedState {
             let audienceManager = AudienceManagerInfo(blob: identitySharedState[TargetConstants.Identity.SharedState.Keys.VISITOR_ID_BLOB] as? String, locationHint: identitySharedState[TargetConstants.Identity.SharedState.Keys.VISITOR_ID_LOCATION_HINT] as? String)
@@ -169,7 +177,7 @@ enum DeliveryRequestBuilder {
         return ExperienceCloudInfo(audienceManager: nil, analytics: analytics)
     }
 
-    private static func generateTargetContext() -> TargetContext? {
+    private static func getTargetContext() -> TargetContext? {
         let deviceType: DeviceType = systemInfoService.getDeviceType() == AEPServices.DeviceType.PHONE ? .phone : .tablet
         let mobilePlatform = MobilePlatform(deviceName: systemInfoService.getDeviceName(), deviceType: deviceType, platformType: .ios)
         let application = AppInfo(id: systemInfoService.getApplicationBundleId(), name: systemInfoService.getApplicationName(), version: systemInfoService.getApplicationVersion())
@@ -178,7 +186,7 @@ enum DeliveryRequestBuilder {
         return TargetContext(channel: TargetConstants.TargetRequestValue.CHANNEL_MOBILE, userAgent: systemInfoService.getDefaultUserAgent(), mobilePlatform: mobilePlatform, application: application, screen: screen, timeOffsetInMinutes: Date().getUnixTimeInSeconds())
     }
 
-    private static func generatePrefetchBy(targetPrefetchArray: [TargetPrefetch], lifecycleSharedState: [String: Any]?, globalParameters: TargetParameters?) -> Prefetch? {
+    private static func getPrefetch(targetPrefetchArray: [TargetPrefetch], lifecycleSharedState: [String: Any]?, globalParameters: TargetParameters?) -> Mboxes? {
         let lifecycleDataDict = lifecycleSharedState as? [String: String]
 
         var mboxes = [Mbox]()
@@ -187,12 +195,29 @@ enum DeliveryRequestBuilder {
             let parameterWithLifecycleData = merge(newDictionary: lifecycleDataDict, to: prefetch.targetParameters?.parameters)
             let parameters = merge(newDictionary: globalParameters?.parameters, to: parameterWithLifecycleData)
             let profileParameters = merge(newDictionary: globalParameters?.profileParameters, to: prefetch.targetParameters?.profileParameters)
-            let order = findFirstAvailableOrder(globalOrder: globalParameters?.order, order: prefetch.targetParameters?.order)
-            let product = findFirstAvailableProduct(product: prefetch.targetParameters?.product, globalProduct: globalParameters?.product)
+            let order = getOrder(globalOrder: globalParameters?.order, order: prefetch.targetParameters?.order)
+            let product = getProduct(product: prefetch.targetParameters?.product, globalProduct: globalParameters?.product)
             let mbox = Mbox(name: prefetch.name, index: index, parameters: parameters, profileParameters: profileParameters, order: order, product: product)
             mboxes.append(mbox)
         }
-        return Prefetch(mboxes: mboxes)
+        return Mboxes(mboxes: mboxes)
+    }
+
+    private static func getBatch(targetRequestArray: [TargetRequest], lifecycleSharedState: [String: Any]?, globalParameters: TargetParameters?) -> Mboxes? {
+        let lifecycleDataDict = lifecycleSharedState as? [String: String]
+
+        var mboxes = [Mbox]()
+
+        for (index, request) in targetRequestArray.enumerated() {
+            let parameterWithLifecycleData = merge(newDictionary: lifecycleDataDict, to: request.targetParameters?.parameters)
+            let parameters = merge(newDictionary: globalParameters?.parameters, to: parameterWithLifecycleData)
+            let profileParameters = merge(newDictionary: globalParameters?.profileParameters, to: request.targetParameters?.profileParameters)
+            let order = getOrder(globalOrder: globalParameters?.order, order: request.targetParameters?.order)
+            let product = getProduct(product: request.targetParameters?.product, globalProduct: globalParameters?.product)
+            let mbox = Mbox(name: request.name, index: index, parameters: parameters, profileParameters: profileParameters, order: order, product: product)
+            mboxes.append(mbox)
+        }
+        return Mboxes(mboxes: mboxes)
     }
 
     /// Merges the given dictionaries, and only keeps values from the new dictionary for duplicated keys.
@@ -210,7 +235,7 @@ enum DeliveryRequestBuilder {
         return dictionary.merging(newDictionary) { _, new in new }
     }
 
-    private static func findFirstAvailableOrder(globalOrder: TargetOrder?, order: TargetOrder?) -> Order? {
+    private static func getOrder(globalOrder: TargetOrder?, order: TargetOrder?) -> Order? {
         if let globalOrder = globalOrder {
             return globalOrder.toInternalOrder()
         }
@@ -220,7 +245,7 @@ enum DeliveryRequestBuilder {
         return nil
     }
 
-    private static func findFirstAvailableProduct(product: TargetProduct?, globalProduct: TargetProduct?) -> Product? {
+    private static func getProduct(product: TargetProduct?, globalProduct: TargetProduct?) -> Product? {
         if let product = product {
             return product.toInternalProduct()
         }

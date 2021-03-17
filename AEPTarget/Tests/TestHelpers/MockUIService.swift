@@ -37,13 +37,6 @@ class MockFloatingButton: FloatingButtonPresentable {
     }
 }
 
-class MockAlertMessage: AlertMessageShowable {
-    var showCalled = false
-    func show() {
-        showCalled = true
-    }
-}
-
 class MockUIService: UIService {
     public init() {}
 
@@ -61,12 +54,5 @@ class MockUIService: UIService {
     public func createFloatingButton(listener _: FloatingButtonDelegate) -> FloatingButtonPresentable {
         createFloatingButtonCalled = true
         return floatingButton ?? MockFloatingButton()
-    }
-
-    var createAlertMessageCalled = false
-    var alertMessage: AlertMessageShowable?
-    public func createAlertMessage(title _: String, message _: String, positiveButtonLabel _: String?, negativeButtonLabel _: String?, listener _: AlertMessageDelegate?) -> AlertMessageShowable {
-        createAlertMessageCalled = true
-        return alertMessage ?? MockAlertMessage()
     }
 }

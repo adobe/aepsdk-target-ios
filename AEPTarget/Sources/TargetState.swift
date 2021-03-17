@@ -16,7 +16,6 @@ import Foundation
 /// Represents the state of the `Target` extension
 class TargetState {
     private(set) var thirdPartyId: String?
-    private(set) var edgeHost: String?
     private(set) var tntId: String?
     private(set) var sessionTimestampInSeconds: Int64?
     private(set) var clientCode: String?
@@ -27,6 +26,8 @@ class TargetState {
 
     private var storedSessionId: String
 
+    private let LOADED_MBOX_ACCEPTED_KEYS = [TargetConstants.TargetJson.Mbox.NAME, TargetConstants.TargetJson.METRICS]
+
     var sessionId: String {
         if storedSessionId.isEmpty || isSessionExpired() {
             storedSessionId = UUID().uuidString
@@ -36,13 +37,21 @@ class TargetState {
         return storedSessionId
     }
 
+    private var storedEdgeHost: String?
+    var edgeHost: String? {
+        if isSessionExpired() {
+            updateEdgeHost(nil)
+        }
+        return storedEdgeHost
+    }
+
     private let dataStore: NamedCollectionDataStore
 
     /// Loads the TNT ID and the edge host string from the data store when initializing the `TargetState` object
     init() {
         dataStore = NamedCollectionDataStore(name: TargetConstants.DATASTORE_NAME)
         tntId = dataStore.getString(key: TargetConstants.DataStoreKeys.TNT_ID)
-        edgeHost = dataStore.getString(key: TargetConstants.DataStoreKeys.EDGE_HOST)
+        storedEdgeHost = dataStore.getString(key: TargetConstants.DataStoreKeys.EDGE_HOST)
         sessionTimestampInSeconds = dataStore.getLong(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP)
         storedSessionId = dataStore.getString(key: TargetConstants.DataStoreKeys.SESSION_ID) ?? UUID().uuidString
         sessionTimeoutInSeconds = TargetConstants.DEFAULT_SESSION_TIMEOUT
@@ -95,11 +104,11 @@ class TargetState {
 
     /// Updates the edge host in memory and in the data store
     func updateEdgeHost(_ edgeHost: String?) {
-        if edgeHost == self.edgeHost {
+        if edgeHost == storedEdgeHost {
             Log.debug(label: Target.LOG_TAG, "setEdgeHost - New edgeHost value is same as the existing edgeHost \(String(describing: edgeHost))")
             return
         }
-        self.edgeHost = edgeHost
+        storedEdgeHost = edgeHost
         if let edgeHost = edgeHost, !edgeHost.isEmpty {
             dataStore.set(key: TargetConstants.DataStoreKeys.EDGE_HOST, value: edgeHost)
         } else {
@@ -125,12 +134,35 @@ class TargetState {
         prefetchedMboxJsonDicts = prefetchedMboxJsonDicts.merging(mboxesDictionary) { _, new in new }
     }
 
+    /// Combines the prefetched mboxes with the cached mboxes
+    func saveLoadedMbox(mboxesDictionary: [String: [String: Any]]) {
+        for mbox in mboxesDictionary {
+            let name = mbox.key
+            var mboxNode = mbox.value
+            if !name.isEmpty, prefetchedMboxJsonDicts[name] == nil {
+                // remove not accepted keys
+                for key in LOADED_MBOX_ACCEPTED_KEYS {
+                    mboxNode.removeValue(forKey: key)
+                }
+                loadedMboxJsonDicts[name] = mboxNode
+            }
+        }
+    }
+
+    func removeLoadedMbox(mboxName: String) {
+        loadedMboxJsonDicts.removeValue(forKey: mboxName)
+    }
+
     func addNotification(_ notification: Notification) {
         notifications.append(notification)
     }
 
     func clearNotifications() {
         notifications.removeAll()
+    }
+
+    func clearprefetchedMboxes() {
+        prefetchedMboxJsonDicts.removeAll()
     }
 
     /// Verifies if current target session is expired.

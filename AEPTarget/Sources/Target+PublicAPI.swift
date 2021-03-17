@@ -15,6 +15,12 @@ import AEPServices
 import Foundation
 
 @objc public extension Target {
+    /// true if the response content event listener is already registered, false otherwise
+    private static var isResponseListenerRegister: Bool = false
+    /// `Dictionary` to keep track of pending target request
+    @nonobjc
+    private static var pendingTargetRequest: ThreadSafeDictionary<String, TargetRequest> = ThreadSafeDictionary()
+
     /// Prefetch multiple Target mboxes simultaneously.
     ///
     /// Executes a prefetch request to your configured Target server with the TargetPrefetchObject list provided
@@ -75,11 +81,58 @@ import Foundation
     /// - Parameters:
     ///   - requests:  An array of AEPTargetRequestObject objects to retrieve content
     ///   - targetParameters: a TargetParameters object containing parameters for all locations in the requests array
-    static func retrieveLocationContent(requests: [TargetRequest], targetParameters: TargetParameters) {
-        // TODO: need to verify input parameters
-        // TODO: need to convert "requests" to [String:Any] array
-        let eventData = [TargetConstants.EventDataKeys.LOAD_REQUESTS: requests, TargetConstants.EventDataKeys.LOAD_REQUESTS: targetParameters] as [String: Any]
+    @objc(retrieveLocationContent:withParameters:)
+    static func retrieveLocationContent(requests: [TargetRequest], targetParameters: TargetParameters?) {
+        if requests.isEmpty {
+            Log.error(label: Target.LOG_TAG, "Failed to retrieve location content target request \(TargetError.ERROR_NULL_EMPTY_REQUEST_MESSAGE)")
+            return
+        }
+
+        var targetRequestsArray = [[String: Any]]()
+        var tempIdToRequest: [String: TargetRequest] = [:]
+
+        for request in requests {
+            if request.name.isEmpty {
+                // If the callback is present call with default content
+                if let callback = request.contentCallback {
+                    callback(request.defaultContent)
+                }
+                Log.debug(label: Target.LOG_TAG, "TargetRequest removed because mboxName is empty.")
+                continue
+            }
+
+            guard let requestDictionary = request.asDictionary() else {
+                Log.error(label: Target.LOG_TAG, "Failed to convert Target request to [String: Any] dictionary), prefetch => \(String(describing: request))")
+                continue
+            }
+
+            tempIdToRequest[request.responsePairId] = request
+
+            targetRequestsArray.append(requestDictionary)
+        }
+
+        if targetRequestsArray.isEmpty {
+            Log.error(label: Target.LOG_TAG, "Failed to retrieve location content target request is empty")
+            return
+        }
+
+        // Register the response content event listener
+        registerResponseContentEventListener()
+
+        var eventData = [TargetConstants.EventDataKeys.LOAD_REQUESTS: targetRequestsArray] as [String: Any]
+        if let targetParametersDict = targetParameters?.asDictionary() {
+            eventData[TargetConstants.EventDataKeys.TARGET_PARAMETERS] = targetParametersDict
+        }
         let event = Event(name: TargetConstants.EventName.LOAD_REQUEST, type: EventType.target, source: EventSource.requestContent, data: eventData)
+
+        // Update the pending target request dictionary with
+        // key = `event.id-request.responsePairId`, value = `TargetRequest` object
+        for (responsePairId, targetRequest) in tempIdToRequest {
+            pendingTargetRequest["\(event.id)-\(responsePairId)"] = targetRequest
+        }
+
+        Log.trace(label: Target.LOG_TAG, "retrieveLocationContent - Event dispatched \(event.name), \(event.id.uuidString)")
+
         MobileCore.dispatch(event: event)
     }
 
@@ -89,18 +142,36 @@ import Foundation
     /// when AEPTarget::resetExperience is called.
     /// - Parameter thirdPartyId: a string pointer containing the value of the third party id (custom visitor id)
     static func setThirdPartyId(_ id: String) {
-        // TODO: need to verify input parameters
         let eventData = [TargetConstants.EventDataKeys.THIRD_PARTY_ID: id]
         let event = Event(name: TargetConstants.EventName.REQUEST_IDENTITY, type: EventType.target, source: EventSource.requestIdentity, data: eventData)
         MobileCore.dispatch(event: event)
     }
 
     /// Gets the custom visitor ID for Target
+    /// This ID will be reset  when the `resetExperience()` API is called.
     /// - Parameter completion:  the callback `closure` will be invoked to return the thirdPartyId value or `nil` if no third-party ID is set
-    static func getThirdPartyId(completion _: (String) -> Void) {
+    static func getThirdPartyId(completion: @escaping (String?, Error?) -> Void) {
         let event = Event(name: TargetConstants.EventName.REQUEST_IDENTITY, type: EventType.target, source: EventSource.requestIdentity, data: nil)
-        MobileCore.dispatch(event: event) { _ in
-            // TODO:
+        MobileCore.dispatch(event: event) { responseEvent in
+            guard let responseEvent = responseEvent else {
+                let error = "Request to get third party id failed, \(TargetError.ERROR_TIMEOUT)"
+                completion(nil, TargetError(message: error))
+                Log.error(label: Target.LOG_TAG, error)
+                return
+            }
+            guard let eventData = responseEvent.data else {
+                let error = "Unable to handle response, event data is nil."
+                completion(nil, TargetError(message: error))
+                Log.error(label: Target.LOG_TAG, error)
+                return
+            }
+            guard let thirdPartyId = eventData[TargetConstants.EventDataKeys.THIRD_PARTY_ID] as? String else {
+                let error = "Unable to handle response, No third party id available."
+                completion(nil, TargetError(message: error))
+                Log.error(label: Target.LOG_TAG, error)
+                return
+            }
+            completion(thirdPartyId, nil)
         }
     }
 
@@ -112,10 +183,28 @@ import Foundation
     /// backup process, and is removed at uninstall or when AEPTarget::resetExperience is called.
     ///
     /// - Parameter completion:  the callback `closure` invoked with the current tnt id or `nil` if no tnt id is set.
-    static func getTntId(completion _: (String) -> Void) {
+    static func getTntId(completion: @escaping (String?, Error?) -> Void) {
         let event = Event(name: TargetConstants.EventName.REQUEST_IDENTITY, type: EventType.target, source: EventSource.requestIdentity, data: nil)
-        MobileCore.dispatch(event: event) { _ in
-            // TODO:
+        MobileCore.dispatch(event: event) { responseEvent in
+            guard let responseEvent = responseEvent else {
+                let error = "Request to get third party id failed, \(TargetError.ERROR_TIMEOUT)"
+                completion(nil, TargetError(message: error))
+                Log.error(label: Target.LOG_TAG, error)
+                return
+            }
+            guard let eventData = responseEvent.data else {
+                let error = "Unable to handle response, event data is nil."
+                completion(nil, TargetError(message: error))
+                Log.error(label: Target.LOG_TAG, error)
+                return
+            }
+            guard let tntId = eventData[TargetConstants.EventDataKeys.TNT_ID] as? String else {
+                let error = "Unable to handle response, No tntid available."
+                completion(nil, TargetError(message: error))
+                Log.error(label: Target.LOG_TAG, error)
+                return
+            }
+            completion(tntId, nil)
         }
     }
 
@@ -149,14 +238,14 @@ import Foundation
     /// - Parameters:
     ///   - mboxNames:  (required) an array of displayed location names
     ///   - targetParameters: for the displayed location
-    @objc(displayedLocations:withParameters:)
-    static func displayedLocations(mboxNames: [String], targetParameters: TargetParameters?) {
-        if mboxNames.isEmpty {
+    @objc(displayedLocations:withTargetParameters:)
+    static func displayedLocations(names: [String], targetParameters: TargetParameters?) {
+        if names.isEmpty {
             Log.error(label: LOG_TAG, "Failed to send display notification, List of Mbox names must not be empty.")
             return
         }
 
-        var eventData = [TargetConstants.EventDataKeys.MBOX_NAMES: mboxNames, TargetConstants.EventDataKeys.IS_LOCATION_DISPLAYED: true] as [String: Any]
+        var eventData = [TargetConstants.EventDataKeys.MBOX_NAMES: names, TargetConstants.EventDataKeys.IS_LOCATION_DISPLAYED: true] as [String: Any]
 
         if let targetParametersDict = targetParameters?.asDictionary() {
             eventData[TargetConstants.EventDataKeys.TARGET_PARAMETERS] = targetParametersDict
@@ -173,14 +262,14 @@ import Foundation
     /// - Parameters:
     ///   - mboxName:  NSString value representing the name for location/mbox
     ///   - targetParameters:  a TargetParameters object containing parameters for the location clicked
-    @objc(clickedLocation:withParameters:)
-    static func clickedLocation(mboxName: String, targetParameters: TargetParameters?) {
-        if mboxName.isEmpty {
+    @objc(clickedLocation:withTargetParameters:)
+    static func clickedLocation(name: String, targetParameters: TargetParameters?) {
+        if name.isEmpty {
             Log.error(label: LOG_TAG, "Failed to send click notification, Mbox name must not be empty or nil.")
             return
         }
 
-        var eventData = [TargetConstants.EventDataKeys.MBOX_NAME: mboxName, TargetConstants.EventDataKeys.IS_LOCATION_CLICKED: true] as [String: Any]
+        var eventData = [TargetConstants.EventDataKeys.MBOX_NAME: name, TargetConstants.EventDataKeys.IS_LOCATION_CLICKED: true] as [String: Any]
 
         if let targetParametersDict = targetParameters?.asDictionary() {
             eventData[TargetConstants.EventDataKeys.TARGET_PARAMETERS] = targetParametersDict
@@ -188,5 +277,45 @@ import Foundation
 
         let event = Event(name: TargetConstants.EventName.LOCATION_CLICKED, type: EventType.target, source: EventSource.requestContent, data: eventData)
         MobileCore.dispatch(event: event)
+    }
+
+    /// Registers the response content event listener
+    private static func registerResponseContentEventListener() {
+        // Only register the listener once
+        if !isResponseListenerRegister {
+            MobileCore.registerEventListener(type: EventType.target, source: EventSource.responseContent, listener: handleResponseEvent(_:))
+            isResponseListenerRegister = true
+        }
+    }
+
+    /// Handles the response event with event name as `TargetConstants.EventName.TARGET_REQUEST_RESPONSE`
+    /// - Parameters:
+    ///     - event: Response content event with content
+    private static func handleResponseEvent(_ event: Event) {
+        if event.name != TargetConstants.EventName.TARGET_REQUEST_RESPONSE {
+            return
+        }
+
+        guard let id = event.responseID,
+              let responsePairId = event.data?[TargetConstants.EventDataKeys.TARGET_RESPONSE_PAIR_ID] as? String
+        else {
+            Log.error(label: LOG_TAG, "Missing response pair id for the target request in the response event")
+            return
+        }
+
+        let searchId = "\(id)-\(responsePairId)"
+
+        // Remove and use the target request from the map
+        guard let targetRequest = pendingTargetRequest.removeValue(forKey: searchId) else {
+            Log.error(label: LOG_TAG, "Missing target request for the \(searchId)")
+            return
+        }
+
+        guard let callback = targetRequest.contentCallback else {
+            Log.warning(label: LOG_TAG, "Missing callback for target request with pair id the \(responsePairId)")
+            return
+        }
+        let content = event.data?[TargetConstants.EventDataKeys.TARGET_CONTENT] as? String ?? targetRequest.defaultContent
+        callback(content)
     }
 }

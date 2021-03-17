@@ -10,17 +10,25 @@
  governing permissions and limitations under the License.
  */
 
+import AEPServices
 import AEPTarget
 import SwiftUI
 
 struct ContentView: View {
+    @State var thirdPartyId: String = ""
+    @State var updatedThirdPartyId: String = ""
+    @State var tntId: String = ""
     var body: some View {
         VStack {
             Button("Prefetch") {
                 prefetch()
             }.padding(10)
 
-            Button("Location displayed") {
+            Button("GetLocations") {
+                getLocations()
+            }.padding(10)
+
+            Button("Locations displayed") {
                 locationDisplayed()
             }.padding(10)
 
@@ -31,6 +39,28 @@ struct ContentView: View {
             Button("Reset Experience") {
                 resetExperience()
             }.padding(10)
+
+            Text("Third Party ID - \(thirdPartyId)")
+            Button("Get Third Party Id") {
+                getThirdPartyId()
+            }.padding(10)
+
+            Text("Tnt id - \(tntId)")
+            Button("Get Tnt Id") {
+                getTntId()
+            }.padding(10)
+
+            Group {
+                TextField("Please enter thirdPartyId", text: $updatedThirdPartyId).multilineTextAlignment(.center)
+
+                Button("Set Third Party Id") {
+                    setThirdPartyId()
+                }.padding(10)
+
+                Button("Clear prefetch cache") {
+                    setThirdPartyId()
+                }.padding(10)
+            }
         }
     }
 
@@ -44,16 +74,57 @@ struct ContentView: View {
         )
     }
 
+    func getLocations() {
+        Target.retrieveLocationContent(requests:
+            [TargetRequest(mboxName: "aep-loc-1", defaultContent: "DefaultValue", targetParameters: nil, contentCallback: { content in
+                print(content ?? "")
+            }),
+            TargetRequest(mboxName: "aep-loc-2", defaultContent: "DefaultValue2", targetParameters: nil, contentCallback: { content in
+                print(content ?? "")
+            })],
+            targetParameters: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"], order: TargetOrder(id: "id1", total: 1.0, purchasedProductIds: ["ppId1"]), product: TargetProduct(productId: "pId1", categoryId: "cId1")))
+    }
+
     func locationDisplayed() {
-        Target.displayedLocations(mboxNames: ["aep-loc-1", "aep-loc-2"], targetParameters: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"], order: TargetOrder(id: "id1", total: 1.0, purchasedProductIds: ["ppId1"]), product: TargetProduct(productId: "pId1", categoryId: "cId1")))
+        Target.displayedLocations(names: ["aep-loc-1", "aep-loc-2"], targetParameters: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"], order: TargetOrder(id: "id1", total: 1.0, purchasedProductIds: ["ppId1"]), product: TargetProduct(productId: "pId1", categoryId: "cId1")))
     }
 
     func locationClicked() {
-        Target.clickedLocation(mboxName: "aep-loc-1", targetParameters: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"], order: TargetOrder(id: "id1", total: 1.0, purchasedProductIds: ["ppId1"]), product: TargetProduct(productId: "pId1", categoryId: "cId1")))
+        Target.clickedLocation(name: "aep-loc-1", targetParameters: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"], order: TargetOrder(id: "id1", total: 1.0, purchasedProductIds: ["ppId1"]), product: TargetProduct(productId: "pId1", categoryId: "cId1")))
     }
 
     func resetExperience() {
         Target.resetExperience()
+    }
+
+    func clearPrefetchCache() {
+        Target.clearPrefetchCache()
+    }
+
+    func getThirdPartyId() {
+        Target.getThirdPartyId { id, err in
+            if let id = id {
+                self.thirdPartyId = id
+            }
+            if let err = err {
+                Log.error(label: "AEPTargetDemoApp", "Error: \(err)")
+            }
+        }
+    }
+
+    func getTntId() {
+        Target.getTntId { id, err in
+            if let id = id {
+                self.tntId = id
+            }
+            if let err = err {
+                Log.error(label: "AEPTargetDemoApp", "Error: \(err)")
+            }
+        }
+    }
+
+    func setThirdPartyId() {
+        Target.setThirdPartyId(updatedThirdPartyId)
     }
 }
 

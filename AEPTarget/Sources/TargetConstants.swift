@@ -22,6 +22,7 @@ enum TargetConstants {
     static let API_URL_HOST_BASE = "%@.tt.omtrdc.net"
     static let HEADER_CONTENT_TYPE = "Content-Type"
     static let HEADER_CONTENT_TYPE_JSON = "application/json"
+    static let A4T_ACTION_NAME = "AnalyticsForTarget"
 
     static let MAP_TO_CONTEXT_DATA_KEYS: [String: String] = [
         Identity.SharedState.Keys.ADVERTISING_IDENTIFIER: ContextDataKeys.ADVERTISING_IDENTIFIER,
@@ -81,6 +82,12 @@ enum TargetConstants {
         static let OPTIONS = "options"
         static let PARAMETERS = "parameters"
         static let METRICS = "metrics"
+        static let HTML = "html"
+        static let JSON = "json"
+        static let ANALYTICS_PARAMETERS = "analytics"
+        static let ANALYTICS_PAYLOAD = "payload"
+        /// For A4T requests event data.
+        static let SESSION_ID = "a.target.sessionId"
 
         enum Notification {
             static let ID = "id"
@@ -102,9 +109,13 @@ enum TargetConstants {
 
         enum Mbox {
             static let STATE = "state"
-            static let MBOX_AT_PROPERTY_KEY = "at_property"
             static let NAME = "name"
             static let INDEX = "index"
+        }
+
+        enum Option {
+            static let TYPE = "type"
+            static let CONTENT = "content"
         }
     }
 
@@ -131,6 +142,10 @@ enum TargetConstants {
         static let SET_PREVIEW_DEEPLINK = "TargetSetPreviewRestartDeeplink"
         static let LOCATIONS_DISPLAYED = "TargetLocationsDisplayed"
         static let LOCATION_CLICKED = "TargetLocationClicked"
+        static let IDENTITY_RESPONSE = "TargetResponseIdentity"
+        static let TARGET_RESPONSE = "TargetResponse"
+        static let TARGET_REQUEST_RESPONSE = "TargetRequestResponse"
+        static let ANALYTICS_FOR_TARGET_REQUEST_EVENT_NAME = "AnalyticsForTargetRequest"
     }
 
     enum EventDataKeys {
@@ -142,17 +157,25 @@ enum TargetConstants {
         static let RESET_EXPERIENCE = "resetexperience"
         static let CLEAR_PREFETCH_CACHE = "clearcache"
         static let PREVIEW_RESTART_DEEP_LINK = "restartdeeplink"
-        static let MBOX_NAMES = "mboxnames"
-        static let MBOX_NAME = "mboxname"
+        static let MBOX_NAMES = "names"
+        static let MBOX_NAME = "name"
         static let IS_LOCATION_DISPLAYED = "islocationdisplayed"
         static let IS_LOCATION_CLICKED = "islocationclicked"
-        static let MBOX_PARAMETERS = "mboxparameters"
+        static let MBOX_PARAMETERS = "parameters"
         static let ORDER_PARAMETERS = "orderparameters"
         static let PRODUCT_PARAMETERS = "productparameters"
-        static let PROFILE_PARAMETERS = "profileparams"
+        static let PROFILE_PARAMETERS = "profileparameters"
+        static let TARGET_CONTENT = "content"
+        static let TARGET_RESPONSE_PAIR_ID = "responsePairId"
         // shared sate
         static let TNT_ID = "tntid"
         static let PREVIEW_INITIATED = "ispreviewinitiated"
+
+        enum Analytics {
+            static let TRACK_INTERNAL = "trackinternal"
+            static let TRACK_ACTION = "action"
+            static let CONTEXT_DATA = "contextdata"
+        }
     }
 
     enum Identity {

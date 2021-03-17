@@ -46,8 +46,8 @@ class TargetPreviewManager: PreviewManager {
     typealias httpResponseConstants = HttpConnectionConstants.ResponseCodes
     typealias httpHeaderConstants = HttpConnectionConstants.Header
 
-    public var floatingButtonDelegate: FloatingButtonDelegate?
-    public var fullscreenMessageDelegate: FullscreenMessageDelegate?
+    public weak var floatingButtonDelegate: FloatingButtonDelegate?
+    public weak var fullscreenMessageDelegate: FullscreenMessageDelegate?
 
     private var urlOpeningService: URLOpening {
         ServiceProvider.shared.urlService

@@ -85,7 +85,7 @@ class TargetTests: XCTestCase {
         target.targetState.mergePrefetchedMboxJson(mboxesDictionary: mockMBoxJson)
 
         let data: [String: Any] = [
-            "mboxnames": mockMBox,
+            "names": mockMBox,
             "targetparams": TargetParameters(profileParameters: mockProfileParam).asDictionary() as Any,
             TargetConstants.EventDataKeys.IS_LOCATION_DISPLAYED: true,
         ]
@@ -111,7 +111,7 @@ class TargetTests: XCTestCase {
         target.targetState.mergePrefetchedMboxJson(mboxesDictionary: mockMBoxJson)
 
         let data: [String: Any] = [
-            "mboxname": "mbox1",
+            "name": "mbox1",
             "targetparams": TargetParameters(profileParameters: mockProfileParam).asDictionary() as Any,
             TargetConstants.EventDataKeys.IS_LOCATION_CLICKED: true,
         ]
@@ -151,6 +151,108 @@ class TargetTests: XCTestCase {
             XCTAssertTrue(target.targetState.sessionTimestampInSeconds == 0)
             XCTAssertNil(target.targetState.thirdPartyId)
             XCTAssertNotNil(target.targetState.sessionId)
+            return
+        }
+        XCTFail()
+    }
+
+    func testSetThirdPartyId() {
+        let data: [String: Any] = [
+            TargetConstants.EventDataKeys.THIRD_PARTY_ID: "mockId",
+        ]
+
+        let event = Event(name: "", type: "", source: "", data: data)
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
+        target.onRegistered()
+        if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestIdentity"] {
+            eventListener(event)
+            XCTAssertNotNil(target.targetState.thirdPartyId)
+            XCTAssertEqual(target.targetState.thirdPartyId, "mockId")
+            return
+        }
+        XCTFail()
+    }
+
+    func testGetThirdPartyId() {
+        let event = Event(name: "", type: "", source: "", data: nil)
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
+        target.onRegistered()
+        target.targetState.updateThirdPartyId("mockId")
+        if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestIdentity"] {
+            eventListener(event)
+            if let data = mockRuntime.dispatchedEvents[0].data, let id = data[TargetConstants.EventDataKeys.THIRD_PARTY_ID] as? String {
+                XCTAssertEqual(mockRuntime.dispatchedEvents[0].type, EventType.target)
+                XCTAssertEqual(id, "mockId")
+                return
+            }
+            XCTFail()
+        }
+        XCTFail()
+    }
+
+    func testGetTntId() {
+        let event = Event(name: "", type: "", source: "", data: nil)
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
+        target.onRegistered()
+        target.targetState.updateTntId("mockId")
+        if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestIdentity"] {
+            eventListener(event)
+            if let data = mockRuntime.dispatchedEvents[0].data, let id = data[TargetConstants.EventDataKeys.TNT_ID] as? String {
+                XCTAssertEqual(mockRuntime.dispatchedEvents[0].type, EventType.target)
+                XCTAssertEqual(id, "mockId")
+                return
+            }
+            XCTFail()
+        }
+        XCTFail()
+    }
+
+    func testConfigurationResponseContent() {
+        let event = Event(name: "", type: "", source: "", data: nil)
+        mockConfigSharedState["global.privacy"] = "optedout"
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
+        target.onRegistered()
+        // Update state with mocks
+        target.targetState.updateSessionTimestamp()
+        target.targetState.updateEdgeHost("mockedge")
+        target.targetState.updateTntId("sometnt")
+        target.targetState.updateThirdPartyId("somehtirdparty")
+        if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.configuration-com.adobe.eventSource.responseContent"] {
+            eventListener(event)
+            XCTAssertNil(target.targetState.edgeHost)
+            XCTAssertTrue(target.targetState.sessionTimestampInSeconds == 0)
+            XCTAssertNil(target.targetState.thirdPartyId)
+            XCTAssertNotNil(target.targetState.sessionId)
+            return
+        }
+        XCTFail()
+    }
+
+    func testLoadRequestContent() {
+        MockNetworkService.request = nil
+        ServiceProvider.shared.networkService = MockNetworkService()
+        let requestDataArray: [[String: Any]?] = [
+            TargetRequest(mboxName: "Drink_1", defaultContent: "default", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+            TargetRequest(mboxName: "Drink_2", defaultContent: "default2", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+        ].map {
+            $0.asDictionary()
+        }
+
+        let data: [String: Any] = [
+            "request": requestDataArray,
+            "targetparams": TargetParameters(profileParameters: mockProfileParam).asDictionary() as Any,
+        ]
+        let event = Event(name: "", type: "", source: "", data: data)
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
+        target.onRegistered()
+        if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] {
+            eventListener(event)
+            XCTAssertNotNil(MockNetworkService.request)
+            if let url = MockNetworkService.request?.url.absoluteString {
+                XCTAssertTrue(url.hasPrefix("https://code_123.tt.omtrdc.net/rest/v1/delivery/?client=code_123&sessionId="))
+            } else {
+                XCTFail()
+            }
             return
         }
         XCTFail()
