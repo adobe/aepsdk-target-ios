@@ -31,7 +31,10 @@ class TargetState {
 
     private let LOADED_MBOX_ACCEPTED_KEYS = [TargetConstants.TargetJson.Mbox.NAME, TargetConstants.TargetJson.METRICS]
 
-    private(set) var privacyStatus: String = TargetConstants.Configuration.SharedState.Values.GLOBAL_CONFIG_PRIVACY_OPT_UNKNOWN
+    private var privacyStatus: String {
+        return storedConfigurationSharedState?[TargetConstants.Configuration.SharedState.Keys.GLOBAL_CONFIG_PRIVACY] as? String
+            ?? TargetConstants.Configuration.SharedState.Values.GLOBAL_CONFIG_PRIVACY_OPT_UNKNOWN
+    }
 
     var privacyStatusIsOptOut: Bool {
         return privacyStatus == TargetConstants.Configuration.SharedState.Values.GLOBAL_CONFIG_PRIVACY_OPT_OUT
@@ -156,11 +159,6 @@ class TargetState {
         } else {
             dataStore.remove(key: TargetConstants.DataStoreKeys.EDGE_HOST)
         }
-    }
-
-    /// Updates the client code in memory and in the data store
-    func updateClientCode(_: String) {
-//        self.clientCode = clientCode
     }
 
     /// Generates a `Target` shared state with the stored TNT ID and third party id.

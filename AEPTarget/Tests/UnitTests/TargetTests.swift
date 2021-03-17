@@ -66,6 +66,7 @@ class TargetTests: XCTestCase {
         let event = Event(name: "", type: "", source: "", data: data)
         mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
         target.onRegistered()
+        XCTAssertTrue(target.readyForEvent(event))
         if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] {
             eventListener(event)
             XCTAssertNotNil(MockNetworkService.request)
@@ -92,6 +93,7 @@ class TargetTests: XCTestCase {
         let event = Event(name: "", type: "", source: "", data: data)
         mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
         target.onRegistered()
+        XCTAssertTrue(target.readyForEvent(event))
         if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] {
             eventListener(event)
             XCTAssertNotNil(MockNetworkService.request)
@@ -118,6 +120,7 @@ class TargetTests: XCTestCase {
         let event = Event(name: "", type: "", source: "", data: data)
         mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
         target.onRegistered()
+        XCTAssertTrue(target.readyForEvent(event))
         if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] {
             eventListener(event)
             XCTAssertNotNil(MockNetworkService.request)
@@ -212,6 +215,7 @@ class TargetTests: XCTestCase {
         mockConfigSharedState["global.privacy"] = "optedout"
         mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
         target.onRegistered()
+        XCTAssertTrue(target.readyForEvent(event))
         // Update state with mocks
         target.targetState.updateSessionTimestamp()
         target.targetState.updateEdgeHost("mockedge")
@@ -245,6 +249,7 @@ class TargetTests: XCTestCase {
         let event = Event(name: "", type: "", source: "", data: data)
         mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
         target.onRegistered()
+        XCTAssertTrue(target.readyForEvent(event))
         if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] {
             eventListener(event)
             XCTAssertNotNil(MockNetworkService.request)
