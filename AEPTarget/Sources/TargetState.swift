@@ -15,13 +15,16 @@ import Foundation
 
 /// Represents the state of the `Target` extension
 class TargetState {
-    private(set) var thirdPartyId: String?
-    private(set) var tntId: String?
-    private(set) var sessionTimestampInSeconds: Int64?
-    private(set) var clientCode: String?
+    private let DEFAULT_NETWORK_TIMEOUT: TimeInterval = 2.0
     private(set) var prefetchedMboxJsonDicts = [String: [String: Any]]()
     private(set) var loadedMboxJsonDicts = [String: [String: Any]]()
     private(set) var notifications = [Notification]()
+
+    private(set) var storedConfigurationSharedState: [String: Any]?
+
+    private(set) var thirdPartyId: String?
+    private(set) var tntId: String?
+    private(set) var sessionTimestampInSeconds: Int64?
     private(set) var sessionTimeoutInSeconds: Int
 
     private var storedSessionId: String
@@ -32,6 +35,30 @@ class TargetState {
 
     var privacyStatusIsOptOut: Bool {
         return privacyStatus == TargetConstants.Configuration.SharedState.Values.GLOBAL_CONFIG_PRIVACY_OPT_OUT
+    }
+
+    var privacyStatusIsOptIn: Bool {
+        return privacyStatus == TargetConstants.Configuration.SharedState.Values.GLOBAL_CONFIG_PRIVACY_OPT_IN
+    }
+
+    var clientCode: String? {
+        return storedConfigurationSharedState?[TargetConstants.Configuration.SharedState.Keys.TARGET_CLIENT_CODE] as? String
+    }
+
+    var environmentId: Int64 {
+        return storedConfigurationSharedState?[TargetConstants.Configuration.SharedState.Keys.TARGET_ENVIRONMENT_ID] as? Int64 ?? 0
+    }
+
+    var propertyToken: String {
+        return storedConfigurationSharedState?[TargetConstants.Configuration.SharedState.Keys.TARGET_PROPERTY_TOKEN] as? String ?? ""
+    }
+
+    var targetServer: String? {
+        return storedConfigurationSharedState?[TargetConstants.Configuration.SharedState.Keys.TARGET_SERVER] as? String
+    }
+
+    var networkTimeout: Double {
+        return storedConfigurationSharedState?[TargetConstants.Configuration.SharedState.Keys.TARGET_NETWORK_TIMEOUT] as? Double ?? DEFAULT_NETWORK_TIMEOUT
     }
 
     var sessionId: String {
@@ -63,10 +90,17 @@ class TargetState {
         sessionTimeoutInSeconds = TargetConstants.DEFAULT_SESSION_TIMEOUT
     }
 
-    func updateSessionTimeoutInSeconds(_ timeout: Int?) {
-        if let timeout = timeout {
-            sessionTimeoutInSeconds = timeout
+    func updateConfigurationSharedState(_ configuration: [String: Any]?) {
+        guard let configuration = configuration else {
+            return
         }
+        if let newClientCode = configuration[TargetConstants.Configuration.SharedState.Keys.TARGET_CLIENT_CODE] as? String,
+           newClientCode != clientCode
+        {
+            updateEdgeHost("")
+        }
+
+        storedConfigurationSharedState = configuration
     }
 
     /// Updates the session timestamp of the latest target API call in memory and in the data store
@@ -110,12 +144,6 @@ class TargetState {
         }
     }
 
-    func updatePrivacyStatus(_ status: String?) {
-        if let status = status {
-            privacyStatus = status
-        }
-    }
-
     /// Updates the edge host in memory and in the data store
     func updateEdgeHost(_ edgeHost: String?) {
         if edgeHost == storedEdgeHost {
@@ -131,8 +159,8 @@ class TargetState {
     }
 
     /// Updates the client code in memory and in the data store
-    func updateClientCode(_ clientCode: String) {
-        self.clientCode = clientCode
+    func updateClientCode(_: String) {
+//        self.clientCode = clientCode
     }
 
     /// Generates a `Target` shared state with the stored TNT ID and third party id.
