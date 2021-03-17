@@ -48,8 +48,8 @@ class TargetState {
         return storedConfigurationSharedState?[TargetConstants.Configuration.SharedState.Keys.TARGET_CLIENT_CODE] as? String
     }
 
-    var environmentId: Int64 {
-        return storedConfigurationSharedState?[TargetConstants.Configuration.SharedState.Keys.TARGET_ENVIRONMENT_ID] as? Int64 ?? 0
+    var environmentId: Int {
+        return storedConfigurationSharedState?[TargetConstants.Configuration.SharedState.Keys.TARGET_ENVIRONMENT_ID] as? Int ?? 0
     }
 
     var propertyToken: String {
@@ -61,7 +61,11 @@ class TargetState {
     }
 
     var networkTimeout: Double {
-        return storedConfigurationSharedState?[TargetConstants.Configuration.SharedState.Keys.TARGET_NETWORK_TIMEOUT] as? Double ?? DEFAULT_NETWORK_TIMEOUT
+        guard let timeout = storedConfigurationSharedState?[TargetConstants.Configuration.SharedState.Keys.TARGET_NETWORK_TIMEOUT] as? Int else {
+            return DEFAULT_NETWORK_TIMEOUT
+        }
+
+        return Double(timeout)
     }
 
     var sessionId: String {
@@ -93,12 +97,16 @@ class TargetState {
         sessionTimeoutInSeconds = TargetConstants.DEFAULT_SESSION_TIMEOUT
     }
 
+    ///  Updates the stored configuration shared state if the given on is not nil.
+    ///  If the given configuration shared state contains a new client code, the stored `edge host` will be set with an empty String.
+    /// - Parameter configuration: the shared state of the `Configuration`
     func updateConfigurationSharedState(_ configuration: [String: Any]?) {
         guard let configuration = configuration else {
             return
         }
         if let newClientCode = configuration[TargetConstants.Configuration.SharedState.Keys.TARGET_CLIENT_CODE] as? String,
-           newClientCode != clientCode {
+           newClientCode != clientCode
+        {
             updateEdgeHost("")
         }
 

@@ -30,7 +30,7 @@ enum TargetDeliveryRequestBuilder {
     ///   - environmentId: target environmentId
     ///   - propertyToken: String to be passed for all requests
     /// - Returns: a `DeliveryRequest` object
-    static func build(tntId: String?, thirdPartyId: String?, identitySharedState: [String: Any]?, lifecycleSharedState: [String: Any]?, targetPrefetchArray: [TargetPrefetch]? = nil, targetRequestArray: [TargetRequest]? = nil, targetParameters: TargetParameters? = nil, notifications: [Notification]? = nil, environmentId _: Int64 = 0, propertyToken: String? = nil) -> TargetDeliveryRequest? {
+    static func build(tntId: String?, thirdPartyId: String?, identitySharedState: [String: Any]?, lifecycleSharedState: [String: Any]?, targetPrefetchArray: [TargetPrefetch]? = nil, targetRequestArray: [TargetRequest]? = nil, targetParameters: TargetParameters? = nil, notifications: [Notification]? = nil, environmentId _: Int = 0, propertyToken: String? = nil) -> TargetDeliveryRequest? {
         let targetIDs = getTargetIDs(tntid: tntId, thirdPartyId: thirdPartyId, identitySharedState: identitySharedState)
         let experienceCloud = getExperienceCloudInfo(identitySharedState: identitySharedState)
         guard let context = getTargetContext() else {
@@ -157,7 +157,8 @@ enum TargetDeliveryRequestBuilder {
             for visitorId in visitorIds {
                 if let id = visitorId[TargetConstants.Identity.SharedState.Keys.VISITORID_ID] as? String,
                    let code = visitorId[TargetConstants.Identity.SharedState.Keys.VISITORID_TYPE] as? String,
-                   let authenticatedState = visitorId[TargetConstants.Identity.SharedState.Keys.VISITORID_AUTHENTICATION_STATE] as? Int {
+                   let authenticatedState = visitorId[TargetConstants.Identity.SharedState.Keys.VISITORID_AUTHENTICATION_STATE] as? Int
+                {
                     if customerIds == nil { customerIds = [CustomerID]() }
                     customerIds?.append(CustomerID(id: id, integrationCode: code, authenticatedState: AuthenticatedState.from(state: authenticatedState)))
                 }

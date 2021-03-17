@@ -58,6 +58,7 @@
 		BB1DBEB825D30A4A00DDBA15 /* DeliveryRequestBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1DBEB725D30A4A00DDBA15 /* DeliveryRequestBuilderTests.swift */; };
 		BB1E55892574A35A006632E4 /* TargetParameters+Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1E55882574A35A006632E4 /* TargetParameters+Internal.swift */; };
 		BB1E55A12575BC4B006632E4 /* TargetDeliveryResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1E55A02575BC4B006632E4 /* TargetDeliveryResponse.swift */; };
+		BB3837EC26026C33001FC8E1 /* TargetStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB3837EB26026C33001FC8E1 /* TargetStateTests.swift */; };
 		BB47C0082554771800EC6FB5 /* TargetConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00625546E0500EC6FB5 /* TargetConstants.swift */; };
 		BB47C00A25547A2E00EC6FB5 /* TargetParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00925547A2E00EC6FB5 /* TargetParameters.swift */; };
 		BB47C00C25547BE800EC6FB5 /* TargetPrefetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00B25547BE800EC6FB5 /* TargetPrefetch.swift */; };
@@ -154,6 +155,7 @@
 		BB1DBEB725D30A4A00DDBA15 /* DeliveryRequestBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveryRequestBuilderTests.swift; sourceTree = "<group>"; };
 		BB1E55882574A35A006632E4 /* TargetParameters+Internal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TargetParameters+Internal.swift"; sourceTree = "<group>"; };
 		BB1E55A02575BC4B006632E4 /* TargetDeliveryResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetDeliveryResponse.swift; sourceTree = "<group>"; };
+		BB3837EB26026C33001FC8E1 /* TargetStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetStateTests.swift; sourceTree = "<group>"; };
 		BB47C00625546E0500EC6FB5 /* TargetConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetConstants.swift; sourceTree = "<group>"; };
 		BB47C00925547A2E00EC6FB5 /* TargetParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetParameters.swift; sourceTree = "<group>"; };
 		BB47C00B25547BE800EC6FB5 /* TargetPrefetch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetPrefetch.swift; sourceTree = "<group>"; };
@@ -334,6 +336,7 @@
 				BB1DBE8F25D22C3D00DDBA15 /* Target+PublicAPITests.swift */,
 				BB1DBE9925D2F30400DDBA15 /* TargetTests.swift */,
 				BB1DBEB725D30A4A00DDBA15 /* DeliveryRequestBuilderTests.swift */,
+				BB3837EB26026C33001FC8E1 /* TargetStateTests.swift */,
 			);
 			path = UnitTests;
 			sourceTree = "<group>";
@@ -661,6 +664,7 @@
 				BB1DBE9025D22C3D00DDBA15 /* Target+PublicAPITests.swift in Sources */,
 				BB9C86EF255C9C90007AEF8B /* Event+TargetTests.swift in Sources */,
 				92BF53FC25F362E600403FCD /* MockUrlOpeningService.swift in Sources */,
+				BB3837EC26026C33001FC8E1 /* TargetStateTests.swift in Sources */,
 				BB1DBEB025D2F60800DDBA15 /* TestableExtensionRuntime.swift in Sources */,
 				92BF53F425F362E100403FCD /* MockUIService.swift in Sources */,
 				BB1DBEB825D30A4A00DDBA15 /* DeliveryRequestBuilderTests.swift in Sources */,
