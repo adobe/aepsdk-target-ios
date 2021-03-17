@@ -98,8 +98,7 @@ class TargetState {
             return
         }
         if let newClientCode = configuration[TargetConstants.Configuration.SharedState.Keys.TARGET_CLIENT_CODE] as? String,
-           newClientCode != clientCode
-        {
+           newClientCode != clientCode {
             updateEdgeHost("")
         }
 
