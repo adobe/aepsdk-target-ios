@@ -258,10 +258,10 @@
 		788513FC2552087A008E6999 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				924101CE25FFCF5C00DA88D2 /* TargetRequest+Internal.swift */,
 				78D503082551FCCE00966553 /* AEPTarget.h */,
 				78D503092551FCCE00966553 /* Info.plist */,
 				7885141325532281008E6999 /* Target.swift */,
+				924101CE25FFCF5C00DA88D2 /* TargetRequest+Internal.swift */,
 				78851418255322CB008E6999 /* Target+PublicAPI.swift */,
 				7885141D255322D9008E6999 /* Event+Target.swift */,
 				BB47C00625546E0500EC6FB5 /* TargetConstants.swift */,

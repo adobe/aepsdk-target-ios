@@ -30,6 +30,28 @@ class TargetTests: XCTestCase {
         target = Target(runtime: mockRuntime)
     }
 
+    private func prettify(_ eventData: [String: Any]?) -> String {
+        guard let eventData = eventData else {
+            return ""
+        }
+        guard JSONSerialization.isValidJSONObject(eventData),
+              let data = try? JSONSerialization.data(withJSONObject: eventData, options: .prettyPrinted),
+              let prettyPrintedString = String(data: data, encoding: String.Encoding.utf8)
+        else {
+            return " \(eventData as AnyObject)"
+        }
+        return prettyPrintedString
+    }
+
+    private func payloadAsDictionary(_ payload: String?) -> [String: Any]? {
+        if let payload = payload, let data = payload.data(using: .utf8),
+           let dictionary = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
+        {
+            return dictionary
+        }
+        return nil
+    }
+
     func testRegisterExtension_registersWithoutAnyErrorOrCrash() {
         XCTAssertNoThrow(MobileCore.registerExtensions([Target.self]))
     }
@@ -45,13 +67,49 @@ class TargetTests: XCTestCase {
         XCTAssertTrue(target.readyForEvent(event))
     }
 
+    func testReadyForEvent_no_clientCode() {
+        let event = Event(name: "", type: "", source: "", data: nil)
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: ["k": "v"], status: .set))
+        XCTAssertFalse(target.readyForEvent(event))
+    }
+
     func testReadyForEvent_no_configuration() {
         XCTAssertFalse(target.readyForEvent(Event(name: "", type: "", source: "", data: nil)))
     }
 
     func testPrefetchContent() {
-        MockNetworkService.request = nil
-        ServiceProvider.shared.networkService = MockNetworkService()
+        // mocked network response
+        let responseString = """
+            {
+              "status": 200,
+              "id": {
+                "tntId": "DE03D4AD-1FFE-421F-B2F2-303BF26822C1.35_0",
+                "marketingCloudVisitorId": "61055260263379929267175387965071996926"
+              },
+              "requestId": "01d4a408-6978-48f7-95c6-03f04160b257",
+              "client": "acopprod3",
+              "edgeHost": "mboxedge35.tt.omtrdc.net",
+              "prefetch": {
+                "mboxes": [
+                  {
+                    "index": 0,
+                    "name": "t_test_01",
+                    "options": [
+                      {
+                        "content": {
+                          "key1": "value1"
+                        },
+                        "type": "json",
+                        "eventToken": "uR0kIAPO+tZtIPW92S0NnWqipfsIHvVzTQxHolz2IpSCnQ9Y9OaLL2gsdrWQTvE54PwSz67rmXWmSnkXpSSS2Q=="
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+        """
+
+        // builds the prefetch event
         let prefetchDataArray: [[String: Any]?] = [
             TargetPrefetch(name: "Drink_1", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
             TargetPrefetch(name: "Drink_2", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
@@ -61,19 +119,167 @@ class TargetTests: XCTestCase {
 
         let data: [String: Any] = [
             "prefetch": prefetchDataArray,
+            "targetparams": TargetParameters(profileParameters: ["name": "Smith"]).asDictionary() as Any,
+        ]
+        let prefetchEvent = Event(name: "", type: "", source: "", data: data)
+
+        // creates a configuration's shared state
+        let configuration = [
+            "target.clientCode": "code_123",
+            "global.privacy": "optedin",
+        ]
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: prefetchEvent, data: (value: configuration, status: .set))
+
+        // creates a lifecycle's shared state
+        let lifecycle = [
+            "lifecyclecontextdata":
+                [
+                    "appid": "appid_1",
+                    "devicename": "devicename_1",
+                    "locale": "en-US",
+                    "osversion": "iOS 14.4",
+                    "resolution": "1125x2436",
+                    "runmode": "Application",
+                ] as Any,
+        ]
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.lifecycle", event: prefetchEvent, data: (value: lifecycle, status: .set))
+
+        // creates an identity's shared state
+        let identity = [
+            "mid": "38209274908399841237725561727471528301",
+            "visitoridslist":
+                [
+                    [
+                        "authentication_state": 0,
+                        "id": "vid_id_1",
+                        "id_origin": "d_cid_ic",
+                        "id_type": "vid_type_1",
+                    ],
+                ] as Any,
+        ]
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.identity", event: prefetchEvent, data: (value: identity, status: .set))
+
+        // registers the event listeners for Target extension
+        target.onRegistered()
+
+        // override network service
+        let mockNetworkService = TestableNetworkService()
+        ServiceProvider.shared.networkService = mockNetworkService
+        mockNetworkService.mock { request in
+            // verifies network request
+            XCTAssertNotNil(request)
+            guard let payloadDictionary = self.payloadAsDictionary(request.connectPayload) else {
+                XCTFail()
+                return nil
+            }
+            XCTAssertTrue(request.url.absoluteString.contains("https://code_123.tt.omtrdc.net/rest/v1/delivery/?client=code_123&sessionId="))
+            XCTAssertTrue(Set(payloadDictionary.keys) == Set([
+                "id",
+                "experienceCloud",
+                "context",
+                "prefetch",
+                "environmentId",
+            ]))
+
+            // verifies payloadDictionary["id"]
+            guard let idDictionary = payloadDictionary["id"] as? [String: Any] else {
+                XCTFail()
+                return nil
+            }
+            XCTAssertEqual("38209274908399841237725561727471528301", idDictionary["marketingCloudVisitorId"] as? String)
+            guard let vids = idDictionary["customerIds"] as? [[String: Any]] else {
+                XCTFail()
+                return nil
+            }
+            XCTAssertEqual(1, vids.count)
+            XCTAssertEqual("unknown", vids[0]["authenticatedState"] as? String)
+            XCTAssertEqual("vid_id_1", vids[0]["id"] as? String)
+            XCTAssertEqual("vid_type_1", vids[0]["integrationCode"] as? String)
+
+            // verifies payloadDictionary["context"]
+            guard let context = payloadDictionary["context"] as? [String: Any] else {
+                XCTFail()
+                return nil
+            }
+            XCTAssertTrue(Set(context.keys) == Set([
+                "userAgent",
+                "mobilePlatform",
+                "screen",
+                "channel",
+                "application",
+                "timeOffsetInMinutes",
+            ]))
+
+            // verifies payloadDictionary["prefetch"]
+            guard let prefetchDictionary = payloadDictionary["prefetch"] as? [String: Any] else {
+                XCTFail()
+                return nil
+            }
+
+            XCTAssertTrue(Set(prefetchDictionary.keys) == Set([
+                "mboxes",
+            ]))
+            let prefetchJson = self.prettify(prefetchDictionary)
+            XCTAssertTrue(prefetchJson.contains("\"name\" : \"Drink_2\""))
+            XCTAssertTrue(prefetchJson.contains("\"name\" : \"Drink_1\""))
+            XCTAssertTrue(prefetchJson.contains("\"mbox-parameter-key1\" : \"mbox-parameter-value1\""))
+            XCTAssertTrue(prefetchJson.contains("\"a.OSVersion\""))
+            XCTAssertTrue(prefetchJson.contains("\"a.DeviceName\""))
+            XCTAssertTrue(prefetchJson.contains("\"a.AppID\""))
+            XCTAssertTrue(prefetchJson.contains("\"a.locale\""))
+            let validResponse = HTTPURLResponse(url: URL(string: "https://amsdk.tt.omtrdc.net/rest/v1/delivery")!, statusCode: 200, httpVersion: nil, headerFields: nil)
+            return (data: responseString.data(using: .utf8), response: validResponse, error: nil)
+        }
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
+            XCTFail()
+            return
+        }
+
+        // handles the prefetch event
+        eventListener(prefetchEvent)
+
+        // verifies the content of network response was stored correctly
+        XCTAssertEqual("DE03D4AD-1FFE-421F-B2F2-303BF26822C1.35_0", target.targetState.tntId)
+        XCTAssertEqual("mboxedge35.tt.omtrdc.net", target.targetState.edgeHost)
+        XCTAssertEqual(1, target.targetState.prefetchedMboxJsonDicts.count)
+        let mboxJson = prettify(target.targetState.prefetchedMboxJsonDicts["t_test_01"])
+        XCTAssertTrue(mboxJson.contains("\"eventToken\" : \"uR0kIAPO+tZtIPW92S0NnWqipfsIHvVzTQxHolz2IpSCnQ9Y9OaLL2gsdrWQTvE54PwSz67rmXWmSnkXpSSS2Q==\""))
+
+        // verifies the Target's shared state
+        XCTAssertEqual(1, mockRuntime.createdSharedStates.count)
+        XCTAssertEqual("DE03D4AD-1FFE-421F-B2F2-303BF26822C1.35_0", mockRuntime.createdSharedStates[0]?["tntid"] as? String)
+
+        // verifies the dispatched event
+        XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
+        XCTAssertEqual("TargetPrefetchResponse", mockRuntime.dispatchedEvents[0].name)
+        XCTAssertEqual("com.adobe.eventType.target", mockRuntime.dispatchedEvents[0].type)
+        XCTAssertEqual("com.adobe.eventSource.responseContent", mockRuntime.dispatchedEvents[0].source)
+    }
+
+    func testPrefetchContent_in_PreviewMode() {
+        // TODO: fix this after the preview PR got merged
+    }
+
+    func testPrefetchContent_empty_prefetch_array() {
+        MockNetworkService.request = nil
+        ServiceProvider.shared.networkService = MockNetworkService()
+
+        let data: [String: Any] = [
+            "prefetch": [String: Any](),
             "targetparams": TargetParameters(profileParameters: mockProfileParam).asDictionary() as Any,
         ]
-        let event = Event(name: "", type: "", source: "", data: data)
-        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
+        let prefetchEvent = Event(name: "", type: "", source: "", data: data)
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: prefetchEvent, data: (value: mockConfigSharedState, status: .set))
         target.onRegistered()
+
         if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] {
-            eventListener(event)
-            XCTAssertNotNil(MockNetworkService.request)
-            if let url = MockNetworkService.request?.url.absoluteString {
-                XCTAssertTrue(url.hasPrefix("https://code_123.tt.omtrdc.net/rest/v1/delivery/?client=code_123&sessionId="))
-            } else {
-                XCTFail()
-            }
+            eventListener(prefetchEvent)
+            XCTAssertNil(MockNetworkService.request)
+            XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
+            XCTAssertEqual("TargetPrefetchResponse", mockRuntime.dispatchedEvents[0].name)
+            XCTAssertEqual("com.adobe.eventType.target", mockRuntime.dispatchedEvents[0].type)
+            XCTAssertEqual("com.adobe.eventSource.responseContent", mockRuntime.dispatchedEvents[0].source)
+            XCTAssertNotNil(mockRuntime.dispatchedEvents[0].data?["prefetcherror"])
             return
         }
         XCTFail()
