@@ -1,6 +1,3 @@
-* auto-gen TOC:
-{:toc}
-
 # Target API reference
 This document details all the APIs provided by Target, along with sample code snippets on how to properly use the APIs.
 
