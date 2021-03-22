@@ -79,13 +79,35 @@ struct ContentView: View {
     }
 
     func prefetch() {
+        let TargetParameters1 = TargetParameters(
+            parameters: ["status": "platinum"],
+            profileParameters: ["age": "20"],
+            order: TargetOrder(id: "ADCKKIM", total: 344.30, purchasedProductIds: ["34", "125"]),
+            product: TargetProduct(productId: "24D3412", categoryId: "Books")
+        )
+
+        let TargetParameters2 = TargetParameters(
+            parameters: ["userType": "Paid"],
+            profileParameters: nil,
+            order: TargetOrder(id: "ADCKKIM", total: 344.30, purchasedProductIds: ["id1", "id2"]),
+            product: TargetProduct(productId: "764334", categoryId: "Online")
+        )
+
+        let globalTargetParameters = TargetParameters(
+            parameters: ["status": "progressive"],
+            profileParameters: ["age": "20-32"],
+            order: TargetOrder(id: "ADCKKBC", total: 400.50, purchasedProductIds: ["34", "125"]),
+            product: TargetProduct(productId: "24D334", categoryId: "Stationary")
+        )
         Target.prefetchContent(
             prefetchObjectArray: [
-                TargetPrefetch(name: "aep-loc-1", targetParameters: nil),
-                TargetPrefetch(name: "aep-loc-2", targetParameters: nil),
+                TargetPrefetch(name: "mboxName1", targetParameters: TargetParameters1),
+                TargetPrefetch(name: "mboxName2", targetParameters: TargetParameters2),
             ],
-            targetParameters: nil, completion: nil
-        )
+            targetParameters: globalTargetParameters
+        ) { _ in
+            // do something with the callback response
+        }
     }
 
     func getLocations() {
