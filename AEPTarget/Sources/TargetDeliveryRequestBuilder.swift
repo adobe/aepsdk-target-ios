@@ -157,7 +157,8 @@ enum TargetDeliveryRequestBuilder {
             for visitorId in visitorIds {
                 if let id = visitorId[TargetConstants.Identity.SharedState.Keys.VISITORID_ID] as? String,
                    let code = visitorId[TargetConstants.Identity.SharedState.Keys.VISITORID_TYPE] as? String,
-                   let authenticatedState = visitorId[TargetConstants.Identity.SharedState.Keys.VISITORID_AUTHENTICATION_STATE] as? Int {
+                   let authenticatedState = visitorId[TargetConstants.Identity.SharedState.Keys.VISITORID_AUTHENTICATION_STATE] as? Int
+                {
                     if customerIds == nil { customerIds = [CustomerID]() }
                     customerIds?.append(CustomerID(id: id, integrationCode: code, authenticatedState: AuthenticatedState.from(state: authenticatedState)))
                 }

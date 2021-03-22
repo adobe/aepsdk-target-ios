@@ -635,7 +635,8 @@ public class Target: NSObject, Extension {
                                    configData: [String: Any],
                                    lifecycleData: [String: Any]? = nil,
                                    identityData: [String: Any]? = nil,
-                                   completionHandler: ((HttpConnection) -> Void)?) -> String? {
+                                   completionHandler: ((HttpConnection) -> Void)?) -> String?
+    {
         let tntId = targetState.tntId
         let thirdPartyId = targetState.thirdPartyId
         let environmentId = configData[TargetConstants.Configuration.SharedState.Keys.TARGET_ENVIRONMENT_ID] as? Int64 ?? 0
