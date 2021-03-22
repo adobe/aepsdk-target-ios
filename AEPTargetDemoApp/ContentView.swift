@@ -3,7 +3,6 @@
  This file is licensed to you under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License. You may obtain a copy
  of the License at http://www.apache.org/licenses/LICENSE-2.0
-
  Unless required by applicable law or agreed to in writing, software distributed under
  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
  OF ANY KIND, either express or implied. See the License for the specific language
@@ -79,35 +78,13 @@ struct ContentView: View {
     }
 
     func prefetch() {
-        let TargetParameters1 = TargetParameters(
-            parameters: ["status": "platinum"],
-            profileParameters: ["age": "20"],
-            order: TargetOrder(id: "ADCKKIM", total: 344.30, purchasedProductIds: ["34", "125"]),
-            product: TargetProduct(productId: "24D3412", categoryId: "Books")
-        )
-
-        let TargetParameters2 = TargetParameters(
-            parameters: ["userType": "Paid"],
-            profileParameters: nil,
-            order: TargetOrder(id: "ADCKKIM", total: 344.30, purchasedProductIds: ["id1", "id2"]),
-            product: TargetProduct(productId: "764334", categoryId: "Online")
-        )
-
-        let globalTargetParameters = TargetParameters(
-            parameters: ["status": "progressive"],
-            profileParameters: ["age": "20-32"],
-            order: TargetOrder(id: "ADCKKBC", total: 400.50, purchasedProductIds: ["34", "125"]),
-            product: TargetProduct(productId: "24D334", categoryId: "Stationary")
-        )
         Target.prefetchContent(
             prefetchObjectArray: [
-                TargetPrefetch(name: "mboxName1", targetParameters: TargetParameters1),
-                TargetPrefetch(name: "mboxName2", targetParameters: TargetParameters2),
+                TargetPrefetch(name: "aep-loc-1", targetParameters: nil),
+                TargetPrefetch(name: "aep-loc-2", targetParameters: nil),
             ],
-            targetParameters: globalTargetParameters
-        ) { _ in
-            // do something with the callback response
-        }
+            targetParameters: nil, completion: nil
+        )
     }
 
     func getLocations() {

@@ -39,7 +39,7 @@ This API sends a prefetch request to your configured Target server with the pref
 
 ##### Objective-C
 
-```objective-c
+```objectivec
     NSDictionary *mboxParameters1 = @{@"status":@"platinum"};
     NSDictionary *profileParameters1 = @{@"age":@"20"};
     AEPTargetProduct *product1 = [[AEPTargetProduct alloc] initWithProductId:@"24D3412" categoryId:@"Books"];
