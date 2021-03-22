@@ -3,7 +3,20 @@ This document details all the APIs provided by Target, along with sample code sn
 
 ## prefetchContent
 This API sends a prefetch request to your configured Target server with the prefetch objects array and the specified target parameters. 
-#### Swift
+
+### Syntax 
+```swift
+@objc(prefetchContent:withParameters:callback:)
+    static func prefetchContent(prefetchObjectArray: [TargetPrefetch], targetParameters: TargetParameters?, completion: ((Error?) -> Void)?)
+```
+
+- *prefetchObjectArray* - is an array of `TargetPrefetch` objects for various mbox locations.
+- *targetParameters* - is the configured `TargetParameters` for the prefetch request.
+- If the prefetch is successful, `completion` is invoked with a nil value. If the prefetch is not successful, an error message is returned.
+
+### Examples 
+
+- #### Swift
 
 ```swift
         let TargetParameters1 = TargetParameters(
@@ -37,7 +50,7 @@ This API sends a prefetch request to your configured Target server with the pref
         }
 ```
 
-##### Objective-C
+- ##### Objective-C
 
 ```objectivec
     NSDictionary *mboxParameters1 = @{@"status":@"platinum"};
