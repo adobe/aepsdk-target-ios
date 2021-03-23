@@ -19,19 +19,21 @@ import Foundation
 struct TargetDeliveryRequest: Codable {
     static let LOG_TAG = "TargetDeliveryRequest"
 
-    var id: TargetIDs?
+    var id: TargetIDs
     var context: TargetContext
-    var experienceCloud: ExperienceCloudInfo?
-    var prefetch: Prefetch?
+    var experienceCloud: ExperienceCloudInfo
+    var execute: Mboxes?
+    var prefetch: Mboxes?
     var notifications: [Notification]?
     var environmentId: Int64
     var property: Property?
 
-    init(id: TargetIDs? = nil, context: TargetContext, experienceCloud: ExperienceCloudInfo? = nil, prefetch: Prefetch? = nil, notifications: [Notification]? = nil, environmentId: Int64 = 0, property: Property? = nil) {
+    init(id: TargetIDs, context: TargetContext, experienceCloud: ExperienceCloudInfo, prefetch: Mboxes? = nil, execute: Mboxes? = nil, notifications: [Notification]? = nil, environmentId: Int64 = 0, property: Property? = nil) {
         self.id = id
         self.context = context
         self.experienceCloud = experienceCloud
         self.prefetch = prefetch
+        self.execute = execute
         self.notifications = notifications
         self.environmentId = environmentId
         self.property = property
@@ -155,9 +157,9 @@ enum PlatformType: String, Codable {
     case ios
 }
 
-// MARK: - Delivery Request - prefetch
+// MARK: - Delivery Request
 
-struct Prefetch: Codable {
+struct Mboxes: Codable {
     var mboxes: [Mbox]
 }
 
@@ -165,12 +167,13 @@ struct Mbox: Codable {
     var name: String
     var index: Int?
     var state: String?
+    var analytics: [String: String]?
     var parameters: [String: String]?
     var profileParameters: [String: String]?
     var order: Order?
     var product: Product?
 
-    init(name: String, index: Int? = nil, state: String? = nil, parameters: [String: String]? = nil, profileParameters: [String: String]? = nil, order: Order? = nil, product: Product? = nil) {
+    init(name: String, index: Int? = nil, state: String? = nil, parameters: [String: String]? = nil, profileParameters: [String: String]? = nil, order: Order? = nil, product: Product? = nil, analytics: [String: String]? = nil) {
         self.name = name
         self.index = index
         self.state = state
@@ -178,6 +181,7 @@ struct Mbox: Codable {
         self.order = order
         self.product = product
         self.parameters = parameters
+        self.analytics = analytics
     }
 }
 

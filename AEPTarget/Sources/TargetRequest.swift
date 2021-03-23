@@ -10,6 +10,32 @@
  governing permissions and limitations under the License.
  */
 import Foundation
-
 @objc(AEPTargetRequestObject)
-public class TargetRequest: NSObject {}
+public class TargetRequest: NSObject, Codable {
+    public let name: String
+    public let defaultContent: String
+    public let targetParameters: TargetParameters?
+    let responsePairId: String
+    var contentCallback: ((String?) -> Void)?
+
+    /// Instantiate a `TargetRequest` object
+    /// - Parameters:
+    ///   - name: `String` mbox name for this request
+    ///   - defaultContent: `String` default content for this request
+    ///   - targetParameters: `TargetParameters` for this request
+    ///   - contentCallback: which will get called with target mbox content
+    public init(mboxName: String, defaultContent: String, targetParameters: TargetParameters? = nil, contentCallback: ((String?) -> Void)? = nil) {
+        name = mboxName
+        self.defaultContent = defaultContent
+        self.targetParameters = targetParameters
+        self.contentCallback = contentCallback
+        responsePairId = UUID().uuidString
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case name
+        case defaultContent
+        case targetParameters
+        case responsePairId
+    }
+}

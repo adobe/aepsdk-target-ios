@@ -93,11 +93,19 @@ public class Target: NSObject, Extension {
         if event.isResetExperienceEvent {
             resetIdentity(event)
         }
+        if event.isClearPrefetchCache {
+            targetState.clearprefetchedMboxes()
+        }
     }
 
     private func handleRequestContent(_ event: Event) {
         if event.isPrefetchEvent {
             prefetchContent(event)
+            return
+        }
+
+        if event.isLoadRequest {
+            loadRequest(event)
             return
         }
 
@@ -152,20 +160,32 @@ public class Target: NSObject, Extension {
         let lifecycleSharedState = getSharedState(extensionName: TargetConstants.Lifecycle.EXTENSION_NAME, event: event)?.value
         let identitySharedState = getSharedState(extensionName: TargetConstants.Identity.EXTENSION_NAME, event: event)?.value
 
+        // Check whether request can be sent
+        if let error = prepareForTargetRequest(configData: configurationSharedState) {
+            Log.debug(label: Target.LOG_TAG, "Unable to prefetch mbox content, Error \(error)")
+            return
+        }
+
         guard let privacy = configurationSharedState[TargetConstants.Configuration.SharedState.Keys.GLOBAL_CONFIG_PRIVACY] as? String, privacy == TargetConstants.Configuration.SharedState.Values.GLOBAL_CONFIG_PRIVACY_OPT_IN else {
             dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Privacy status is opted out")
             return
         }
 
         let error = sendTargetRequest(event, prefetchRequests: targetPrefetchArray, targetParameters: targetParameters, configData: configurationSharedState, lifecycleData: lifecycleSharedState, identityData: identitySharedState) { connection in
+            if connection.responseCode != 200 {
+                self.dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Errors returned in Target response with response code: \(String(describing: connection.responseCode))")
+            }
+            // Clear notification
+            self.targetState.clearNotifications()
 
-            guard let data = connection.data, let responseDict = try? JSONDecoder().decode([String: AnyCodable].self, from: data), let dict: [String: Any] = AnyCodable.toAnyDictionary(dictionary: responseDict) else {
+            guard let data = connection.data, let responseDict = try? JSONDecoder().decode([String: AnyCodable].self, from: data), let dict = AnyCodable.toAnyDictionary(dictionary: responseDict) else {
                 self.dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Target response parser initialization failed")
                 return
             }
-            let response = DeliveryResponse(responseJson: dict)
+            let response = TargetDeliveryResponse(responseJson: dict)
 
-            if connection.responseCode != 200, let error = response.errorMessage {
+            if let error = response.errorMessage {
+                self.targetState.clearNotifications()
                 self.dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Errors returned in Target response: \(error)")
             }
 
@@ -175,7 +195,7 @@ public class Target: NSObject, Extension {
             if let edgeHost = response.edgeHost { self.targetState.updateEdgeHost(edgeHost) }
             self.createSharedState(data: self.targetState.generateSharedState(), event: event)
 
-            if let mboxes = response.mboxes {
+            if let mboxes = response.prefetchMboxes {
                 var mboxesDictionary = [String: [String: Any]]()
                 for mbox in mboxes {
                     if let name = mbox[TargetResponseConstants.JSONKeys.MBOX_NAME] as? String { mboxesDictionary[name] = mbox }
@@ -183,14 +203,63 @@ public class Target: NSObject, Extension {
                 if !mboxesDictionary.isEmpty { self.targetState.mergePrefetchedMboxJson(mboxesDictionary: mboxesDictionary) }
             }
 
+            // Remove duplicate loaded mboxes
+            for (k, _) in self.targetState.prefetchedMboxJsonDicts {
+                self.targetState.removeLoadedMbox(mboxName: k)
+            }
+
             self.dispatch(event: event.createResponseEvent(name: TargetConstants.EventName.PREFETCH_RESPOND, type: EventType.target, source: EventSource.responseContent, data: nil))
-            // TODO: removeDuplicateLoadedMboxes
-            // TODO: notifications.clear()
-            self.startEvents()
         }
 
         if let err = error {
             dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: err)
+        }
+    }
+
+    /// Request multiple Target mboxes in a single network call.
+    /// - Parameter event: an event of type target and  source request content is dispatched by the `EventHub`
+    private func loadRequest(_ event: Event) {
+        guard let targetRequests = event.targetRequests else {
+            Log.debug(label: Target.LOG_TAG, "Unable to process the batch requests, Target Batch Requests are null")
+            return
+        }
+
+        let targetParameters = event.targetParameters
+        guard let configurationSharedState = getSharedState(extensionName: TargetConstants.Configuration.EXTENSION_NAME, event: event)?.value else {
+            dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Missing shared state - configuration")
+            return
+        }
+
+        let lifecycleSharedState = getSharedState(extensionName: TargetConstants.Lifecycle.EXTENSION_NAME, event: event)?.value
+        let identitySharedState = getSharedState(extensionName: TargetConstants.Identity.EXTENSION_NAME, event: event)?.value
+
+        // Check whether request can be sent
+        if let error = prepareForTargetRequest(configData: configurationSharedState) {
+            Log.debug(label: Target.LOG_TAG, "\(TargetError.ERROR_BATCH_REQUEST_SEND_FAILED) \(error)")
+            runDefaultCallbacks(event: event, batchRequests: targetRequests)
+            return
+        }
+
+        var requestsToSend: [TargetRequest] = targetRequests
+
+        let timestamp = Int64(event.timestamp.timeIntervalSince1970 * 1000.0)
+
+        if !isInPreviewMode() {
+            Log.debug(label: Target.LOG_TAG, "Current cached mboxes : \(targetState.prefetchedMboxJsonDicts.keys.description), size: \(targetState.prefetchedMboxJsonDicts.count)")
+            requestsToSend = processCachedTargetRequest(event: event, batchRequests: targetRequests, timeStamp: timestamp)
+        }
+
+        if requestsToSend.isEmpty && targetState.notifications.isEmpty {
+            Log.warning(label: Target.LOG_TAG, "Unable to process the batch requests, requests and notifications are empty")
+            return
+        }
+
+        let error = sendTargetRequest(event, batchRequests: requestsToSend, targetParameters: targetParameters, configData: configurationSharedState, lifecycleData: lifecycleSharedState, identityData: identitySharedState) { connection in
+            self.processTargetRequestResponse(batchRequests: requestsToSend, event: event, connection: connection)
+        }
+
+        if let err = error {
+            Log.warning(label: Target.LOG_TAG, err)
         }
     }
 
@@ -201,13 +270,13 @@ public class Target: NSObject, Extension {
     /// - Privacy status is opted-out or opt-unknown.
     /// - If the mboxes are either loaded previously or not prefetched.
     private func displayedLocations(_ event: Event) {
-        guard let eventData = event.data as [String: Any]? else {
-            Log.error(label: Target.LOG_TAG, "Unable to handle request content, event data is nil.")
+        guard let eventData = event.data else {
+            Log.warning(label: Target.LOG_TAG, "Unable to handle request content, event data is nil.")
             return
         }
 
-        guard let mboxNames: [String] = eventData[TargetConstants.EventDataKeys.MBOX_NAMES] as? [String] else {
-            Log.error(label: Target.LOG_TAG, "Location displayed unsuccessful \(TargetError.ERROR_MBOX_NAMES_NULL_OR_EMPTY)")
+        guard let mboxNames = eventData[TargetConstants.EventDataKeys.MBOX_NAMES] as? [String] else {
+            Log.warning(label: Target.LOG_TAG, "Location displayed unsuccessful \(TargetError.ERROR_MBOX_NAMES_NULL_OR_EMPTY)")
             return
         }
 
@@ -215,7 +284,7 @@ public class Target: NSObject, Extension {
 
         // Get the configuration shared state
         guard let configuration = getSharedState(extensionName: TargetConstants.Configuration.EXTENSION_NAME, event: event)?.value else {
-            Log.error(label: Target.LOG_TAG, "Location displayed unsuccessful, configuration is nil")
+            Log.warning(label: Target.LOG_TAG, "Location displayed unsuccessful, configuration is nil")
             return
         }
 
@@ -224,7 +293,7 @@ public class Target: NSObject, Extension {
 
         // Check whether request can be sent
         if let error = prepareForTargetRequest(configData: configuration) {
-            Log.error(label: Target.LOG_TAG, TargetError.ERROR_DISPLAY_NOTIFICATION_SEND_FAILED + error)
+            Log.warning(label: Target.LOG_TAG, TargetError.ERROR_DISPLAY_NOTIFICATION_SEND_FAILED + error)
             return
         }
 
@@ -237,32 +306,32 @@ public class Target: NSObject, Extension {
                 continue
             }
 
-            guard let mboxJson: [String: Any] = targetState.prefetchedMboxJsonDicts[mboxName] else {
-                Log.error(label: Target.LOG_TAG, "\(TargetError.ERROR_NO_CACHED_MBOX_FOUND) \(mboxName).")
+            guard let mboxJson = targetState.prefetchedMboxJsonDicts[mboxName] else {
+                Log.warning(label: Target.LOG_TAG, "\(TargetError.ERROR_NO_CACHED_MBOX_FOUND) \(mboxName).")
                 continue
             }
 
             let timeInMills = Int64(event.timestamp.timeIntervalSince1970 * 1000.0)
 
             if !addDisplayNotification(mboxName: mboxName, mboxJson: mboxJson, targetParameters: event.targetParameters, lifecycleData: lifecycleSharedState, timestamp: timeInMills) {
-                Log.debug(label: Target.LOG_TAG, "handleLocationsDisplayed - \(mboxName) mBox not added for display notification.")
+                Log.debug(label: Target.LOG_TAG, "displayedLocations - \(mboxName) mbox not added for display notification.")
                 continue
             }
 
-            // - TODO: dispatchAnalyticsForTargetRequest
+            dispatchAnalyticsForTargetRequest(payload: getAnalyticsForTargetPayload(mboxJson: mboxJson, sessionId: targetState.sessionId))
+        }
 
-            if targetState.notifications.isEmpty {
-                Log.debug(label: Target.LOG_TAG, "displayedLocations - \(TargetError.ERROR_DISPLAY_NOTIFICATION_NOT_SENT)")
-                return
-            }
+        if targetState.notifications.isEmpty {
+            Log.debug(label: Target.LOG_TAG, "displayedLocations - \(TargetError.ERROR_DISPLAY_NOTIFICATION_NOT_SENT)")
+            return
+        }
 
-            let error = sendTargetRequest(event, targetParameters: event.targetParameters, configData: configuration, lifecycleData: lifecycleSharedState, identityData: identitySharedState, propertyToken: nil) { connection in
-                self.processNotificationResponse(event: event, connection: connection)
-            }
+        let error = sendTargetRequest(event, targetParameters: event.targetParameters, configData: configuration, lifecycleData: lifecycleSharedState, identityData: identitySharedState) { connection in
+            self.processNotificationResponse(event: event, connection: connection)
+        }
 
-            if let err = error {
-                Log.warning(label: Target.LOG_TAG, err)
-            }
+        if let err = error {
+            Log.warning(label: Target.LOG_TAG, err)
         }
     }
 
@@ -294,12 +363,12 @@ public class Target: NSObject, Extension {
         // Check if the mbox is already prefetched or loaded.
         // if not, Log and bail out
 
-        guard let mboxJson: [String: Any?] = targetState.prefetchedMboxJsonDicts[mboxName] ?? targetState.loadedMboxJsonDicts[mboxName] else {
+        guard let mboxJson = targetState.prefetchedMboxJsonDicts[mboxName] ?? targetState.loadedMboxJsonDicts[mboxName] else {
             Log.warning(label: Target.LOG_TAG, "\(TargetError.ERROR_CLICK_NOTIFICATION_SEND_FAILED) \(TargetError.ERROR_NO_CACHED_MBOX_FOUND) \(mboxName).")
             return
         }
 
-        guard let metrics: [[String: Any?]?] = mboxJson[TargetConstants.TargetJson.METRICS] as? [[String: Any?]?] else {
+        guard let metrics = mboxJson[TargetConstants.TargetJson.METRICS] as? [[String: Any?]?] else {
             Log.warning(label: Target.LOG_TAG, "\(TargetError.ERROR_CLICK_NOTIFICATION_SEND_FAILED) \(TargetError.ERROR_NO_CLICK_METRICS) \(mboxName).")
             return
         }
@@ -322,7 +391,7 @@ public class Target: NSObject, Extension {
 
         // Get the configuration shared state
         guard let configuration = getSharedState(extensionName: TargetConstants.Configuration.EXTENSION_NAME, event: event)?.value else {
-            Log.error(label: Target.LOG_TAG, "Target location clicked notification can't be sent, configuration is nil")
+            Log.warning(label: Target.LOG_TAG, "Target location clicked notification can't be sent, configuration is nil")
             return
         }
 
@@ -331,7 +400,7 @@ public class Target: NSObject, Extension {
 
         // bail out if the target configuration is not available or if the privacy is opted-out
         if let error = prepareForTargetRequest(configData: configuration) {
-            Log.error(label: Target.LOG_TAG, TargetError.ERROR_CLICK_NOTIFICATION_NOT_SENT + error)
+            Log.warning(label: Target.LOG_TAG, TargetError.ERROR_CLICK_NOTIFICATION_NOT_SENT + error)
             return
         }
 
@@ -341,8 +410,8 @@ public class Target: NSObject, Extension {
         let timeInMills = Int64(event.timestamp.timeIntervalSince1970 * 1000.0)
 
         // create and add click notification to the notification list
-        if !addClickedNotification(mBoxJson: mboxJson, targetParameters: event.targetParameters, lifecycleData: lifecycleSharedState, timestamp: timeInMills) {
-            Log.debug(label: Target.LOG_TAG, "handleLocationClicked - \(mboxName) mBox not added for click notification.")
+        if !addClickedNotification(mboxJson: mboxJson, targetParameters: event.targetParameters, lifecycleData: lifecycleSharedState, timestamp: timeInMills) {
+            Log.debug(label: Target.LOG_TAG, "handleLocationClicked - \(mboxName) mbox not added for click notification.")
             return
         }
 
@@ -367,11 +436,13 @@ public class Target: NSObject, Extension {
             Log.debug(label: Target.LOG_TAG, "Errors returned in Target response with response code: \(String(describing: connection.responseCode))")
         }
 
+        targetState.clearNotifications()
+
         guard let data = connection.data, let responseDict = try? JSONDecoder().decode([String: AnyCodable].self, from: data), let dict: [String: Any] = AnyCodable.toAnyDictionary(dictionary: responseDict) else {
             Log.debug(label: Target.LOG_TAG, "Target response parser initialization failed")
             return
         }
-        let response = DeliveryResponse(responseJson: dict)
+        let response = TargetDeliveryResponse(responseJson: dict)
 
         if let error = response.errorMessage {
             targetState.clearNotifications()
@@ -390,6 +461,60 @@ public class Target: NSObject, Extension {
         createSharedState(data: targetState.generateSharedState(), event: event)
     }
 
+    /// Process the network response after the notification network call.
+    /// - Parameters:
+    ///     - batchRequests: `[TargetRequest]` representing the desired mboxes to load
+    ///     - event: event which triggered this network call
+    ///     - connection: `NetworkService.HttpConnection` instance
+    private func processTargetRequestResponse(batchRequests: [TargetRequest], event: Event, connection: HttpConnection) {
+        if connection.responseCode != 200 {
+            dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Errors returned in Target response with response code: \(String(describing: connection.responseCode))")
+        }
+
+        // clear notifications
+        targetState.clearNotifications()
+
+        guard let data = connection.data, let responseDict = try? JSONDecoder().decode([String: AnyCodable].self, from: data), let dict = AnyCodable.toAnyDictionary(dictionary: responseDict) else {
+            dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Target response parser initialization failed")
+            return
+        }
+        let response = TargetDeliveryResponse(responseJson: dict)
+
+        if let error = response.errorMessage {
+            targetState.clearNotifications()
+            dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Errors returned in Target request response: \(error)")
+        }
+
+        targetState.updateSessionTimestamp()
+        if let tntId = response.tntId { targetState.updateTntId(tntId) }
+        if let edgeHost = response.edgeHost { targetState.updateEdgeHost(edgeHost) }
+        createSharedState(data: targetState.generateSharedState(), event: nil)
+
+        var mboxesDictionary = [String: [String: Any]]()
+        if let mboxes = response.executeMboxes {
+            for mbox in mboxes {
+                if let name = mbox[TargetResponseConstants.JSONKeys.MBOX_NAME] as? String { mboxesDictionary[name] = mbox }
+            }
+            if !mboxesDictionary.isEmpty {
+                // save the loaded mboxes from target response to be used later on for notifications
+                targetState.saveLoadedMbox(mboxesDictionary: mboxesDictionary)
+            }
+        } else {
+            runDefaultCallbacks(event: event, batchRequests: batchRequests)
+            return
+        }
+
+        for targetRequest in batchRequests {
+            var content = ""
+            if let mboxJson = mboxesDictionary[targetRequest.name] {
+                content = extractMboxContent(mboxJson: mboxJson) ?? targetRequest.defaultContent
+                let payload = getAnalyticsForTargetPayload(mboxJson: mboxJson, sessionId: targetState.sessionId)
+                dispatchAnalyticsForTargetRequest(payload: payload)
+            }
+            dispatchMboxContent(event: event, content: content, responsePairId: targetRequest.responsePairId)
+        }
+    }
+
     private func dispatchPrefetchErrorEvent(triggerEvent: Event, errorMessage: String) {
         Log.warning(label: Target.LOG_TAG, "dispatch prefetch error event")
         dispatch(event: triggerEvent.createResponseEvent(name: TargetConstants.EventName.PREFETCH_RESPOND, type: EventType.target, source: EventSource.responseContent, data: [TargetConstants.EventDataKeys.PREFETCH_ERROR: errorMessage]))
@@ -406,7 +531,7 @@ public class Target: NSObject, Extension {
         dispatch(event: triggerEvent.createResponseEvent(name: TargetConstants.EventName.IDENTITY_RESPONSE, type: EventType.target, source: EventSource.responseIdentity, data: eventData))
     }
 
-    private func generateTargetDeliveryURL(targetServer: String?, clientCode: String) -> String {
+    private func getTargetDeliveryURL(targetServer: String?, clientCode: String) -> String {
         if let targetServer = targetServer {
             return String(format: TargetConstants.DELIVERY_API_URL_BASE, targetServer, clientCode, targetState.sessionId)
         }
@@ -449,14 +574,14 @@ public class Target: NSObject, Extension {
     /// Adds the display notification for the given mbox to the {@link #notifications} list
     /// - Parameters:
     ///     - mboxName: the displayed mbox name
-    ///     - mBoxJson: the cached `MBox` object
+    ///     - mboxJson: the cached `Mbox` object
     ///     - targetParameters: `TargetParameters` object corresponding to the display location
     ///     - lifecycleData: the lifecycle dictionary that should be added as mbox parameters
     ///     - timestamp: timestamp associated with the notification event
     /// - Returns: `Bool` indicating the success of appending the display notification to the notification list
     private func addDisplayNotification(mboxName: String, mboxJson: [String: Any], targetParameters: TargetParameters?, lifecycleData: [String: Any]?, timestamp: Int64) -> Bool {
         let lifecycleContextData = getLifecycleDataForTarget(lifecycleData: lifecycleData)
-        guard let displayNotification = DeliveryRequestBuilder.getDisplayNotification(mboxName: mboxName, cachedMboxJson: mboxJson, parameters: targetParameters, timestamp: timestamp, lifecycleContextData: lifecycleContextData) as Notification? else {
+        guard let displayNotification = TargetDeliveryRequestBuilder.getDisplayNotification(mboxName: mboxName, cachedMboxJson: mboxJson, targetParameters: targetParameters, timestamp: timestamp, lifecycleContextData: lifecycleContextData) else {
             Log.debug(label: Target.LOG_TAG, "addDisplayNotification - \(TargetError.ERROR_DISPLAY_NOTIFICATION_NULL_FOR_MBOX), \(mboxName)")
             return false
         }
@@ -467,14 +592,14 @@ public class Target: NSObject, Extension {
 
     /// Adds the clicked notification for the given mbox to the {@link #notifications} list.
     /// - Parameters:
-    ///     - mBoxJson: the cached `MBox` object
+    ///     - mboxJson: the cached `Mbox` object
     ///     - targetParameters: `TargetParameters` object corresponding to the display location
     ///     - lifecycleData: the lifecycle dictionary that should be added as mbox parameters
     ///     - timestamp: timestamp associated with the notification event
     /// - Returns: `Bool` indicating the success of appending the click notification to the notification list
-    private func addClickedNotification(mBoxJson: [String: Any?], targetParameters: TargetParameters?, lifecycleData: [String: Any]?, timestamp: Int64) -> Bool {
+    private func addClickedNotification(mboxJson: [String: Any?], targetParameters: TargetParameters?, lifecycleData: [String: Any]?, timestamp: Int64) -> Bool {
         let lifecycleContextData = getLifecycleDataForTarget(lifecycleData: lifecycleData)
-        guard let clickNotification = DeliveryRequestBuilder.getClickedNotification(cachedMboxJson: mBoxJson, parameters: targetParameters, timestamp: timestamp, lifecycleContextData: lifecycleContextData) as Notification? else {
+        guard let clickNotification = TargetDeliveryRequestBuilder.getClickedNotification(cachedMboxJson: mboxJson, targetParameters: targetParameters, timestamp: timestamp, lifecycleContextData: lifecycleContextData) else {
             Log.debug(label: Target.LOG_TAG, "addClickedNotification - \(TargetError.ERROR_CLICK_NOTIFICATION_NOT_SENT)")
             return false
         }
@@ -505,38 +630,49 @@ public class Target: NSObject, Extension {
     }
 
     private func sendTargetRequest(_: Event,
-                                   batchRequests _: [TargetRequest]? = nil,
+                                   batchRequests: [TargetRequest]? = nil,
                                    prefetchRequests: [TargetPrefetch]? = nil,
                                    targetParameters: TargetParameters? = nil,
                                    configData: [String: Any],
                                    lifecycleData: [String: Any]? = nil,
                                    identityData: [String: Any]? = nil,
-                                   propertyToken: String? = nil,
-                                   completionHandler: ((HttpConnection) -> Void)?) -> String? {
+                                   completionHandler: ((HttpConnection) -> Void)?) -> String?
+    {
         let tntId = targetState.tntId
         let thirdPartyId = targetState.thirdPartyId
-        let environmentId: Int64 = configData[TargetConstants.Configuration.SharedState.Keys.TARGET_ENVIRONMENT_ID] as? Int64 ?? 0
+        let environmentId = configData[TargetConstants.Configuration.SharedState.Keys.TARGET_ENVIRONMENT_ID] as? Int64 ?? 0
         let lifecycleContextData = getLifecycleDataForTarget(lifecycleData: lifecycleData)
-        let propToken = propertyToken != nil ? propertyToken : (configData[TargetConstants.Configuration.SharedState.Keys.TARGET_PROPERTY_TOKEN] as? String ?? "")
+        let propToken = configData[TargetConstants.Configuration.SharedState.Keys.TARGET_PROPERTY_TOKEN] as? String ?? ""
 
-        guard let requestJson = DeliveryRequestBuilder.build(tntId: tntId, thirdPartyId: thirdPartyId, identitySharedState: identityData, lifecycleSharedState: lifecycleContextData, targetPrefetchArray: prefetchRequests, targetParameters: targetParameters, notifications: targetState.notifications.isEmpty ? nil : targetState.notifications, environmentId: environmentId, propertyToken: propToken)?.toJSON() else {
+        guard let requestJson = TargetDeliveryRequestBuilder.build(tntId: tntId, thirdPartyId: thirdPartyId, identitySharedState: identityData, lifecycleSharedState: lifecycleContextData, targetPrefetchArray: prefetchRequests, targetRequestArray: batchRequests, targetParameters: targetParameters, notifications: targetState.notifications.isEmpty ? nil : targetState.notifications, environmentId: environmentId, propertyToken: propToken)?.toJSON() else {
             return "Failed to generate request parameter(JSON) for target delivery API call"
         }
 
         let headers = [TargetConstants.HEADER_CONTENT_TYPE: TargetConstants.HEADER_CONTENT_TYPE_JSON]
 
         let targetServer = configData[TargetConstants.Configuration.SharedState.Keys.TARGET_SERVER] as? String
-        guard let clientCode = configData[TargetConstants.Configuration.SharedState.Keys.TARGET_CLIENT_CODE] as? String else {
+
+        guard let clientCode = targetState.clientCode else {
             return "Missing client code"
         }
 
-        guard let url = URL(string: generateTargetDeliveryURL(targetServer: targetServer, clientCode: clientCode)) else {
+        guard let url = URL(string: getTargetDeliveryURL(targetServer: targetServer, clientCode: clientCode)) else {
             return "Failed to generate the url for target API call"
         }
+
+        let timeout = configData[TargetConstants.Configuration.SharedState.Keys.TARGET_NETWORK_TIMEOUT] as? Double ?? DEFAULT_NETWORK_TIMEOUT
+
         // https://developers.adobetarget.com/api/delivery-api/#tag/Delivery-API
-        let request = NetworkRequest(url: url, httpMethod: .post, connectPayload: requestJson, httpHeaders: headers, connectTimeout: DEFAULT_NETWORK_TIMEOUT, readTimeout: DEFAULT_NETWORK_TIMEOUT)
-        // stopEvents()
-        networkService.connectAsync(networkRequest: request, completionHandler: completionHandler)
+
+        let request = NetworkRequest(url: url, httpMethod: .post, connectPayload: requestJson, httpHeaders: headers, connectTimeout: timeout, readTimeout: timeout)
+
+        stopEvents()
+        networkService.connectAsync(networkRequest: request) { connection in
+            if let completionHandler = completionHandler {
+                completionHandler(connection)
+            }
+            self.startEvents()
+        }
         return nil
     }
 
@@ -634,5 +770,124 @@ public class Target: NSObject, Extension {
 
     private func updateSessionTimeout(configuration: [String: Any]) {
         targetState.sessionTimeoutInSeconds = configuration[TargetConstants.Configuration.SharedState.Keys.TARGET_SESSION_TIMEOUT] as? Int ?? TargetConstants.DEFAULT_SESSION_TIMEOUT
+    }
+
+    /// Runs the default callback for each of the request in the list.
+    /// - Parameters:
+    ///     - batchRequests: `[TargetRequests]` to return the default content
+    private func runDefaultCallbacks(event: Event, batchRequests: [TargetRequest]) {
+        for request in batchRequests {
+            dispatchMboxContent(event: event, content: request.defaultContent, responsePairId: request.responsePairId)
+        }
+    }
+
+    /// Dispatches the Target Response Content Event.
+    /// - Parameters:
+    ///     - content: the target content
+    ///     - pairId: the pairId of the associated target request content event.
+    private func dispatchMboxContent(event: Event, content: String, responsePairId: String) {
+        Log.trace(label: Target.LOG_TAG, "dispatchMboxContent - " + TargetError.ERROR_TARGET_EVENT_DISPATCH_MESSAGE)
+
+        let responseEvent = event.createResponseEvent(name: TargetConstants.EventName.TARGET_REQUEST_RESPONSE, type: EventType.target, source: EventSource.responseContent, data: [TargetConstants.EventDataKeys.TARGET_CONTENT: content, TargetConstants.EventDataKeys.TARGET_RESPONSE_PAIR_ID: responsePairId])
+
+        MobileCore.dispatch(event: responseEvent)
+    }
+
+    /// Checks if the cached mboxs contain the data for each of the `TargetRequest` in the input List.
+    /// If a cached mbox exists, then dispatch the mbox content.
+    ///
+    private func processCachedTargetRequest(event: Event, batchRequests: [TargetRequest], timeStamp _: Int64) -> [TargetRequest] {
+        var requestsToSend: [TargetRequest] = []
+        for request in batchRequests {
+            guard let cachedMbox = targetState.prefetchedMboxJsonDicts[request.name] else {
+                Log.debug(label: Target.LOG_TAG, "processCachedTargetRequest - \(TargetError.ERROR_NO_CACHED_MBOX_FOUND) \(request.name)")
+                requestsToSend.append(request)
+                continue
+            }
+            Log.debug(label: Target.LOG_TAG, "processCachedTargetRequest - Cached mbox found for \(request.name) with data \(cachedMbox.description)")
+
+            let content = extractMboxContent(mboxJson: cachedMbox) ?? request.defaultContent
+            dispatchMboxContent(event: event, content: content, responsePairId: request.responsePairId)
+        }
+
+        return requestsToSend
+    }
+
+    /// Return Mbox content from mboxJson, if any
+    /// - Parameters:
+    ///     - mboxJson: `[String: Any]` target response dictionary
+    /// - Returns: `String` mbox content, if any otherwise returns nil
+    private func extractMboxContent(mboxJson: [String: Any]) -> String? {
+        guard let optionsArray = mboxJson[TargetConstants.TargetJson.OPTIONS] as? [[String: Any?]?] else {
+            Log.debug(label: Target.LOG_TAG, "extractMboxContent - unable to extract mbox contents, options array is nil")
+            return nil
+        }
+
+        var contentBuilder: String = ""
+
+        for option in optionsArray {
+            guard let content = option?[TargetConstants.TargetJson.Option.CONTENT] else {
+                continue
+            }
+
+            guard let type = option?[TargetConstants.TargetJson.Option.TYPE] as? String, !type.isEmpty else {
+                continue
+            }
+
+            if TargetConstants.TargetJson.HTML == type, let contentString = content as? String {
+                contentBuilder.append(contentString)
+            } else if TargetConstants.TargetJson.JSON == type, let contentDict = content as? [String: Any?] {
+                guard let jsonData = try? JSONSerialization.data(withJSONObject: contentDict, options: .prettyPrinted) else {
+                    continue
+                }
+                guard let jsonString = String(data: jsonData, encoding: .utf8) else { continue }
+                contentBuilder.append(jsonString)
+            }
+        }
+
+        return contentBuilder
+    }
+
+    /// Dispatches an Analytics Event containing the Analytics for Target (A4T) payload
+    /// - Parameters:
+    ///     - payload: analytics for target (a4t) payload
+    private func dispatchAnalyticsForTargetRequest(payload: [String: String]?) {
+        guard let payloadJson = payload, !payloadJson.isEmpty else {
+            Log.debug(label: Target.LOG_TAG, "dispatchAnalyticsForTargetRequest - Failed to dispatch analytics. Payload is either null or empty")
+            return
+        }
+
+        let eventData = [TargetConstants.EventDataKeys.Analytics.CONTEXT_DATA: payloadJson,
+                         TargetConstants.EventDataKeys.Analytics.TRACK_ACTION: TargetConstants.A4T_ACTION_NAME,
+                         TargetConstants.EventDataKeys.Analytics.TRACK_INTERNAL: true] as [String: Any]
+        let event = Event(name: TargetConstants.EventName.ANALYTICS_FOR_TARGET_REQUEST_EVENT_NAME, type: EventType.analytics, source: EventSource.requestContent, data: eventData)
+        MobileCore.dispatch(event: event)
+    }
+
+    /// Grabs the a4t payload from the target response and convert the keys to correct format
+    /// Returns an empty `Dictionary` if there are no analytics payload that needs to be sent.
+    /// - Parameters:
+    ///     - mboxJson: A prefetched mbox dictionary
+    ///     - sessionId: session id
+    /// - Returns: `Dictionary` containing a4t payload
+    private func getAnalyticsForTargetPayload(mboxJson: [String: Any], sessionId: String) -> [String: String]? {
+        var payload: [String: String] = [:]
+        guard let analyticsJson = mboxJson[TargetConstants.TargetJson.ANALYTICS_PARAMETERS] as? [String: Any] else {
+            return nil
+        }
+
+        guard let payloadJson = analyticsJson[TargetConstants.TargetJson.ANALYTICS_PAYLOAD] as? [String: String] else {
+            return nil
+        }
+
+        for (k, v) in payloadJson {
+            payload["&&\(k)"] = v
+        }
+
+        if !sessionId.isEmpty {
+            payload[TargetConstants.TargetJson.SESSION_ID] = sessionId
+        }
+
+        return payload
     }
 }

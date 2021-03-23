@@ -15,7 +15,7 @@ import Foundation
 
 /// Provides functionality for migrating stored data from c++ V5 to Swift V5
 enum TargetV5Migrator {
-    private static func getUserDefaultV5() -> UserDefaults {
+    private static func getUserDefaultsV5() -> UserDefaults {
         if let v5AppGroup = ServiceProvider.shared.namedKeyValueService.getAppGroup(), !v5AppGroup.isEmpty {
             return UserDefaults(suiteName: v5AppGroup) ?? UserDefaults.standard
         }
@@ -25,7 +25,7 @@ enum TargetV5Migrator {
 
     /// Migrates the c++ V5 Target values into the Swift V5 Target data store
     static func migrate() {
-        let userDefaultV5 = getUserDefaultV5()
+        let userDefaultV5 = getUserDefaultsV5()
         let targetDataStore = NamedCollectionDataStore(name: TargetConstants.DATASTORE_NAME)
 
         guard targetDataStore.getBool(key: TargetConstants.DataStoreKeys.V5_MIGRATION_COMPLETE) == nil else {
@@ -34,15 +34,15 @@ enum TargetV5Migrator {
 
         // load old values
         let edgeHost = userDefaultV5.string(forKey: TargetConstants.V5Migration.EDGE_HOST)
-        let sessionTimeStamp = userDefaultV5.double(forKey: TargetConstants.V5Migration.SESSION_TIMESTAMP)
+        let sessionTimestamp = userDefaultV5.integer(forKey: TargetConstants.V5Migration.SESSION_TIMESTAMP)
         let sessionId = userDefaultV5.string(forKey: TargetConstants.V5Migration.SESSION_ID)
         let thirdPartyId = userDefaultV5.string(forKey: TargetConstants.V5Migration.THIRD_PARTY_ID)
         let tntId = userDefaultV5.string(forKey: TargetConstants.V5Migration.TNT_ID)
 
         // save values
         targetDataStore.set(key: TargetConstants.DataStoreKeys.EDGE_HOST, value: edgeHost)
-        if sessionTimeStamp > 0 {
-            targetDataStore.set(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP, value: sessionTimeStamp)
+        if sessionTimestamp > 0 {
+            targetDataStore.set(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP, value: sessionTimestamp)
         }
         targetDataStore.set(key: TargetConstants.DataStoreKeys.SESSION_ID, value: sessionId)
         targetDataStore.set(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID, value: thirdPartyId)

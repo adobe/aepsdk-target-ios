@@ -31,19 +31,24 @@ class TargetTests: XCTestCase {
     }
 
     private func cleanUserDefaults() {
-        ServiceProvider.shared.namedKeyValueService.setAppGroup(nil)
+        for _ in 0 ... 5 {
+            for key in getUserDefaultsV5().dictionaryRepresentation().keys {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
+        }
         for _ in 0 ... 5 {
             for key in UserDefaults.standard.dictionaryRepresentation().keys {
                 UserDefaults.standard.removeObject(forKey: key)
             }
         }
+        ServiceProvider.shared.namedKeyValueService.setAppGroup(nil)
     }
 
     private func getTargetDataStore() -> NamedCollectionDataStore {
         return NamedCollectionDataStore(name: "com.adobe.module.target")
     }
 
-    private func getUserDefaultV5() -> UserDefaults {
+    private func getUserDefaultsV5() -> UserDefaults {
         if let v5AppGroup = ServiceProvider.shared.namedKeyValueService.getAppGroup(), !v5AppGroup.isEmpty {
             return UserDefaults(suiteName: v5AppGroup) ?? UserDefaults.standard
         }
@@ -61,20 +66,25 @@ class TargetTests: XCTestCase {
     }
 
     func testTargetInitWithDataMigration() {
-        let userDefaultsV5 = getUserDefaultV5()
+        let userDefaultsV5 = getUserDefaultsV5()
         let targetDataStore = getTargetDataStore()
         cleanUserDefaults()
         XCTAssertEqual(nil, targetDataStore.getBool(key: "v5.migration.complete"))
 
+        let timestamp = Date().getUnixTimeInSeconds()
         userDefaultsV5.set("edge.host.com", forKey: "Adobe.ADOBEMOBILE_TARGET.EDGE_HOST")
         userDefaultsV5.set("id_1", forKey: "Adobe.ADOBEMOBILE_TARGET.TNT_ID")
         userDefaultsV5.set("id_2", forKey: "Adobe.ADOBEMOBILE_TARGET.THIRD_PARTY_ID")
         userDefaultsV5.set("E621E1F8-C36C-495A-93FC-0C247A3E6E5F", forKey: "Adobe.ADOBEMOBILE_TARGET.SESSION_ID")
-        userDefaultsV5.set(1_615_436_587, forKey: "Adobe.ADOBEMOBILE_TARGET.SESSION_TIMESTAMP")
+        userDefaultsV5.set(timestamp, forKey: "Adobe.ADOBEMOBILE_TARGET.SESSION_TIMESTAMP")
 
         let target = Target(runtime: mockRuntime)
         XCTAssertEqual(true, targetDataStore.getBool(key: "v5.migration.complete"))
+        XCTAssertEqual("edge.host.com", target?.targetState.edgeHost)
         XCTAssertEqual("id_1", target?.targetState.tntId)
+        XCTAssertEqual("id_2", target?.targetState.thirdPartyId)
+        XCTAssertEqual("E621E1F8-C36C-495A-93FC-0C247A3E6E5F", target?.targetState.sessionId)
+        XCTAssertEqual(timestamp, target?.targetState.sessionTimestampInSeconds)
     }
 
     func testReadyForEvent() {
@@ -123,7 +133,7 @@ class TargetTests: XCTestCase {
         target.targetState.mergePrefetchedMboxJson(mboxesDictionary: mockMBoxJson)
 
         let data: [String: Any] = [
-            "mboxnames": mockMBox,
+            "names": mockMBox,
             "targetparams": TargetParameters(profileParameters: mockProfileParam).asDictionary() as Any,
             TargetConstants.EventDataKeys.IS_LOCATION_DISPLAYED: true,
         ]
@@ -149,7 +159,7 @@ class TargetTests: XCTestCase {
         target.targetState.mergePrefetchedMboxJson(mboxesDictionary: mockMBoxJson)
 
         let data: [String: Any] = [
-            "mboxname": "mbox1",
+            "name": "mbox1",
             "targetparams": TargetParameters(profileParameters: mockProfileParam).asDictionary() as Any,
             TargetConstants.EventDataKeys.IS_LOCATION_CLICKED: true,
         ]
@@ -261,6 +271,36 @@ class TargetTests: XCTestCase {
             XCTAssertTrue(target.targetState.sessionTimestampInSeconds == 0)
             XCTAssertNil(target.targetState.thirdPartyId)
             XCTAssertNotNil(target.targetState.sessionId)
+            return
+        }
+        XCTFail()
+    }
+
+    func testLoadRequestContent() {
+        MockNetworkService.request = nil
+        ServiceProvider.shared.networkService = MockNetworkService()
+        let requestDataArray: [[String: Any]?] = [
+            TargetRequest(mboxName: "Drink_1", defaultContent: "default", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+            TargetRequest(mboxName: "Drink_2", defaultContent: "default2", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+        ].map {
+            $0.asDictionary()
+        }
+
+        let data: [String: Any] = [
+            "request": requestDataArray,
+            "targetparams": TargetParameters(profileParameters: mockProfileParam).asDictionary() as Any,
+        ]
+        let event = Event(name: "", type: "", source: "", data: data)
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
+        target.onRegistered()
+        if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] {
+            eventListener(event)
+            XCTAssertNotNil(MockNetworkService.request)
+            if let url = MockNetworkService.request?.url.absoluteString {
+                XCTAssertTrue(url.hasPrefix("https://code_123.tt.omtrdc.net/rest/v1/delivery/?client=code_123&sessionId="))
+            } else {
+                XCTFail()
+            }
             return
         }
         XCTFail()

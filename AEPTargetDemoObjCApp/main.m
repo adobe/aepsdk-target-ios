@@ -9,20 +9,16 @@
  OF ANY KIND, either express or implied. See the License for the specific language
  governing permissions and limitations under the License.
  */
-import Foundation
 
-/// `TargetPrefetch` class, used for specifying a mbox location.
-@objc(AEPTargetPrefetchObject)
-public class TargetPrefetch: NSObject, Codable {
-    @objc public let name: String
-    @objc public let targetParameters: TargetParameters?
 
-    /// Instantiate a `TargetPrefetch` object
-    /// - Parameters:
-    ///   - name: `String` mbox name for this prefetch
-    ///   - targetParameters: `TargetParameters` for this prefetch
-    @objc public init(name: String, targetParameters: TargetParameters? = nil) {
-        self.name = name
-        self.targetParameters = targetParameters
+#import <UIKit/UIKit.h>
+#import "AppDelegate.h"
+
+int main(int argc, char * argv[]) {
+    NSString * appDelegateClassName;
+    @autoreleasepool {
+        // Setup code that might create autoreleased objects goes here.
+        appDelegateClassName = NSStringFromClass([AppDelegate class]);
     }
+    return UIApplicationMain(argc, argv, nil, appDelegateClassName);
 }

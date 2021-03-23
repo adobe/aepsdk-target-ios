@@ -26,6 +26,8 @@ class TargetState {
 
     private var storedSessionId: String
 
+    private let LOADED_MBOX_ACCEPTED_KEYS = [TargetConstants.TargetJson.Mbox.NAME, TargetConstants.TargetJson.METRICS]
+
     var sessionId: String {
         if storedSessionId.isEmpty || isSessionExpired() {
             storedSessionId = UUID().uuidString
@@ -49,6 +51,7 @@ class TargetState {
     init() {
         dataStore = NamedCollectionDataStore(name: TargetConstants.DATASTORE_NAME)
         tntId = dataStore.getString(key: TargetConstants.DataStoreKeys.TNT_ID)
+        thirdPartyId = dataStore.getString(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID)
         storedEdgeHost = dataStore.getString(key: TargetConstants.DataStoreKeys.EDGE_HOST)
         sessionTimestampInSeconds = dataStore.getLong(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP)
         storedSessionId = dataStore.getString(key: TargetConstants.DataStoreKeys.SESSION_ID) ?? UUID().uuidString
@@ -132,12 +135,35 @@ class TargetState {
         prefetchedMboxJsonDicts = prefetchedMboxJsonDicts.merging(mboxesDictionary) { _, new in new }
     }
 
+    /// Combines the prefetched mboxes with the cached mboxes
+    func saveLoadedMbox(mboxesDictionary: [String: [String: Any]]) {
+        for mbox in mboxesDictionary {
+            let name = mbox.key
+            var mboxNode = mbox.value
+            if !name.isEmpty, prefetchedMboxJsonDicts[name] == nil {
+                // remove not accepted keys
+                for key in LOADED_MBOX_ACCEPTED_KEYS {
+                    mboxNode.removeValue(forKey: key)
+                }
+                loadedMboxJsonDicts[name] = mboxNode
+            }
+        }
+    }
+
+    func removeLoadedMbox(mboxName: String) {
+        loadedMboxJsonDicts.removeValue(forKey: mboxName)
+    }
+
     func addNotification(_ notification: Notification) {
         notifications.append(notification)
     }
 
     func clearNotifications() {
         notifications.removeAll()
+    }
+
+    func clearprefetchedMboxes() {
+        prefetchedMboxJsonDicts.removeAll()
     }
 
     /// Verifies if current target session is expired.

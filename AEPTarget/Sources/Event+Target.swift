@@ -29,6 +29,16 @@ extension Event {
         return data?[TargetConstants.EventDataKeys.PREFETCH_REQUESTS] != nil
     }
 
+    /// Returns true if this event is a load request event
+    var isLoadRequest: Bool {
+        return data?[TargetConstants.EventDataKeys.LOAD_REQUESTS] != nil
+    }
+
+    /// Reads an array`TargetRequest` from the event data
+    var targetRequests: [TargetRequest]? {
+        return TargetRequest.from(dictionaries: data?[TargetConstants.EventDataKeys.LOAD_REQUESTS] as? [[String: Any]])
+    }
+
     /// Returns true if the event is location display request event
     var isLocationsDisplayedEvent: Bool {
         return data?[TargetConstants.EventDataKeys.IS_LOCATION_DISPLAYED] as? Bool ?? false
@@ -42,5 +52,10 @@ extension Event {
     /// Returns true if this event is a prefetch request event
     var isResetExperienceEvent: Bool {
         return data?[TargetConstants.EventDataKeys.RESET_EXPERIENCE] as? Bool ?? false
+    }
+
+    /// Returns true if this event is a clear prefetch request event
+    var isClearPrefetchCache: Bool {
+        return data?[TargetConstants.EventDataKeys.CLEAR_PREFETCH_CACHE] as? Bool ?? false
     }
 }

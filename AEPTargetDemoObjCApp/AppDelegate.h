@@ -9,20 +9,19 @@
  OF ANY KIND, either express or implied. See the License for the specific language
  governing permissions and limitations under the License.
  */
-import Foundation
 
-/// Class for specifying Target product parameters
-@objc(AEPTargetProduct)
-public class TargetProduct: NSObject, Codable {
-    @objc public let productId: String
-    @objc public let categoryId: String?
 
-    /// Initialize a `TargetProduct` with a product  id and a productCategoryId.
-    /// - Parameters:
-    ///   - productId: product id
-    ///   - categoryId: product category id
-    @objc public init(productId: String, categoryId: String? = nil) {
-        self.productId = productId
-        self.categoryId = categoryId
-    }
-}
+#import <UIKit/UIKit.h>
+@import AEPCore;
+@import AEPLifecycle;
+@import AEPIdentity;
+@import AEPServices;
+@import AEPTarget;
+@import AEPAssurance;
+@import ACPCore;
+
+@interface AppDelegate : UIResponder <UIApplicationDelegate>
+
+
+@end
+

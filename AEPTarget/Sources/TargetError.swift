@@ -31,6 +31,9 @@ class TargetError: Error, CustomStringConvertible {
     static let ERROR_NO_CLICK_METRICS = "No click metrics set on mbox:"
     static let ERROR_NO_CLICK_METRIC_FOUND = "No click metric found on mbox:"
     static let ERROR_CLICK_NOTIFICATION_CREATE_FAILED = "Failed to create click notification Json"
+    static let ERROR_NULL_EMPTY_REQUEST_MESSAGE = "The provided request list for mboxes is empty or null"
+    static let ERROR_TARGET_EVENT_DISPATCH_MESSAGE = "Dispatching - Target response content event"
+    static let ERROR_BATCH_REQUEST_SEND_FAILED = "Unable to send batch requests: "
 
     init(message: String) {
         self.message = message

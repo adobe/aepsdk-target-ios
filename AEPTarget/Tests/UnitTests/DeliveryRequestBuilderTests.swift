@@ -36,26 +36,26 @@ class DeliveryRequestBuilderTests: XCTestCase {
               ]
             }
         """
+        let targetIds = TargetDeliveryRequestBuilder.getTargetIDs(
+            tntid: "tntid_1", thirdPartyId: "thirdPartyId_1",
+            identitySharedState: [
+                "mid": "mid_001",
+                "visitoridslist": [
+                    [
+                        "id": "vid_id_1",
+                        "id_type": "vid_type_1",
+                        "authentication_state": 1,
+                    ],
+                    [
+                        "id": "vid_id_2",
+                        "id_type": "vid_type_2",
+                        "authentication_state": 0,
+                    ],
+                ],
+            ]
+        )
         if let data = EXPECTED_TARGET_IDS.data(using: .utf8),
-           let jsonDictionary = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any],
-           let targetIds = DeliveryRequestBuilder.generateTargetIDsBy(
-               tntid: "tntid_1", thirdPartyId: "thirdPartyId_1",
-               identitySharedState: [
-                   "mid": "mid_001",
-                   "visitoridslist": [
-                       [
-                           "id": "vid_id_1",
-                           "id_type": "vid_type_1",
-                           "authentication_state": 1,
-                       ],
-                       [
-                           "id": "vid_id_2",
-                           "id_type": "vid_type_2",
-                           "authentication_state": 0,
-                       ],
-                   ],
-               ]
-           )
+           let jsonDictionary = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
         {
             XCTAssertTrue(NSDictionary(dictionary: targetIds.asDictionary() ?? [String: Any]()).isEqual(to: jsonDictionary))
             return
@@ -78,25 +78,25 @@ class DeliveryRequestBuilderTests: XCTestCase {
               ]
             }
         """
+        let targetIds = TargetDeliveryRequestBuilder.getTargetIDs(
+            tntid: "tntid_1", thirdPartyId: "thirdPartyId_1",
+            identitySharedState: [
+                "mid": "mid_001",
+                "visitoridslist": [
+                    [
+                        "id": "vid_id_1",
+                        "id_type": "vid_type_1",
+                        "authentication_state": 1,
+                    ],
+                    [
+                        "id": "vid_id_2",
+                        "authentication_state": 0,
+                    ],
+                ],
+            ]
+        )
         if let data = EXPECTED_TARGET_IDS.data(using: .utf8),
-           let jsonDictionary = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any],
-           let targetIds = DeliveryRequestBuilder.generateTargetIDsBy(
-               tntid: "tntid_1", thirdPartyId: "thirdPartyId_1",
-               identitySharedState: [
-                   "mid": "mid_001",
-                   "visitoridslist": [
-                       [
-                           "id": "vid_id_1",
-                           "id_type": "vid_type_1",
-                           "authentication_state": 1,
-                       ],
-                       [
-                           "id": "vid_id_2",
-                           "authentication_state": 0,
-                       ],
-                   ],
-               ]
-           )
+           let jsonDictionary = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
         {
             XCTAssertTrue(NSDictionary(dictionary: targetIds.asDictionary() ?? [String: Any]()).isEqual(to: jsonDictionary))
             return
@@ -112,14 +112,14 @@ class DeliveryRequestBuilderTests: XCTestCase {
               "marketingCloudVisitorId": "mid_001"
             }
         """
+        let targetIds = TargetDeliveryRequestBuilder.getTargetIDs(
+            tntid: "tntid_1", thirdPartyId: "thirdPartyId_1",
+            identitySharedState: [
+                "mid": "mid_001",
+            ]
+        )
         if let data = EXPECTED_TARGET_IDS.data(using: .utf8),
-           let jsonDictionary = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any],
-           let targetIds = DeliveryRequestBuilder.generateTargetIDsBy(
-               tntid: "tntid_1", thirdPartyId: "thirdPartyId_1",
-               identitySharedState: [
-                   "mid": "mid_001",
-               ]
-           )
+           let jsonDictionary = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
         {
             XCTAssertTrue(NSDictionary(dictionary: targetIds.asDictionary() ?? [String: Any]()).isEqual(to: jsonDictionary))
             return
@@ -134,14 +134,14 @@ class DeliveryRequestBuilderTests: XCTestCase {
               "marketingCloudVisitorId": "mid_001"
             }
         """
+        let targetIds = TargetDeliveryRequestBuilder.getTargetIDs(
+            tntid: nil, thirdPartyId: "thirdPartyId_1",
+            identitySharedState: [
+                "mid": "mid_001",
+            ]
+        )
         if let data = EXPECTED_TARGET_IDS.data(using: .utf8),
-           let jsonDictionary = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any],
-           let targetIds = DeliveryRequestBuilder.generateTargetIDsBy(
-               tntid: nil, thirdPartyId: "thirdPartyId_1",
-               identitySharedState: [
-                   "mid": "mid_001",
-               ]
-           )
+           let jsonDictionary = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
         {
             XCTAssertTrue(NSDictionary(dictionary: targetIds.asDictionary() ?? [String: Any]()).isEqual(to: jsonDictionary))
             return
@@ -151,7 +151,7 @@ class DeliveryRequestBuilderTests: XCTestCase {
 
     func testBuild_Prefetch() {
         ServiceProvider.shared.systemInfoService = MockedSystemInfoService()
-        let request = DeliveryRequestBuilder.build(
+        let request = TargetDeliveryRequestBuilder.build(
             tntId: "tnt_id_1",
             thirdPartyId: "thirdPartyId_1",
             identitySharedState: ["mid": "mid_xxxx", "blob": "blob_xxx", "locationhint": "9"],
@@ -197,7 +197,7 @@ class DeliveryRequestBuilderTests: XCTestCase {
 
     func testBuild_Notification() {
         ServiceProvider.shared.systemInfoService = MockedSystemInfoService()
-        let request = DeliveryRequestBuilder.build(
+        let request = TargetDeliveryRequestBuilder.build(
             tntId: "tnt_id_1",
             thirdPartyId: "thirdPartyId_1",
             identitySharedState: ["mid": "mid_xxxx", "blob": "blob_xxx", "locationhint": "9"],
@@ -245,19 +245,19 @@ class DeliveryRequestBuilderTests: XCTestCase {
     }
 
     func testGetDisplayNotification_withNoState() {
-        let notification = DeliveryRequestBuilder.getDisplayNotification(mboxName: "Drink_1", cachedMboxJson: ["mboxes": "mboxes1"], parameters: TargetParameters(parameters: ["p": "v"], profileParameters: ["name": "myname"], order: TargetOrder(id: "oid1"), product: TargetProduct(productId: "pid1")), timestamp: 12345, lifecycleContextData: ["a.OSVersion": "iOS 14.2"])
+        let notification = TargetDeliveryRequestBuilder.getDisplayNotification(mboxName: "Drink_1", cachedMboxJson: ["mboxes": "mboxes1"], targetParameters: TargetParameters(parameters: ["p": "v"], profileParameters: ["name": "myname"], order: TargetOrder(id: "oid1"), product: TargetProduct(productId: "pid1")), timestamp: 12345, lifecycleContextData: ["a.OSVersion": "iOS 14.2"])
 
         XCTAssertNil(notification)
     }
 
     func testGetDisplayNotification_withNoTokense() {
-        let notification = DeliveryRequestBuilder.getDisplayNotification(mboxName: "Drink_1", cachedMboxJson: ["state": "state1"], parameters: TargetParameters(parameters: ["p": "v"], profileParameters: ["name": "myname"], order: TargetOrder(id: "oid1"), product: TargetProduct(productId: "pid1")), timestamp: 12345, lifecycleContextData: ["a.OSVersion": "iOS 14.2"])
+        let notification = TargetDeliveryRequestBuilder.getDisplayNotification(mboxName: "Drink_1", cachedMboxJson: ["state": "state1"], targetParameters: TargetParameters(parameters: ["p": "v"], profileParameters: ["name": "myname"], order: TargetOrder(id: "oid1"), product: TargetProduct(productId: "pid1")), timestamp: 12345, lifecycleContextData: ["a.OSVersion": "iOS 14.2"])
 
         XCTAssertNil(notification)
     }
 
     func testGetDisplayNotification() {
-        let notification = DeliveryRequestBuilder.getDisplayNotification(mboxName: "Drink_1", cachedMboxJson: mockCacheMBoxJson, parameters: mockTargetParams, timestamp: 12345, lifecycleContextData: mockLifecycleContextData)
+        let notification = TargetDeliveryRequestBuilder.getDisplayNotification(mboxName: "Drink_1", cachedMboxJson: mockCacheMBoxJson, targetParameters: mockTargetParams, timestamp: 12345, lifecycleContextData: mockLifecycleContextData)
 
         XCTAssertNotNil(notification)
         XCTAssertNotNil(notification?.id)
@@ -267,7 +267,7 @@ class DeliveryRequestBuilderTests: XCTestCase {
     }
 
     func testGetClickedNotification_NoMMboxName() {
-        let notification = DeliveryRequestBuilder.getClickedNotification(cachedMboxJson: mockCacheMBoxJson, parameters: mockTargetParams, timestamp: 12345, lifecycleContextData: mockLifecycleContextData)
+        let notification = TargetDeliveryRequestBuilder.getClickedNotification(cachedMboxJson: mockCacheMBoxJson, targetParameters: mockTargetParams, timestamp: 12345, lifecycleContextData: mockLifecycleContextData)
 
         XCTAssertNotNil(notification)
         XCTAssertNotNil(notification?.id)
@@ -280,13 +280,57 @@ class DeliveryRequestBuilderTests: XCTestCase {
         var tempMockCacheMBoxJson = mockCacheMBoxJson
         tempMockCacheMBoxJson["name"] = "Drink_1"
         tempMockCacheMBoxJson["metrics"] = metrics
-        let notification = DeliveryRequestBuilder.getClickedNotification(cachedMboxJson: tempMockCacheMBoxJson, parameters: mockTargetParams, timestamp: 12345, lifecycleContextData: mockLifecycleContextData)
+        let notification = TargetDeliveryRequestBuilder.getClickedNotification(cachedMboxJson: tempMockCacheMBoxJson, targetParameters: mockTargetParams, timestamp: 12345, lifecycleContextData: mockLifecycleContextData)
 
         XCTAssertNotNil(notification)
         XCTAssertNotNil(notification?.id)
         XCTAssertTrue(notification?.mbox.name == "Drink_1")
         XCTAssertTrue(notification?.parameters?["a.OSVersion"] == "iOS 14.2")
         XCTAssertTrue(notification?.tokens?.first == "token1")
+    }
+
+    func testBuild_BatchRequest() {
+        ServiceProvider.shared.systemInfoService = MockedSystemInfoService()
+        let request = TargetDeliveryRequestBuilder.build(
+            tntId: "tnt_id_1",
+            thirdPartyId: "thirdPartyId_1",
+            identitySharedState: ["mid": "mid_xxxx", "blob": "blob_xxx", "locationhint": "9"],
+            lifecycleSharedState: [
+                "a.OSVersion": "iOS 14.2",
+                "a.DaysSinceFirstUse": "0",
+                "a.CrashEvent": "CrashEvent",
+                "a.CarrierName": "(nil)",
+                "a.Resolution": "828x1792",
+                "a.RunMode": "Application",
+                "a.ignoredSessionLength": "-1605549540",
+                "a.HourOfDay": "11",
+                "a.AppID": "v5ManualTestApp 1.0 (1)",
+                "a.DayOfWeek": "2",
+                "a.DeviceName": "x86_64",
+                "a.LaunchEvent": "LaunchEvent",
+                "a.Launches": "2",
+                "a.DaysSinceLastUse": "0",
+                "a.locale": "en-US",
+            ],
+            targetRequestArray: [TargetRequest(mboxName: "Drink_1", defaultContent: "default", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+                                 TargetRequest(mboxName: "Drink_2", defaultContent: "default2", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"]))],
+            targetParameters: TargetParameters(profileParameters: ["name": "Smith"])
+        )
+
+        if let data = EXPECTED_BATCH_JSON.data(using: .utf8),
+           let jsonArray = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any],
+           let result = request?.asDictionary()
+        {
+            XCTAssertTrue(NSDictionary(dictionary: jsonArray["id"] as! [String: Any]).isEqual(to: result["id"] as! [String: Any]))
+            XCTAssertTrue(NSDictionary(dictionary: jsonArray["experienceCloud"] as! [String: Any]).isEqual(to: result["experienceCloud"] as! [String: Any]))
+            var context = result["context"] as! [String: Any]
+            context["timeOffsetInMinutes"] = 0
+            XCTAssertTrue(NSDictionary(dictionary: jsonArray["context"] as! [String: Any]).isEqual(to: context))
+            XCTAssertTrue(NSDictionary(dictionary: jsonArray["execute"] as! [String: Any]).isEqual(to: result["execute"] as! [String: Any]))
+            return
+        }
+
+        XCTFail()
     }
 
     private var mockCacheMBoxJson = ["state": "state1", "options": [["eventToken": "sometoken"]]] as [String: Any]
@@ -332,6 +376,100 @@ class DeliveryRequestBuilderTests: XCTestCase {
         "timeOffsetInMinutes": 0
       },
       "prefetch": {
+        "mboxes": [
+          {
+            "parameters": {
+              "a.OSVersion": "iOS 14.2",
+              "a.DaysSinceFirstUse": "0",
+              "a.CrashEvent": "CrashEvent",
+              "a.CarrierName": "(nil)",
+              "a.Resolution": "828x1792",
+              "a.RunMode": "Application",
+              "a.ignoredSessionLength": "-1605549540",
+              "a.HourOfDay": "11",
+              "a.DeviceName": "x86_64",
+              "a.DayOfWeek": "2",
+              "a.LaunchEvent": "LaunchEvent",
+              "a.AppID": "v5ManualTestApp 1.0 (1)",
+              "a.Launches": "2",
+              "a.DaysSinceLastUse": "0",
+              "a.locale": "en-US"
+            },
+            "profileParameters": {
+              "name": "Smith",
+              "mbox-parameter-key1": "mbox-parameter-value1"
+            },
+            "name": "Drink_1",
+            "index": 0
+          },
+          {
+            "parameters": {
+              "a.OSVersion": "iOS 14.2",
+              "a.DaysSinceFirstUse": "0",
+              "a.CrashEvent": "CrashEvent",
+              "a.CarrierName": "(nil)",
+              "a.Resolution": "828x1792",
+              "a.RunMode": "Application",
+              "a.ignoredSessionLength": "-1605549540",
+              "a.HourOfDay": "11",
+              "a.DeviceName": "x86_64",
+              "a.DayOfWeek": "2",
+              "a.LaunchEvent": "LaunchEvent",
+              "a.AppID": "v5ManualTestApp 1.0 (1)",
+              "a.Launches": "2",
+              "a.DaysSinceLastUse": "0",
+              "a.locale": "en-US"
+            },
+            "profileParameters": {
+              "mbox-parameter-key1": "mbox-parameter-value1",
+              "name": "Smith"
+            },
+            "name": "Drink_2",
+            "index": 1
+          }
+        ]
+      }
+    }
+    """
+
+    private let EXPECTED_BATCH_JSON = """
+    {
+      "id": {
+        "tntId": "tnt_id_1",
+        "marketingCloudVisitorId": "mid_xxxx",
+        "thirdPartyId": "thirdPartyId_1"
+      },
+      "experienceCloud": {
+        "analytics": {
+          "logging": "client_side"
+        },
+        "audienceManager": {
+          "blob": "blob_xxx",
+          "locationHint": "9"
+        }
+      },
+      "context": {
+        "userAgent": "Mozilla/5.0 (iPhone; CPU OS 14_0; en_US)",
+        "mobilePlatform": {
+          "deviceName": "My iPhone",
+          "deviceType": "phone",
+          "platformType": "ios"
+        },
+        "screen": {
+          "colorDepth": 32,
+          "width": 1125,
+          "height": 2436,
+          "orientation": "portrait"
+        },
+        "channel": "mobile",
+        "application": {
+          "id": "com.adobe.marketing.mobile.testing",
+          "name": "test_app",
+          "version": "1.2"
+        },
+        "timeOffsetInMinutes": 0
+      },
+      "execute": {
         "mboxes": [
           {
             "parameters": {
