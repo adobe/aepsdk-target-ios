@@ -32,21 +32,23 @@ enum TargetV5Migrator {
             return
         }
 
-        // load old values
-        let edgeHost = userDefaultV5.string(forKey: TargetConstants.V5Migration.EDGE_HOST)
-        let sessionTimestamp = userDefaultV5.integer(forKey: TargetConstants.V5Migration.SESSION_TIMESTAMP)
-        let sessionId = userDefaultV5.string(forKey: TargetConstants.V5Migration.SESSION_ID)
-        let thirdPartyId = userDefaultV5.string(forKey: TargetConstants.V5Migration.THIRD_PARTY_ID)
-        let tntId = userDefaultV5.string(forKey: TargetConstants.V5Migration.TNT_ID)
-
         // save values
-        targetDataStore.set(key: TargetConstants.DataStoreKeys.EDGE_HOST, value: edgeHost)
+        if let edgeHost = userDefaultV5.string(forKey: TargetConstants.V5Migration.EDGE_HOST) {
+            targetDataStore.set(key: TargetConstants.DataStoreKeys.EDGE_HOST, value: edgeHost)
+        }
+        let sessionTimestamp = userDefaultV5.integer(forKey: TargetConstants.V5Migration.SESSION_TIMESTAMP)
         if sessionTimestamp > 0 {
             targetDataStore.set(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP, value: sessionTimestamp)
         }
-        targetDataStore.set(key: TargetConstants.DataStoreKeys.SESSION_ID, value: sessionId)
-        targetDataStore.set(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID, value: thirdPartyId)
-        targetDataStore.set(key: TargetConstants.DataStoreKeys.TNT_ID, value: tntId)
+        if let sessionId = userDefaultV5.string(forKey: TargetConstants.V5Migration.SESSION_ID) {
+            targetDataStore.set(key: TargetConstants.DataStoreKeys.SESSION_ID, value: sessionId)
+        }
+        if let thirdPartyId = userDefaultV5.string(forKey: TargetConstants.V5Migration.THIRD_PARTY_ID) {
+            targetDataStore.set(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID, value: thirdPartyId)
+        }
+        if let tntId = userDefaultV5.string(forKey: TargetConstants.V5Migration.TNT_ID) {
+            targetDataStore.set(key: TargetConstants.DataStoreKeys.TNT_ID, value: tntId)
+        }
 
         // remove old values
         userDefaultV5.removeObject(forKey: TargetConstants.V5Migration.EDGE_HOST)

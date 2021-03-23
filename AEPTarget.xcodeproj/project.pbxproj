@@ -58,6 +58,8 @@
 		BB0C915B25775F1100F635B8 /* TargetError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0C915A25775F1100F635B8 /* TargetError.swift */; };
 		BB1CE6B0260A76E0000BDEB8 /* TargetV5Migrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1CE6AF260A76E0000BDEB8 /* TargetV5Migrator.swift */; };
 		BB1CE6B6260A76F1000BDEB8 /* TargetV5MigratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1CE6B5260A76F1000BDEB8 /* TargetV5MigratorTests.swift */; };
+		BB1CE6C0260AA7B5000BDEB8 /* TargetV4Migrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1CE6BF260AA7B5000BDEB8 /* TargetV4Migrator.swift */; };
+		BB1CE6CA260AAB4B000BDEB8 /* TargetV4MigratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1CE6C9260AAB4B000BDEB8 /* TargetV4MigratorTests.swift */; };
 		BB1DBE9025D22C3D00DDBA15 /* Target+PublicAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1DBE8F25D22C3D00DDBA15 /* Target+PublicAPITests.swift */; };
 		BB1DBEA125D2F33D00DDBA15 /* TargetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1DBE9925D2F30400DDBA15 /* TargetTests.swift */; };
 		BB1DBEB825D30A4A00DDBA15 /* DeliveryRequestBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1DBEB725D30A4A00DDBA15 /* DeliveryRequestBuilderTests.swift */; };
@@ -176,6 +178,8 @@
 		BB0C915A25775F1100F635B8 /* TargetError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetError.swift; sourceTree = "<group>"; };
 		BB1CE6AF260A76E0000BDEB8 /* TargetV5Migrator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TargetV5Migrator.swift; sourceTree = "<group>"; };
 		BB1CE6B5260A76F1000BDEB8 /* TargetV5MigratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TargetV5MigratorTests.swift; sourceTree = "<group>"; };
+		BB1CE6BF260AA7B5000BDEB8 /* TargetV4Migrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetV4Migrator.swift; sourceTree = "<group>"; };
+		BB1CE6C9260AAB4B000BDEB8 /* TargetV4MigratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetV4MigratorTests.swift; sourceTree = "<group>"; };
 		BB1DBE8F25D22C3D00DDBA15 /* Target+PublicAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Target+PublicAPITests.swift"; sourceTree = "<group>"; };
 		BB1DBE9925D2F30400DDBA15 /* TargetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetTests.swift; sourceTree = "<group>"; };
 		BB1DBEB725D30A4A00DDBA15 /* DeliveryRequestBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveryRequestBuilderTests.swift; sourceTree = "<group>"; };
@@ -282,6 +286,7 @@
 				92AE6D0A25D8E31700F46C59 /* TargetDeliveryRequestBuilder.swift */,
 				BB1E55A02575BC4B006632E4 /* TargetDeliveryResponse.swift */,
 				BB1CE6AF260A76E0000BDEB8 /* TargetV5Migrator.swift */,
+				BB1CE6BF260AA7B5000BDEB8 /* TargetV4Migrator.swift */,
 				BB0C91492575F72200F635B8 /* TargetState.swift */,
 				BB0C915A25775F1100F635B8 /* TargetError.swift */,
 				780DF564258924B70033F107 /* URL+Target.swift */,
@@ -405,6 +410,7 @@
 				BB1DBE9925D2F30400DDBA15 /* TargetTests.swift */,
 				BB1DBEB725D30A4A00DDBA15 /* DeliveryRequestBuilderTests.swift */,
 				BB1CE6B5260A76F1000BDEB8 /* TargetV5MigratorTests.swift */,
+				BB1CE6C9260AAB4B000BDEB8 /* TargetV4MigratorTests.swift */,
 			);
 			path = UnitTests;
 			sourceTree = "<group>";
@@ -798,6 +804,7 @@
 				780DF56A258924C40033F107 /* TargetPreviewManager.swift in Sources */,
 				786C00DE25C1D95300F26D34 /* TargetPreviewManagerFloatingButtonDelegate.swift in Sources */,
 				BB47C01225547DAE00EC6FB5 /* TargetRequest.swift in Sources */,
+				BB1CE6C0260AA7B5000BDEB8 /* TargetV4Migrator.swift in Sources */,
 				BB9C870F25623692007AEF8B /* TargetPrefetch+Internal.swift in Sources */,
 				BB1E55892574A35A006632E4 /* TargetParameters+Internal.swift in Sources */,
 				7885141E255322D9008E6999 /* Event+Target.swift in Sources */,
@@ -814,6 +821,7 @@
 				BB8FF0EE2602A705006C80D9 /* TargetIntegrationTests.swift in Sources */,
 				BB1DBEA125D2F33D00DDBA15 /* TargetTests.swift in Sources */,
 				92BF53E625F362B700403FCD /* TargetPreviewManagerTests.swift in Sources */,
+				BB1CE6CA260AAB4B000BDEB8 /* TargetV4MigratorTests.swift in Sources */,
 				BB1DBE9025D22C3D00DDBA15 /* Target+PublicAPITests.swift in Sources */,
 				BB9C86EF255C9C90007AEF8B /* Event+TargetTests.swift in Sources */,
 				BB8FF1262602A72C006C80D9 /* MockUIService.swift in Sources */,
