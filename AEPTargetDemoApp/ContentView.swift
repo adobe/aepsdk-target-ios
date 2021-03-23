@@ -99,28 +99,11 @@ struct ContentView: View {
     }
 
     func locationDisplayed() {
-        Target.displayedLocations(
-            names: ["aep-loc-1", "aep-loc-2"],
-            targetParameters: TargetParameters(
-                parameters: ["mbox_parameter_key": "mbox_parameter_value"],
-                profileParameters: ["name": "Smith"],
-                order: TargetOrder(id: "id1", total: 1.0, purchasedProductIds: ["ppId1"]),
-                product: TargetProduct(productId: "pId1", categoryId: "cId1")
-            )
-        )
+        Target.displayedLocations(names: ["aep-loc-1", "aep-loc-2"], targetParameters: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"], order: TargetOrder(id: "id1", total: 1.0, purchasedProductIds: ["ppId1"]), product: TargetProduct(productId: "pId1", categoryId: "cId1")))
     }
 
     func locationClicked() {
         Target.clickedLocation(name: "aep-loc-1", targetParameters: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"], order: TargetOrder(id: "id1", total: 1.0, purchasedProductIds: ["ppId1"]), product: TargetProduct(productId: "pId1", categoryId: "cId1")))
-        Target.clickedLocation(
-            name: "cartLocation",
-            targetParameters: TargetParameters(
-                parameters: nil,
-                profileParameters: nil,
-                order: TargetOrder(id: "ADCKKBC", total: 400.50, purchasedProductIds: ["34", "125"]),
-                product: TargetProduct(productId: "24D334", categoryId: "Stationary")
-            )
-        )
     }
 
     func resetExperience() {
@@ -129,9 +112,6 @@ struct ContentView: View {
 
     func clearPrefetchCache() {
         Target.clearPrefetchCache()
-        if let url = URL(string: "myapp://HomePage") {
-            Target.setPreviewRestartDeepLink(url)
-        }
     }
 
     func getThirdPartyId() {
