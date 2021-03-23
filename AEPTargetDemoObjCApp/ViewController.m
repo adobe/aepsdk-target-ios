@@ -41,6 +41,7 @@
     AEPTargetProduct *product =[[AEPTargetProduct alloc] initWithProductId:@"pId1" categoryId:@"cId1"];
     AEPTargetParameters * targetParams = [[AEPTargetParameters alloc] initWithParameters:@{@"mbox_parameter_key":@"mbox_parameter_value"} profileParameters:@{@"name":@"Smith"} order:order product:product];
     [AEPMobileTarget displayedLocations:@[@"aep-loc-1", @"aep-loc-2"] withTargetParameters:targetParams];
+    [AEPMobileTarget displayedLocations:<#(NSArray<NSString *> * _Nonnull)#> withTargetParameters:<#(AEPTargetParameters * _Nullable)#>]
 }
 
 - (IBAction)locationClicked:(id)sender {
@@ -56,11 +57,44 @@
 }
 
 - (IBAction)getThirdPartyClicked:(id)sender {
+    NSDictionary *mboxParameters1 = @{@"status":@"platinum"};
+    NSDictionary *profileParameters1 = @{@"age":@"20"};
+    AEPTargetProduct *product1 = [[AEPTargetProduct alloc] initWithProductId:@"24D3412" categoryId:@"Books"];
+    AEPTargetOrder *order1 = [[AEPTargetOrder alloc] initWithId:@"ADCKKIM" total:[@(344.30) doubleValue] purchasedProductIds:@[@"34", @"125"]];
+
+    AEPTargetParameters *targetParameters1 = [[AEPTargetParameters alloc] initWithParameters:mboxParameters1 profileParameters:profileParameters1 order:order1 product:product1 ];
+
+    NSDictionary *mboxParameters2 = @{@"userType":@"Paid"};
+    AEPTargetProduct *product2 = [[AEPTargetProduct alloc] initWithProductId:@"764334" categoryId:@"Online"];
+    AEPTargetOrder *order2 = [[AEPTargetOrder alloc] initWithId:@"ADCKKIM" total:[@(344.30) doubleValue] purchasedProductIds:@[@"id1",@"id2"]];
+    AEPTargetParameters *targetParameters2 = [[AEPTargetParameters alloc] initWithParameters:mboxParameters2 profileParameters:nil order:order2 product:product2 ];
+    
+    AEPTargetRequestObject *request1 = [[AEPTargetRequestObject alloc] initWithMboxName: @"logo" defaultContent: @"BlueWhale" targetParameters: targetParameters1 contentCallback:^(NSString * _Nullable content) {
+        // do something with the received content
+        }];
+    AEPTargetRequestObject *request2 = [[AEPTargetRequestObject alloc] initWithMboxName: @"logo" defaultContent: @"red" targetParameters: targetParameters2 contentCallback:^(NSString * _Nullable content) {
+        // do something with the received content
+        }];
+    // Create request object array
+    NSArray *requestArray = @[request1,request2];
+
+    // Creating Target parameters
+    NSDictionary *mboxParameters = @{@"status":@"progressive"};
+    NSDictionary *profileParameters = @{@"age":@"20-32"};
+    AEPTargetProduct *product = [[AEPTargetProduct alloc] initWithProductId:@"24D334" categoryId:@"Stationary"];
+    AEPTargetOrder *order = [[AEPTargetOrder alloc] initWithId:@"ADCKKBC" total:[@(400.50) doubleValue] purchasedProductIds:@[@"34", @"125"]];
+
+    AEPTargetParameters *targetParameters = [[AEPTargetParameters alloc] initWithParameters:mboxParameters
+                                                                          profileParameters:profileParameters
+                                                                                      order:order
+                                                                                    product:product];
+    [AEPMobileTarget retrieveLocationContent: requestArray withParameters: targetParameters];
     [AEPMobileTarget getThirdPartyIdWithCompletion:^(NSString *thirdPartyID, NSError *error){
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.lblThirdParty setText:thirdPartyID];
         });
     }];
+    [AEPMobileTarget setPreviewRestartDeepLink:@"myapp://HomePage"];
 }
 
 - (IBAction)getTntIDClicked:(id)sender {
