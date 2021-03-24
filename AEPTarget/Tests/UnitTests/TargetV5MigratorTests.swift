@@ -187,7 +187,7 @@ class TargetV5MigratorTests: XCTestCase {
               UserDefaults.standard.object(forKey: "Adobe.ADOBEMOBILE_TARGET.TNT_ID") != nil,
               UserDefaults.standard.object(forKey: "Adobe.ADOBEMOBILE_TARGET.THIRD_PARTY_ID") != nil,
               UserDefaults.standard.object(forKey: "Adobe.ADOBEMOBILE_TARGET.SESSION_ID") != nil,
-              UserDefaults.standard.double(forKey: "Adobe.ADOBEMOBILE_TARGET.SESSION_TIMESTAMP") > 0
+              UserDefaults.standard.integer(forKey: "Adobe.ADOBEMOBILE_TARGET.SESSION_TIMESTAMP") > 0
         else {
             XCTFail("the old V5 data should not be deleted")
             return
