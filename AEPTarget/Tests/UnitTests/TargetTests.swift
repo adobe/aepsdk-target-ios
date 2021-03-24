@@ -26,6 +26,7 @@ class TargetTests: XCTestCase {
     var mockConfigSharedState = ["target.clientCode": "code_123", "global.privacy": "optedin"]
 
     override func setUp() {
+        cleanUserDefaults()
         mockRuntime = TestableExtensionRuntime()
         target = Target(runtime: mockRuntime)
     }

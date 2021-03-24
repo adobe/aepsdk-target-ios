@@ -59,7 +59,7 @@ class TargetV5MigratorTests: XCTestCase {
               targetDataStore.getString(key: "tnt.id") == nil,
               targetDataStore.getString(key: "thirdparty.id") == nil,
               targetDataStore.getString(key: "session.id") == nil,
-              targetDataStore.getInt(key: "session.timestamp") == nil
+              targetDataStore.getLong(key: "session.timestamp") == nil
         else {
             XCTFail("should not do data migration if no data was stored in V5 c++ SDK")
             return
@@ -95,7 +95,7 @@ class TargetV5MigratorTests: XCTestCase {
         XCTAssertEqual("id_1", targetDataStore.getString(key: "tnt.id"))
         XCTAssertEqual("id_2", targetDataStore.getString(key: "thirdparty.id"))
         XCTAssertEqual("E621E1F8-C36C-495A-93FC-0C247A3E6E5F", targetDataStore.getString(key: "session.id"))
-        XCTAssertEqual(1_615_436_587, targetDataStore.getInt(key: "session.timestamp"))
+        XCTAssertEqual(1_615_436_587, targetDataStore.getLong(key: "session.timestamp"))
         XCTAssertEqual(true, targetDataStore.getBool(key: "v5.migration.complete"))
     }
 
@@ -127,7 +127,7 @@ class TargetV5MigratorTests: XCTestCase {
         XCTAssertEqual("id_1", targetDataStore.getString(key: "tnt.id"))
         XCTAssertEqual("id_2", targetDataStore.getString(key: "thirdparty.id"))
         XCTAssertEqual(nil, targetDataStore.getString(key: "session.id"))
-        XCTAssertEqual(nil, targetDataStore.getInt(key: "session.timestamp"))
+        XCTAssertEqual(nil, targetDataStore.getLong(key: "session.timestamp"))
         XCTAssertEqual(true, targetDataStore.getBool(key: "v5.migration.complete"))
     }
 
@@ -161,7 +161,7 @@ class TargetV5MigratorTests: XCTestCase {
         XCTAssertEqual("id_1", targetDataStore.getString(key: "tnt.id"))
         XCTAssertEqual("id_2", targetDataStore.getString(key: "thirdparty.id"))
         XCTAssertEqual("E621E1F8-C36C-495A-93FC-0C247A3E6E5F", targetDataStore.getString(key: "session.id"))
-        XCTAssertEqual(1_615_436_587, targetDataStore.getInt(key: "session.timestamp"))
+        XCTAssertEqual(1_615_436_587, targetDataStore.getLong(key: "session.timestamp"))
         XCTAssertEqual(true, targetDataStore.getBool(key: "v5.migration.complete"))
     }
 
@@ -187,7 +187,7 @@ class TargetV5MigratorTests: XCTestCase {
               UserDefaults.standard.object(forKey: "Adobe.ADOBEMOBILE_TARGET.TNT_ID") != nil,
               UserDefaults.standard.object(forKey: "Adobe.ADOBEMOBILE_TARGET.THIRD_PARTY_ID") != nil,
               UserDefaults.standard.object(forKey: "Adobe.ADOBEMOBILE_TARGET.SESSION_ID") != nil,
-              UserDefaults.standard.double(forKey: "Adobe.ADOBEMOBILE_TARGET.SESSION_TIMESTAMP") > 0
+              UserDefaults.standard.integer(forKey: "Adobe.ADOBEMOBILE_TARGET.SESSION_TIMESTAMP") > 0
         else {
             XCTFail("the old V5 data should not be deleted")
             return
@@ -197,7 +197,7 @@ class TargetV5MigratorTests: XCTestCase {
               targetDataStore.getString(key: "tnt.id") == nil,
               targetDataStore.getString(key: "thirdparty.id") == nil,
               targetDataStore.getString(key: "session.id") == nil,
-              targetDataStore.getInt(key: "session.timestamp") == nil
+              targetDataStore.getLong(key: "session.timestamp") == nil
         else {
             XCTFail("should not do data migration if app group changed")
             return
