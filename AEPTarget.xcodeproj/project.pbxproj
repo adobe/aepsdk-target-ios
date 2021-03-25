@@ -45,6 +45,7 @@
 		925E066725FAAF1E00489733 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 925E066625FAAF1E00489733 /* Assets.xcassets */; };
 		925E066A25FAAF1E00489733 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 925E066825FAAF1E00489733 /* LaunchScreen.storyboard */; };
 		925E066D25FAAF1E00489733 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 925E066C25FAAF1E00489733 /* main.m */; };
+		927284B8260D17E200F91BC1 /* TargetFunctionalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 927284B6260D17E200F91BC1 /* TargetFunctionalTests.swift */; };
 		92AE6D0B25D8E31700F46C59 /* TargetDeliveryRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92AE6D0A25D8E31700F46C59 /* TargetDeliveryRequestBuilder.swift */; };
 		92C44A7F25DB0D39000175FB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C44A7E25DB0D39000175FB /* AppDelegate.swift */; };
 		92C44A8125DB0D39000175FB /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C44A8025DB0D39000175FB /* SceneDelegate.swift */; };
@@ -183,6 +184,7 @@
 		925E066925FAAF1E00489733 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		925E066B25FAAF1E00489733 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		925E066C25FAAF1E00489733 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		927284B6260D17E200F91BC1 /* TargetFunctionalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetFunctionalTests.swift; sourceTree = "<group>"; };
 		92AE6D0A25D8E31700F46C59 /* TargetDeliveryRequestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetDeliveryRequestBuilder.swift; sourceTree = "<group>"; };
 		92C44A7C25DB0D39000175FB /* AEPTargetDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AEPTargetDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		92C44A7E25DB0D39000175FB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -361,6 +363,7 @@
 		78D503122551FCCE00966553 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				927284B5260D17C500F91BC1 /* FunctionalTests */,
 				BB8FF0EC2602A705006C80D9 /* IntegrationTests */,
 				BB1DBEAE25D2F5E700DDBA15 /* TestHelpers */,
 				BB0C91602577640200F635B8 /* UnitTests */,
@@ -387,6 +390,14 @@
 				925E066C25FAAF1E00489733 /* main.m */,
 			);
 			path = AEPTargetDemoObjCApp;
+			sourceTree = "<group>";
+		};
+		927284B5260D17C500F91BC1 /* FunctionalTests */ = {
+			isa = PBXGroup;
+			children = (
+				927284B6260D17E200F91BC1 /* TargetFunctionalTests.swift */,
+			);
+			path = FunctionalTests;
 			sourceTree = "<group>";
 		};
 		92C44A7D25DB0D39000175FB /* AEPTargetDemoApp */ = {
@@ -840,6 +851,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB8FF11F2602A72C006C80D9 /* TestableNetworkService.swift in Sources */,
+				927284B8260D17E200F91BC1 /* TargetFunctionalTests.swift in Sources */,
 				BB8FF0EE2602A705006C80D9 /* TargetIntegrationTests.swift in Sources */,
 				BB1DBEA125D2F33D00DDBA15 /* TargetTests.swift in Sources */,
 				924102A1260C01CA00DA88D2 /* MockPreviewManagerUIDelegate.swift in Sources */,
