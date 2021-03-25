@@ -7,21 +7,14 @@ on [![Cocoapods](https://img.shields.io/cocoapods/v/AEPCore.svg?color=orange&lab
 ![Target-CI](https://github.com/adobe/aepsdk-target-ios/workflows/Target-CI/badge.svg)
 [![Code Coverage](https://img.shields.io/codecov/c/github/adobe/aepsdk-target-ios/dev.svg?logo=codecov)](https://codecov.io/gh/adobe/aepsdk-target-ios/branch/dev)
 
-## BETA ACKNOWLEDGEMENT
-
-AEPTarget is currently in Beta. Use of this code is by invitation only and not otherwise supported by Adobe. Please contact your Adobe Customer Success Manager to learn more.
-
-By using the Beta, you hereby acknowledge that the Beta is provided "as is" without warranty of any kind. Adobe shall have no obligation to maintain, correct, update, change, modify or otherwise support the Beta. You are advised to use caution and not to rely in any way on the correct functioning or performance of such Beta and/or accompanying materials.
-
 ## About this project
 
 The Adobe Experience Platform Target Mobile Extension is an extension for the [Adobe Experience Platform SDK](https://github.com/Adobe-Marketing-Cloud/acp-sdks).
 
-To learn more about this extension, read [Adobe Experience Platform Edge Mobile Extension](https://aep-sdks.gitbook.io/docs/using-mobile-extensions/target).
 
 ## Requirements
-- Xcode 11.x
-- Swift 5.x
+- Xcode 11.0 (or newer)
+- Swift 5.1 (or newer)
 
 ## Installation
 
@@ -32,10 +25,10 @@ To learn more about this extension, read [Adobe Experience Platform Edge Mobile 
 use_frameworks!
 
 target 'YOUR_TARGET_NAME' do
-    pod 'AEPTarget', :git => 'git@github.com:adobe/aepsdk-target-ios.git', :branch => 'main'
-    pod 'AEPCore', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'main'
-    pod 'AEPServices', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'main'
-    pod 'AEPRulesEngine', :git => 'git@github.com:adobe/aepsdk-rulesengine-ios.git', :branch => 'main'
+    pod 'AEPTarget'
+    pod 'AEPCore'
+    pod 'AEPLifecycle'
+    pod 'AEPIdentity'
 end
 ```
 
