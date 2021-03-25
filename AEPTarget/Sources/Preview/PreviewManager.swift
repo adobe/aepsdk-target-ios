@@ -1,5 +1,5 @@
 /*
- Copyright 2020 Adobe. All rights reserved.
+ Copyright 2021 Adobe. All rights reserved.
  This file is licensed to you under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License. You may obtain a copy
  of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -32,7 +32,7 @@ protocol PreviewManager {
     ///     - url: `URL` to be processed
     ///     - message: The `FullScreenMessage` to be displayed
     ///     - previewLifecycleEventDispatcher: The event dispatcher closure which handles the preview lifecycle event dispatching
-    func previewConfirmedWithUrl(_ url: URL, message: FullscreenPresentable, previewLifecycleEventDispatcher: (Event) -> Void) -> Bool
+    func previewConfirmedWithUrl(_ url: URL, message: FullscreenPresentable, previewLifecycleEventDispatcher: (Event) -> Void)
 
     ///
     /// If there is no other fetching in progress, it initiates a new async request to target.

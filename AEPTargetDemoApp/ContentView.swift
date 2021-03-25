@@ -10,6 +10,7 @@
  */
 
 import AEPAssurance
+import AEPCore
 import AEPServices
 import AEPTarget
 import SwiftUI
@@ -19,6 +20,7 @@ struct ContentView: View {
     @State var updatedThirdPartyId: String = ""
     @State var tntId: String = ""
     @State var griffonUrl: String = "targetsdk://?adb_validation_sessionid=860de10f-acd1-40eb-be31-f7dca4e650f3"
+    @State var fullscreenMessage: FullscreenPresentable?
     var body: some View {
         ScrollView {
             VStack(alignment: .center, spacing: nil, content: {
@@ -65,6 +67,10 @@ struct ContentView: View {
 
                     Button("Clear prefetch cache") {
                         setThirdPartyId()
+                    }.padding(10)
+
+                    Button("Enter Preview") {
+                        enterPreview()
                     }.padding(10)
                 }
             })
@@ -138,6 +144,12 @@ struct ContentView: View {
 
     func setThirdPartyId() {
         Target.setThirdPartyId(updatedThirdPartyId)
+    }
+
+    func enterPreview() {
+        let eventData = ["deeplink": "com.adobe.targetpreview://?at_preview_token=yOrxbuHy8B3o80U0bnL8N5b1pDr5x7_lW-haGSc5zt4"]
+        let event = Event(name: "deeplink", type: EventType.genericData, source: EventSource.os, data: eventData)
+        MobileCore.dispatch(event: event)
     }
 }
 

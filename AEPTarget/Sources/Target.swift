@@ -18,12 +18,17 @@ import Foundation
 public class Target: NSObject, Extension {
     static let LOG_TAG = "Target"
 
-    private var DEFAULT_NETWORK_TIMEOUT: TimeInterval = 2.0
-
     private(set) var targetState: TargetState
 
     private var networkService: Networking {
         return ServiceProvider.shared.networkService
+    }
+
+    private var isInPreviewMode: Bool {
+        guard let previewParameters = previewManager.previewParameters, !previewParameters.isEmpty else {
+            return false
+        }
+        return true
     }
 
     // MARK: - Extension
@@ -38,8 +43,11 @@ public class Target: NSObject, Extension {
 
     public var runtime: ExtensionRuntime
 
+    var previewManager: PreviewManager = TargetPreviewManager()
+
     public required init?(runtime: ExtensionRuntime) {
         self.runtime = runtime
+        TargetV5Migrator.migrate()
         targetState = TargetState()
         super.init()
     }
@@ -49,7 +57,7 @@ public class Target: NSObject, Extension {
         registerListener(type: EventType.target, source: EventSource.requestReset, listener: handleReset)
         registerListener(type: EventType.target, source: EventSource.requestIdentity, listener: handleRequestIdentity)
         registerListener(type: EventType.configuration, source: EventSource.responseContent, listener: handleConfigurationResponseContent)
-        registerListener(type: EventType.genericData, source: EventSource.os, listener: handle)
+        registerListener(type: EventType.genericData, source: EventSource.os, listener: handleGenericDataOS)
     }
 
     public func onUnregistered() {}
@@ -64,8 +72,12 @@ public class Target: NSObject, Extension {
 
     // MARK: - Event Listeners
 
-    private func handle(_ event: Event) {
-        print(event)
+    private func handle(event _: Event) {}
+
+    private func handleGenericDataOS(event: Event) {
+        if let deeplink = event.data?[TargetConstants.EventDataKeys.DEEPLINK] as? String, !deeplink.isEmpty {
+            processPreviewDeepLink(event: event, deeplink: deeplink)
+        }
     }
 
     private func handleRequestIdentity(_ event: Event) {
@@ -118,8 +130,14 @@ public class Target: NSObject, Extension {
             return
         }
 
+        if let restartDeeplink = event.data?[TargetConstants.EventDataKeys.PREVIEW_RESTART_DEEP_LINK] as? String {
+            previewManager.setRestartDeepLink(restartDeeplink)
+        }
+
         Log.debug(label: Target.LOG_TAG, "Unknown event: \(event)")
     }
+
+    // MARK: - Event Handlers
 
     /// Clears all the current identifiers.
     /// After clearing the identifiers, creates a shared state and dispatches an `EventType#TARGET` `EventSource#REQUEST_RESET` event.
@@ -133,10 +151,35 @@ public class Target: NSObject, Extension {
         resetIdentity(configurationSharedState: configurationSharedState)
     }
 
+    private func processPreviewDeepLink(event: Event, deeplink: String) {
+        guard let configSharedState = getSharedState(extensionName: TargetConstants.Configuration.EXTENSION_NAME, event: event)?.value else {
+            Log.warning(label: Target.LOG_TAG, "Target process preview deep link failed, config data is nil")
+            return
+        }
+
+        if let error = prepareForTargetRequest(configData: configSharedState) {
+            Log.error(label: Target.LOG_TAG, "Target is not enabled, cannot enter in preview mode. \(error)")
+            return
+        }
+
+        guard let isPreviewEnabled = configSharedState[TargetConstants.Configuration.SharedState.Keys.TARGET_PREVIEW_ENABLED] as? Bool, isPreviewEnabled else {
+            Log.error(label: Target.LOG_TAG, "Target preview is disabled, please change the configuration and try again.")
+            return
+        }
+
+        let clientCode = targetState.clientCode ?? ""
+        guard let deeplinkUrl = URL(string: deeplink) else {
+            Log.error(label: Target.LOG_TAG, "Deeplink is not a valid url")
+            return
+        }
+
+        previewManager.enterPreviewModeWithDeepLink(clientCode: clientCode, deepLink: deeplinkUrl)
+    }
+
     /// Handle prefetch content request
     /// - Parameter event: an event of type target and  source request content is dispatched by the `EventHub`
     private func prefetchContent(_ event: Event) {
-        if isInPreviewMode() {
+        if isInPreviewMode {
             dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Target prefetch can't be used while in preview mode")
             return
         }
@@ -243,7 +286,7 @@ public class Target: NSObject, Extension {
 
         let timestamp = Int64(event.timestamp.timeIntervalSince1970 * 1000.0)
 
-        if !isInPreviewMode() {
+        if !isInPreviewMode {
             Log.debug(label: Target.LOG_TAG, "Current cached mboxes : \(targetState.prefetchedMboxJsonDicts.keys.description), size: \(targetState.prefetchedMboxJsonDicts.count)")
             requestsToSend = processCachedTargetRequest(event: event, batchRequests: targetRequests, timeStamp: timestamp)
         }
@@ -342,7 +385,7 @@ public class Target: NSObject, Extension {
     /// - If the mbox is either not prefetched or loaded previously.
     /// - If the clicked token is empty or nil for the loaded mbox.
     private func clickedLocation(_ event: Event) {
-        if isInPreviewMode() {
+        if isInPreviewMode {
             Log.warning(label: Target.LOG_TAG, "Target location clicked notification can't be sent while in preview mode")
             return
         }
@@ -542,11 +585,6 @@ public class Target: NSObject, Extension {
         return String(format: TargetConstants.DELIVERY_API_URL_BASE, String(format: TargetConstants.API_URL_HOST_BASE, clientCode), clientCode, targetState.sessionId)
     }
 
-    private func isInPreviewMode() -> Bool {
-        // TODO:
-        return false
-    }
-
     /// Prepares for the target requests and checks whether a target request can be sent.
     /// - parameters: configData the shared state of configuration extension
     /// - returns: error indicating why the request can't be sent, nil otherwise
@@ -659,7 +697,7 @@ public class Target: NSObject, Extension {
             return "Failed to generate the url for target API call"
         }
 
-        let timeout = configData[TargetConstants.Configuration.SharedState.Keys.TARGET_NETWORK_TIMEOUT] as? Double ?? DEFAULT_NETWORK_TIMEOUT
+        let timeout = configData[TargetConstants.Configuration.SharedState.Keys.TARGET_NETWORK_TIMEOUT] as? Double ?? TargetConstants.NetworkConnection.DEFAULT_CONNECTION_TIMEOUT_SEC
 
         // https://developers.adobetarget.com/api/delivery-api/#tag/Delivery-API
 

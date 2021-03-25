@@ -51,6 +51,7 @@ class TargetState {
     init() {
         dataStore = NamedCollectionDataStore(name: TargetConstants.DATASTORE_NAME)
         tntId = dataStore.getString(key: TargetConstants.DataStoreKeys.TNT_ID)
+        thirdPartyId = dataStore.getString(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID)
         storedEdgeHost = dataStore.getString(key: TargetConstants.DataStoreKeys.EDGE_HOST)
         sessionTimestampInSeconds = dataStore.getLong(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP)
         storedSessionId = dataStore.getString(key: TargetConstants.DataStoreKeys.SESSION_ID) ?? UUID().uuidString
