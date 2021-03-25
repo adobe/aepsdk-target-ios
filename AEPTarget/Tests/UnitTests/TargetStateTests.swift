@@ -23,7 +23,7 @@ class TargetStateTests: XCTestCase {
             "target.clientCode": "code_123",
             "global.privacy": "optedin",
         ])
-        XCTAssertTrue(NSDictionary(dictionary: ["target.clientCode": "code_123", "global.privacy": "optedin"]).isEqual(to: targetState.storedConfigurationSharedState ?? [:]))
+        XCTAssertEqual(NSDictionary(dictionary: ["target.clientCode": "code_123", "global.privacy": "optedin"]), targetState.storedConfigurationSharedState as NSDictionary?)
     }
 
     func testUpdateConfigurationSharedStateWithNewClientCode() {
@@ -38,8 +38,8 @@ class TargetStateTests: XCTestCase {
             "target.clientCode": "code_456",
             "global.privacy": "optedin",
         ])
-        XCTAssertTrue(NSDictionary(dictionary: ["target.clientCode": "code_456", "global.privacy": "optedin"]).isEqual(to: targetState.storedConfigurationSharedState ?? [:]))
-        XCTAssertTrue(targetState.edgeHost != nil && targetState.edgeHost!.isEmpty)
+        XCTAssertEqual(NSDictionary(dictionary: ["target.clientCode": "code_456", "global.privacy": "optedin"]), targetState.storedConfigurationSharedState as NSDictionary?)
+        XCTAssertEqual(targetState.edgeHost, "")
     }
 
     func testPrivacyStatus() {
@@ -108,7 +108,7 @@ class TargetStateTests: XCTestCase {
 
     func testNetworkTimeout() {
         let targetState = TargetState()
-        XCTAssertEqual(2.0, targetState.networkTimeout)
+        XCTAssertEqual(5.0, targetState.networkTimeout)
         targetState.updateConfigurationSharedState([
             "target.clientCode": "code_123",
             "global.privacy": "optedin",

@@ -119,12 +119,21 @@ enum TargetConstants {
         }
     }
 
+    enum V5Migration {
+        static let TNT_ID = "Adobe.ADOBEMOBILE_TARGET.TNT_ID"
+        static let THIRD_PARTY_ID = "Adobe.ADOBEMOBILE_TARGET.THIRD_PARTY_ID"
+        static let EDGE_HOST = "Adobe.ADOBEMOBILE_TARGET.EDGE_HOST"
+        static let SESSION_ID = "Adobe.ADOBEMOBILE_TARGET.SESSION_ID"
+        static let SESSION_TIMESTAMP = "Adobe.ADOBEMOBILE_TARGET.SESSION_TIMESTAMP"
+    }
+
     enum DataStoreKeys {
-        static let SESSION_TIMESTAMP = "SESSION_TIMESTAMP"
-        static let SESSION_ID = "SESSION_ID"
-        static let TNT_ID = "TNT_ID"
-        static let EDGE_HOST = "EDGE_HOST"
-        static let THIRD_PARTY_ID = "THIRD_PARTY_ID"
+        static let SESSION_TIMESTAMP = "session.timestamp"
+        static let SESSION_ID = "session.id"
+        static let TNT_ID = "tnt.id"
+        static let EDGE_HOST = "edge.host"
+        static let THIRD_PARTY_ID = "thirdparty.id"
+        static let V5_MIGRATION_COMPLETE = "v5.migration.complete"
     }
 
     enum TargetRequestValue {
@@ -170,6 +179,7 @@ enum TargetConstants {
         // shared sate
         static let TNT_ID = "tntid"
         static let PREVIEW_INITIATED = "ispreviewinitiated"
+        static let DEEPLINK = "deeplink"
 
         enum Analytics {
             static let TRACK_INTERNAL = "trackinternal"

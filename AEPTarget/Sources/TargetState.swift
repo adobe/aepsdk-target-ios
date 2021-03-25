@@ -15,7 +15,6 @@ import Foundation
 
 /// Represents the state of the `Target` extension
 class TargetState {
-    private let DEFAULT_NETWORK_TIMEOUT: TimeInterval = 2.0
     private(set) var prefetchedMboxJsonDicts = [String: [String: Any]]()
     private(set) var loadedMboxJsonDicts = [String: [String: Any]]()
     private(set) var notifications = [Notification]()
@@ -25,7 +24,6 @@ class TargetState {
     private(set) var thirdPartyId: String?
     private(set) var tntId: String?
     private(set) var sessionTimestampInSeconds: Int64?
-    private(set) var sessionTimeoutInSeconds: Int
 
     private var storedSessionId: String
 
@@ -34,6 +32,10 @@ class TargetState {
     private var privacyStatus: String {
         return storedConfigurationSharedState?[TargetConstants.Configuration.SharedState.Keys.GLOBAL_CONFIG_PRIVACY] as? String
             ?? TargetConstants.Configuration.SharedState.Values.GLOBAL_CONFIG_PRIVACY_OPT_UNKNOWN
+    }
+
+    var sessionTimeoutInSeconds: Int {
+        return storedConfigurationSharedState?[TargetConstants.Configuration.SharedState.Keys.TARGET_SESSION_TIMEOUT] as? Int ?? TargetConstants.DEFAULT_SESSION_TIMEOUT
     }
 
     var privacyStatusIsOptOut: Bool {
@@ -62,7 +64,7 @@ class TargetState {
 
     var networkTimeout: Double {
         guard let timeout = storedConfigurationSharedState?[TargetConstants.Configuration.SharedState.Keys.TARGET_NETWORK_TIMEOUT] as? Int else {
-            return DEFAULT_NETWORK_TIMEOUT
+            return TargetConstants.NetworkConnection.DEFAULT_CONNECTION_TIMEOUT_SEC
         }
 
         return Double(timeout)
@@ -91,10 +93,10 @@ class TargetState {
     init() {
         dataStore = NamedCollectionDataStore(name: TargetConstants.DATASTORE_NAME)
         tntId = dataStore.getString(key: TargetConstants.DataStoreKeys.TNT_ID)
+        thirdPartyId = dataStore.getString(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID)
         storedEdgeHost = dataStore.getString(key: TargetConstants.DataStoreKeys.EDGE_HOST)
         sessionTimestampInSeconds = dataStore.getLong(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP)
         storedSessionId = dataStore.getString(key: TargetConstants.DataStoreKeys.SESSION_ID) ?? UUID().uuidString
-        sessionTimeoutInSeconds = TargetConstants.DEFAULT_SESSION_TIMEOUT
     }
 
     ///  Updates the stored configuration shared state if the given on is not nil.
@@ -206,6 +208,10 @@ class TargetState {
 
     func clearNotifications() {
         notifications.removeAll()
+    }
+
+    func clearprefetchedMboxes() {
+        prefetchedMboxJsonDicts.removeAll()
     }
 
     /// Verifies if current target session is expired.
