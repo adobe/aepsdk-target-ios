@@ -90,6 +90,11 @@ You can run all the test suites from command line:
 make test
 ~~~
 
+## Documentation
+
+Additional documentation for API usage can be found under the [Documentation](Documentation) directory.
+
+
 ## Contributing
 
 Contributions are welcomed! Read the [Contributing Guide](./.github/CONTRIBUTING.md) for more information.
