@@ -9,8 +9,7 @@ on [![Cocoapods](https://img.shields.io/cocoapods/v/AEPCore.svg?color=orange&lab
 
 ## About this project
 
-The Adobe Experience Platform Target Mobile Extension is an extension for the [Adobe Experience Platform SDK](https://github.com/Adobe-Marketing-Cloud/acp-sdks).
-
+`AEPTarget` helps test, personalize, and optimize mobile app experiences based on user behavior and mobile context. You can deliver interactions that engage and convert through iterative testing and rules-based and AI-powered personalization.  
 
 ## Requirements
 - Xcode 11.0 (or newer)
@@ -24,11 +23,10 @@ The Adobe Experience Platform Target Mobile Extension is an extension for the [A
 # Podfile
 use_frameworks!
 
+# for app development, include all the following pods
 target 'YOUR_TARGET_NAME' do
     pod 'AEPTarget'
     pod 'AEPCore'
-    pod 'AEPLifecycle'
-    pod 'AEPIdentity'
 end
 ```
 
