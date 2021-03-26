@@ -95,7 +95,7 @@ public class Target: NSObject, Extension {
 
     private func handleReset(_ event: Event) {
         if event.isResetExperienceEvent {
-            resetIdentity(event)
+            resetIdentity()
             createSharedState(data: targetState.generateSharedState(), event: event)
         }
         if event.isClearPrefetchCache {
@@ -132,13 +132,6 @@ public class Target: NSObject, Extension {
     }
 
     // MARK: - Event Handlers
-
-    /// Clears all the current identifiers.
-    /// After clearing the identifiers, creates a shared state and dispatches an `EventType#TARGET` `EventSource#REQUEST_RESET` event.
-    /// - Parameter event: an event of type target and  source request content is dispatched by the `EventHub`
-    private func resetIdentity(_: Event) {
-        resetIdentity()
-    }
 
     private func processPreviewDeepLink(event: Event, deeplink: String) {
         guard let configSharedState = getSharedState(extensionName: TargetConstants.Configuration.EXTENSION_NAME, event: event)?.value else {
