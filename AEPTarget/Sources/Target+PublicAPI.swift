@@ -296,7 +296,7 @@ import Foundation
             return
         }
 
-        guard let id = event.responseID,
+        guard let id = event.data?[TargetConstants.EventDataKeys.TARGET_RESPONSE_EVENT_ID] as? String,
               let responsePairId = event.data?[TargetConstants.EventDataKeys.TARGET_RESPONSE_PAIR_ID] as? String
         else {
             Log.error(label: LOG_TAG, "Missing response pair id for the target request in the response event")

@@ -35,6 +35,7 @@ class TargetError: Error, CustomStringConvertible {
     static let ERROR_NULL_EMPTY_REQUEST_MESSAGE = "The provided request list for mboxes is empty or null"
     static let ERROR_TARGET_EVENT_DISPATCH_MESSAGE = "Dispatching - Target response content event"
     static let ERROR_BATCH_REQUEST_SEND_FAILED = "Unable to send batch requests: "
+    static let ERROR_NOTIFICATION_TAG = "Notification"
 
     init(message: String) {
         self.message = message
