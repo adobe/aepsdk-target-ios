@@ -265,7 +265,7 @@ class TargetFunctionalTests: XCTestCase {
             XCTFail()
             return
         }
-
+        XCTAssertTrue(target.readyForEvent(prefetchEvent))
         // handles the prefetch event
         eventListener(prefetchEvent)
 
@@ -394,6 +394,7 @@ class TargetFunctionalTests: XCTestCase {
         mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
         target.onRegistered()
         if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] {
+            XCTAssertTrue(target.readyForEvent(event))
             eventListener(event)
             XCTAssertNotNil(MockNetworkService.request)
             if let url = MockNetworkService.request?.url.absoluteString {
@@ -420,6 +421,7 @@ class TargetFunctionalTests: XCTestCase {
         mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
         target.onRegistered()
         if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] {
+            XCTAssertTrue(target.readyForEvent(event))
             eventListener(event)
             XCTAssertNotNil(MockNetworkService.request)
             if let url = MockNetworkService.request?.url.absoluteString {
@@ -519,6 +521,7 @@ class TargetFunctionalTests: XCTestCase {
         target.targetState.updateTntId("sometnt")
         target.targetState.updateThirdPartyId("somehtirdparty")
         if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.configuration-com.adobe.eventSource.responseContent"] {
+            XCTAssertTrue(target.readyForEvent(event))
             eventListener(event)
             XCTAssertNil(target.targetState.edgeHost)
             XCTAssertTrue(target.targetState.sessionTimestampInSeconds == 0)
@@ -547,6 +550,7 @@ class TargetFunctionalTests: XCTestCase {
         mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
         target.onRegistered()
         if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] {
+            XCTAssertTrue(target.readyForEvent(event))
             eventListener(event)
             XCTAssertNotNil(MockNetworkService.request)
             if let url = MockNetworkService.request?.url.absoluteString {

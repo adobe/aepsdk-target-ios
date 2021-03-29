@@ -30,7 +30,7 @@ enum TargetDeliveryRequestBuilder {
     ///   - environmentId: target environmentId
     ///   - propertyToken: String to be passed for all requests
     /// - Returns: a `DeliveryRequest` object
-    static func build(tntId: String?, thirdPartyId: String?, identitySharedState: [String: Any]?, lifecycleSharedState: [String: Any]?, targetPrefetchArray: [TargetPrefetch]? = nil, targetRequestArray: [TargetRequest]? = nil, targetParameters: TargetParameters? = nil, notifications: [Notification]? = nil, environmentId _: Int64 = 0, propertyToken: String? = nil) -> TargetDeliveryRequest? {
+    static func build(tntId: String?, thirdPartyId: String?, identitySharedState: [String: Any]?, lifecycleSharedState: [String: Any]?, targetPrefetchArray: [TargetPrefetch]? = nil, targetRequestArray: [TargetRequest]? = nil, targetParameters: TargetParameters? = nil, notifications: [Notification]? = nil, environmentId _: Int = 0, propertyToken: String? = nil) -> TargetDeliveryRequest? {
         let targetIDs = getTargetIDs(tntid: tntId, thirdPartyId: thirdPartyId, identitySharedState: identitySharedState)
         let experienceCloud = getExperienceCloudInfo(identitySharedState: identitySharedState)
         guard let context = getTargetContext() else {

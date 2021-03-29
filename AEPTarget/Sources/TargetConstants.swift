@@ -271,6 +271,6 @@ enum TargetConstants {
     }
 
     enum NetworkConnection {
-        static let DEFAULT_CONNECTION_TIMEOUT_SEC = TimeInterval(2)
+        static let DEFAULT_CONNECTION_TIMEOUT_SEC = TimeInterval(5)
     }
 }

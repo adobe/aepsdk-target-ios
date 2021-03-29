@@ -42,12 +42,6 @@ class TargetTests: XCTestCase {
         XCTAssertTrue(target.readyForEvent(event))
     }
 
-    func testReadyForEvent_no_clientCode() {
-        let event = Event(name: "", type: "", source: "", data: nil)
-        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: ["k": "v"], status: .set))
-        XCTAssertFalse(target.readyForEvent(event))
-    }
-
     func testReadyForEvent_no_configuration() {
         XCTAssertFalse(target.readyForEvent(Event(name: "", type: "", source: "", data: nil)))
     }
