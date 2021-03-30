@@ -33,21 +33,28 @@ enum TargetV5Migrator {
         }
 
         // save values
-        if let edgeHost = userDefaultV5.string(forKey: TargetConstants.V5Migration.EDGE_HOST) {
-            targetDataStore.set(key: TargetConstants.DataStoreKeys.EDGE_HOST, value: edgeHost)
-        }
-        let sessionTimestamp = userDefaultV5.integer(forKey: TargetConstants.V5Migration.SESSION_TIMESTAMP)
-        if sessionTimestamp > 0 {
-            targetDataStore.set(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP, value: sessionTimestamp)
-        }
-        if let sessionId = userDefaultV5.string(forKey: TargetConstants.V5Migration.SESSION_ID) {
-            targetDataStore.set(key: TargetConstants.DataStoreKeys.SESSION_ID, value: sessionId)
-        }
-        if let thirdPartyId = userDefaultV5.string(forKey: TargetConstants.V5Migration.THIRD_PARTY_ID) {
-            targetDataStore.set(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID, value: thirdPartyId)
-        }
-        if let tntId = userDefaultV5.string(forKey: TargetConstants.V5Migration.TNT_ID) {
-            targetDataStore.set(key: TargetConstants.DataStoreKeys.TNT_ID, value: tntId)
+        if targetDataStore.getString(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID) == nil,
+           targetDataStore.getString(key: TargetConstants.DataStoreKeys.TNT_ID) == nil,
+           targetDataStore.getString(key: TargetConstants.DataStoreKeys.SESSION_ID) == nil,
+           targetDataStore.getLong(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP) == nil,
+           targetDataStore.getString(key: TargetConstants.DataStoreKeys.EDGE_HOST) == nil
+        {
+            if let edgeHost = userDefaultV5.string(forKey: TargetConstants.V5Migration.EDGE_HOST) {
+                targetDataStore.set(key: TargetConstants.DataStoreKeys.EDGE_HOST, value: edgeHost)
+            }
+            let sessionTimestamp = userDefaultV5.integer(forKey: TargetConstants.V5Migration.SESSION_TIMESTAMP)
+            if sessionTimestamp > 0 {
+                targetDataStore.set(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP, value: sessionTimestamp)
+            }
+            if let sessionId = userDefaultV5.string(forKey: TargetConstants.V5Migration.SESSION_ID) {
+                targetDataStore.set(key: TargetConstants.DataStoreKeys.SESSION_ID, value: sessionId)
+            }
+            if let thirdPartyId = userDefaultV5.string(forKey: TargetConstants.V5Migration.THIRD_PARTY_ID) {
+                targetDataStore.set(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID, value: thirdPartyId)
+            }
+            if let tntId = userDefaultV5.string(forKey: TargetConstants.V5Migration.TNT_ID) {
+                targetDataStore.set(key: TargetConstants.DataStoreKeys.TNT_ID, value: tntId)
+            }
         }
 
         // remove old values
