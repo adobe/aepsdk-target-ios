@@ -412,6 +412,7 @@ class TargetFunctionalTests: XCTestCase {
             TargetConstants.EventDataKeys.IS_LOCATION_DISPLAYED: true,
         ]
         let locationDisplayedEvent = Event(name: "", type: "", source: "", data: data)
+
         // creates a configuration's shared state
         mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: locationDisplayedEvent, data: (value: mockConfigSharedState, status: .set))
 
@@ -424,6 +425,7 @@ class TargetFunctionalTests: XCTestCase {
         // target state has mock prefetch mboxes
         target.targetState.mergePrefetchedMboxJson(mboxesDictionary: mockMBoxJson)
 
+        // registers the event listeners for Target extension
         target.onRegistered()
 
         // override network service
@@ -497,13 +499,12 @@ class TargetFunctionalTests: XCTestCase {
             let validResponse = HTTPURLResponse(url: URL(string: "https://amsdk.tt.omtrdc.net/rest/v1/delivery")!, statusCode: 200, httpVersion: nil, headerFields: nil)
             return (data: responseString.data(using: .utf8), response: validResponse, error: nil)
         }
-
         guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
             XCTFail()
             return
         }
-
-        // handles the location displayed event
+        XCTAssertTrue(target.readyForEvent(locationDisplayedEvent))
+        // handles the location display event
         eventListener(locationDisplayedEvent)
 
         // Check the notifications are cleared
@@ -713,6 +714,7 @@ class TargetFunctionalTests: XCTestCase {
             return
         }
 
+        XCTAssertTrue(target.readyForEvent(locationClickedEvent))
         // handles the location displayed event
         eventListener(locationClickedEvent)
 
@@ -917,22 +919,22 @@ class TargetFunctionalTests: XCTestCase {
             ]))
 
             // verifies payloadDictionary["prefetch"]
-            guard let loadRequestDictionary = payloadDictionary["execute"] as? [String: Any] else {
+            guard let prefetchDictionary = payloadDictionary["execute"] as? [String: Any] else {
                 XCTFail()
                 return nil
             }
 
-            XCTAssertTrue(Set(loadRequestDictionary.keys) == Set([
+            XCTAssertTrue(Set(prefetchDictionary.keys) == Set([
                 "mboxes",
             ]))
-            let loadRequestJson = self.prettify(loadRequestDictionary)
-            XCTAssertTrue(loadRequestJson.contains("\"name\" : \"t_test_01\""))
-            XCTAssertTrue(loadRequestJson.contains("\"name\" : \"t_test_02\""))
-            XCTAssertTrue(loadRequestJson.contains("\"mbox-parameter-key1\" : \"mbox-parameter-value1\""))
-            XCTAssertTrue(loadRequestJson.contains("\"a.OSVersion\""))
-            XCTAssertTrue(loadRequestJson.contains("\"a.DeviceName\""))
-            XCTAssertTrue(loadRequestJson.contains("\"a.AppID\""))
-            XCTAssertTrue(loadRequestJson.contains("\"a.locale\""))
+            let prefetchJson = self.prettify(prefetchDictionary)
+            XCTAssertTrue(prefetchJson.contains("\"name\" : \"t_test_01\""))
+            XCTAssertTrue(prefetchJson.contains("\"name\" : \"t_test_02\""))
+            XCTAssertTrue(prefetchJson.contains("\"mbox-parameter-key1\" : \"mbox-parameter-value1\""))
+            XCTAssertTrue(prefetchJson.contains("\"a.OSVersion\""))
+            XCTAssertTrue(prefetchJson.contains("\"a.DeviceName\""))
+            XCTAssertTrue(prefetchJson.contains("\"a.AppID\""))
+            XCTAssertTrue(prefetchJson.contains("\"a.locale\""))
             let validResponse = HTTPURLResponse(url: URL(string: "https://amsdk.tt.omtrdc.net/rest/v1/delivery")!, statusCode: 200, httpVersion: nil, headerFields: nil)
             return (data: responseString.data(using: .utf8), response: validResponse, error: nil)
         }
@@ -940,17 +942,13 @@ class TargetFunctionalTests: XCTestCase {
             XCTFail()
             return
         }
-
+        XCTAssertTrue(target.readyForEvent(loadRequestEvent))
         // handles the prefetch event
         eventListener(loadRequestEvent)
-
-        // Check the notifications are cleared
-        XCTAssertTrue(target.targetState.notifications.isEmpty)
 
         // verifies the content of network response was stored correctly
         XCTAssertEqual("DE03D4AD-1FFE-421F-B2F2-303BF26822C1.35_0", target.targetState.tntId)
         XCTAssertEqual("mboxedge35.tt.omtrdc.net", target.targetState.edgeHost)
-
         XCTAssertEqual(1, target.targetState.loadedMboxJsonDicts.count)
         let mboxJson = prettify(target.targetState.loadedMboxJsonDicts["t_test_01"])
         XCTAssertTrue(mboxJson.contains("\"eventToken\" : \"uR0kIAPO+tZtIPW92S0NnWqipfsIHvVzTQxHolz2IpSCnQ9Y9OaLL2gsdrWQTvE54PwSz67rmXWmSnkXpSSS2Q==\""))
@@ -958,6 +956,77 @@ class TargetFunctionalTests: XCTestCase {
         // verifies the Target's shared state
         XCTAssertEqual(1, mockRuntime.createdSharedStates.count)
         XCTAssertEqual("DE03D4AD-1FFE-421F-B2F2-303BF26822C1.35_0", mockRuntime.createdSharedStates[0]?["tntid"] as? String)
+    }
+
+    func testLoadRequestContent_empty_requests() {
+        MockNetworkService.request = nil
+        ServiceProvider.shared.networkService = MockNetworkService()
+        let data: [String: Any] = [
+            "request": [String: Any](),
+            "targetparams": TargetParameters(profileParameters: mockProfileParam).asDictionary() as Any,
+        ]
+        let loadRequestEvent = Event(name: "", type: "", source: "", data: data)
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: loadRequestEvent, data: (value: mockConfigSharedState, status: .set))
+        target.onRegistered()
+        if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] {
+            eventListener(loadRequestEvent)
+            XCTAssertNil(MockNetworkService.request)
+            return
+        }
+        XCTFail()
+    }
+
+    func testLoadRequestContent_bad_response() {
+        // mocked network response
+        let responseString = """
+            {
+              "message": "error_message Notifications"
+            }
+        """
+        let requestDataArray: [[String: Any]?] = [
+            TargetRequest(mboxName: "t_test_01", defaultContent: "default", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+            TargetRequest(mboxName: "t_test_02", defaultContent: "default2", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+        ].map {
+            $0.asDictionary()
+        }
+
+        let data: [String: Any] = [
+            "request": requestDataArray,
+            "targetparams": TargetParameters(profileParameters: mockProfileParam).asDictionary() as Any,
+        ]
+        let loadRequestEvent = Event(name: "", type: "", source: "", data: data)
+
+        // creates a configuration's shared state
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: loadRequestEvent, data: (value: mockConfigSharedState, status: .set))
+
+        // creates a lifecycle's shared state
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.lifecycle", event: loadRequestEvent, data: (value: mockLifecycleData, status: .set))
+
+        // creates an identity's shared state
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.identity", event: loadRequestEvent, data: (value: mockIdentityData, status: .set))
+
+        // registers the event listeners for Target extension
+        target.onRegistered()
+        // override network service
+        let mockNetworkService = TestableNetworkService()
+        ServiceProvider.shared.networkService = mockNetworkService
+
+        mockNetworkService.mock { _ in
+            let validResponse = HTTPURLResponse(url: URL(string: "https://amsdk.tt.omtrdc.net/rest/v1/delivery")!, statusCode: 400, httpVersion: nil, headerFields: nil)
+
+            return (data: responseString.data(using: .utf8), response: validResponse, error: nil)
+        }
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
+            XCTFail()
+            return
+        }
+        // handles the location displayed event
+        eventListener(loadRequestEvent)
+
+        // Check the notifications are cleared
+        XCTAssertTrue(target.targetState.notifications.isEmpty)
+
+        XCTAssertEqual(0, target.targetState.loadedMboxJsonDicts.count)
     }
 
     // MARK: - Reset Experiences
@@ -987,6 +1056,27 @@ class TargetFunctionalTests: XCTestCase {
         XCTFail()
     }
 
+    // MARK: - Clear prefetch
+
+    func testClearPrefetchExperience() {
+        let data: [String: Any] = [
+            TargetConstants.EventDataKeys.CLEAR_PREFETCH_CACHE: true,
+        ]
+
+        // Update state with mocks
+        target.targetState.mergePrefetchedMboxJson(mboxesDictionary: ["mbox1": ["name": "mbox1"]])
+
+        let event = Event(name: "", type: "", source: "", data: data)
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
+        target.onRegistered()
+        if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestReset"] {
+            eventListener(event)
+            XCTAssertEqual(0, target.targetState.prefetchedMboxJsonDicts.count)
+            return
+        }
+        XCTFail()
+    }
+
     // MARK: - Set Third Party id
 
     func testSetThirdPartyId() {
@@ -997,13 +1087,32 @@ class TargetFunctionalTests: XCTestCase {
         let event = Event(name: "", type: "", source: "", data: data)
         mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
         target.onRegistered()
-        if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestIdentity"] {
-            eventListener(event)
-            XCTAssertNotNil(target.targetState.thirdPartyId)
-            XCTAssertEqual(target.targetState.thirdPartyId, "mockId")
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestIdentity"] else {
+            XCTFail()
             return
         }
-        XCTFail()
+        eventListener(event)
+        XCTAssertNotNil(target.targetState.thirdPartyId)
+        XCTAssertEqual(target.targetState.thirdPartyId, "mockId")
+    }
+
+    func testSetThirdPartyId_privacyOptOut() {
+        let data: [String: Any] = [
+            TargetConstants.EventDataKeys.THIRD_PARTY_ID: "mockId",
+        ]
+
+        let event = Event(name: "", type: "", source: "", data: data)
+        mockConfigSharedState["global.privacy"] = "optedout"
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
+        target.targetState.updateConfigurationSharedState(mockConfigSharedState)
+        target.onRegistered()
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestIdentity"] else {
+            XCTFail()
+            return
+        }
+        eventListener(event)
+        XCTAssertNil(target.targetState.thirdPartyId)
+        XCTAssertNotEqual(target.targetState.thirdPartyId, "mockId")
     }
 
     // MARK: - Get Third Party id
@@ -1013,14 +1122,18 @@ class TargetFunctionalTests: XCTestCase {
         mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
         target.onRegistered()
         target.targetState.updateThirdPartyId("mockId")
-        if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestIdentity"] {
-            eventListener(event)
-            if let data = mockRuntime.dispatchedEvents[0].data, let id = data[TargetConstants.EventDataKeys.THIRD_PARTY_ID] as? String {
-                XCTAssertEqual(mockRuntime.dispatchedEvents[0].type, EventType.target)
-                XCTAssertEqual(id, "mockId")
-                return
-            }
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestIdentity"] else {
             XCTFail()
+            return
+        }
+        eventListener(event)
+        XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
+        if let data = mockRuntime.dispatchedEvents[0].data, let id = data[TargetConstants.EventDataKeys.THIRD_PARTY_ID] as? String {
+            XCTAssertEqual(mockRuntime.dispatchedEvents[0].type, EventType.target)
+            XCTAssertEqual(id, "mockId")
+            XCTAssertEqual(mockRuntime.dispatchedEvents[0].name, "TargetResponseIdentity")
+            XCTAssertEqual(event.id, mockRuntime.dispatchedEvents[0].responseID)
+            return
         }
         XCTFail()
     }
@@ -1032,14 +1145,17 @@ class TargetFunctionalTests: XCTestCase {
         mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
         target.onRegistered()
         target.targetState.updateTntId("mockId")
-        if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestIdentity"] {
-            eventListener(event)
-            if let data = mockRuntime.dispatchedEvents[0].data, let id = data[TargetConstants.EventDataKeys.TNT_ID] as? String {
-                XCTAssertEqual(mockRuntime.dispatchedEvents[0].type, EventType.target)
-                XCTAssertEqual(id, "mockId")
-                return
-            }
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestIdentity"] else {
             XCTFail()
+            return
+        }
+        eventListener(event)
+        if let data = mockRuntime.dispatchedEvents[0].data, let id = data[TargetConstants.EventDataKeys.TNT_ID] as? String {
+            XCTAssertEqual(mockRuntime.dispatchedEvents[0].type, EventType.target)
+            XCTAssertEqual(id, "mockId")
+            XCTAssertEqual(mockRuntime.dispatchedEvents[0].name, "TargetResponseIdentity")
+            XCTAssertEqual(event.id, mockRuntime.dispatchedEvents[0].responseID)
+            return
         }
         XCTFail()
     }
@@ -1056,16 +1172,40 @@ class TargetFunctionalTests: XCTestCase {
         target.targetState.updateEdgeHost("mockedge")
         target.targetState.updateTntId("sometnt")
         target.targetState.updateThirdPartyId("somehtirdparty")
-        if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.configuration-com.adobe.eventSource.responseContent"] {
-            XCTAssertTrue(target.readyForEvent(event))
-            eventListener(event)
-            XCTAssertNil(target.targetState.edgeHost)
-            XCTAssertTrue(target.targetState.sessionTimestampInSeconds == 0)
-            XCTAssertNil(target.targetState.thirdPartyId)
-            XCTAssertNotNil(target.targetState.sessionId)
+        let sessionId = target.targetState.sessionId
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.configuration-com.adobe.eventSource.responseContent"] else {
+            XCTFail()
             return
         }
-        XCTFail()
+        XCTAssertTrue(target.readyForEvent(event))
+        eventListener(event)
+        XCTAssertNil(target.targetState.edgeHost)
+        XCTAssertTrue(target.targetState.sessionTimestampInSeconds == 0)
+        XCTAssertNil(target.targetState.thirdPartyId)
+        XCTAssertNotEqual(sessionId, target.targetState.sessionId)
+    }
+
+    func testConfigurationResponseContent_privacyOptedIn() {
+        let event = Event(name: "", type: "", source: "", data: nil)
+        mockConfigSharedState["global.privacy"] = "optedin"
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
+        target.onRegistered()
+        // Update state with mocks
+        target.targetState.updateSessionTimestamp()
+        target.targetState.updateEdgeHost("mockedge")
+        target.targetState.updateTntId("sometnt")
+        target.targetState.updateThirdPartyId("somehtirdparty")
+        let sessionId = target.targetState.sessionId
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.configuration-com.adobe.eventSource.responseContent"] else {
+            XCTFail()
+            return
+        }
+        XCTAssertTrue(target.readyForEvent(event))
+        eventListener(event)
+        XCTAssertNotNil(target.targetState.edgeHost)
+        XCTAssertFalse(target.targetState.sessionTimestampInSeconds == 0)
+        XCTAssertNotNil(target.targetState.thirdPartyId)
+        XCTAssertEqual(sessionId, target.targetState.sessionId)
     }
 
     // MARK: - Handle restart Deeplink
@@ -1074,16 +1214,17 @@ class TargetFunctionalTests: XCTestCase {
         let testRestartDeeplink = "testUrl://test"
         let eventData = [TargetConstants.EventDataKeys.PREVIEW_RESTART_DEEP_LINK: testRestartDeeplink]
         let event = Event(name: "testRestartDeeplinkEvent", type: EventType.target, source: EventSource.requestContent, data: eventData)
-        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: ["target.clientCode": "code_123", "global.privacy": "optedin"], status: .set))
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: mockConfigSharedState, status: .set))
         target.onRegistered()
         mockRuntime.simulateComingEvent(event: event)
-        if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] {
-            eventListener(event)
-            XCTAssertTrue(mockPreviewManager.setRestartDeepLinkCalled)
-            XCTAssertEqual(mockPreviewManager.restartDeepLink, testRestartDeeplink)
+
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
+            XCTFail()
             return
         }
-        XCTFail()
+        eventListener(event)
+        XCTAssertTrue(mockPreviewManager.setRestartDeepLinkCalled)
+        XCTAssertEqual(mockPreviewManager.restartDeepLink, testRestartDeeplink)
     }
 }
 
