@@ -130,6 +130,9 @@ enum TargetConstants {
     enum V4Migration {
         static let TNT_ID = "ADBMOBILE_TARGET_TNT_ID"
         static let THIRD_PARTY_ID = "ADBMOBILE_TARGET_3RD_PARTY_ID"
+        static let SESSION_ID = "ADBMOBILE_TARGET_SESSION_ID"
+        static let EDGE_HOST = "ADBMOBILE_TARGET_EDGE_HOST"
+        static let LAST_TIMESTAMP = "ADBMOBILE_TARGET_LAST_TIMESTAMP"
         static let V4_DATA_MIGRATED = "ADBMOBILE_TARGET_DATA_MIGRATED"
     }
 
@@ -183,9 +186,11 @@ enum TargetConstants {
         static let PROFILE_PARAMETERS = "profileparameters"
         static let TARGET_CONTENT = "content"
         static let TARGET_RESPONSE_PAIR_ID = "responsePairId"
+        static let TARGET_RESPONSE_EVENT_ID = "responseEventId"
         // shared sate
         static let TNT_ID = "tntid"
         static let PREVIEW_INITIATED = "ispreviewinitiated"
+        static let DEEPLINK = "deeplink"
 
         enum Analytics {
             static let TRACK_INTERNAL = "trackinternal"

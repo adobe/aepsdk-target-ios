@@ -1,5 +1,5 @@
 /*
- Copyright 2020 Adobe. All rights reserved.
+ Copyright 2021 Adobe. All rights reserved.
  This file is licensed to you under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License. You may obtain a copy
  of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -20,9 +20,10 @@ struct TargetPreviewState {
     var token: String?
     var endpoint: String?
     var webViewHtml: String?
-    var restartUrl: URL?
+    var restartUrl: String?
     var fetchingWebView: Bool = false
     var previewButton: FloatingButtonPresentable?
+    var fullscreenMessage: FullscreenPresentable?
 
     mutating func reset() {
         token = nil
@@ -79,15 +80,15 @@ class TargetPreviewManager: PreviewManager {
         fetchWebView()
     }
 
-    func previewConfirmedWithUrl(_ url: URL, message: FullscreenPresentable, previewLifecycleEventDispatcher: (Event) -> Void) -> Bool {
+    func previewConfirmedWithUrl(_ url: URL, message: FullscreenPresentable, previewLifecycleEventDispatcher: (Event) -> Void) {
         guard state.previewButton != nil else {
             Log.debug(label: LOG_TAG, "Preview button is nil")
-            return false
+            return
         }
 
         guard let deepLinkScheme = url.deepLinkScheme else {
             Log.debug(label: LOG_TAG, "Deeplink scheme does not match")
-            return false
+            return
         }
 
         switch deepLinkScheme {
@@ -103,14 +104,12 @@ class TargetPreviewManager: PreviewManager {
                 }
             }
 
-            if let restartUrl = state.restartUrl {
+            if let restartUrlString = state.restartUrl, let restartUrl = URL(string: restartUrlString) {
                 urlOpeningService.openUrl(restartUrl)
             }
 
             message.dismiss()
         }
-
-        return true
     }
 
     func fetchWebView() {
@@ -147,8 +146,11 @@ class TargetPreviewManager: PreviewManager {
         })
     }
 
-    func setRestartDeepLink(_ restartDeepLink: String) {
-        state.restartUrl = URL(string: restartDeepLink)
+    /// Sets the preview restart url in the target preview manager.
+    /// - Parameters:
+    ///     - deepLink: deepLink the `String`
+    func setRestartDeepLink(_ deepLink: String) {
+        state.restartUrl = deepLink
     }
 
     var previewParameters: String? {
@@ -174,8 +176,8 @@ class TargetPreviewManager: PreviewManager {
             return
         }
 
-        let fullscreenMessage = ServiceProvider.shared.uiService.createFullscreenMessage(payload: webViewHtml, listener: fullscreenMessageDelegate ?? self, isLocalImageUsed: false)
-        fullscreenMessage.show()
+        state.fullscreenMessage = ServiceProvider.shared.uiService.createFullscreenMessage(payload: webViewHtml, listener: fullscreenMessageDelegate ?? self, isLocalImageUsed: false)
+        state.fullscreenMessage?.show()
     }
 
     ///

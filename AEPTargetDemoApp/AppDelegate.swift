@@ -28,6 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         MobileCore.registerExtensions([Lifecycle.self, Identity.self, Target.self, Signal.self])
         // https://experience.adobe.com/#/@obumobile5/launch/companies/COe866eac9a46b406fb25e1576ddb40375/properties/PRa0cdd30c31c1444ab6287bdbb5e28a65/overview
         MobileCore.configureWith(appId: "launch-ENc28aaf2fb6934cff830c8d3ddc5465b1-development")
+        MobileCore.updateConfigurationWith(configDict: ["target.previewEnabled": true])
 
         // register AEPAssurance
         AEPAssurance.registerExtension()

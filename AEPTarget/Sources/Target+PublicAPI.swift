@@ -227,8 +227,8 @@ import Foundation
     /// Sets the Target preview restart deep link.
     /// Set the Target preview URL to be displayed when the preview mode is restarted.
     /// - Parameter deeplink:  the URL which will be set for preview restart
-    static func setPreviewRestartDeepLink(_ deeplink: URL) {
-        // TODO: need to verify input parameters
+    @objc(setPreviewRestartDeepLink:)
+    static func setPreviewRestartDeepLink(deeplink: URL) {
         let eventData = [TargetConstants.EventDataKeys.PREVIEW_RESTART_DEEP_LINK: deeplink.absoluteString]
         let event = Event(name: TargetConstants.EventName.SET_PREVIEW_DEEPLINK, type: EventType.target, source: EventSource.requestContent, data: eventData)
         MobileCore.dispatch(event: event)
@@ -296,7 +296,7 @@ import Foundation
             return
         }
 
-        guard let id = event.responseID,
+        guard let id = event.data?[TargetConstants.EventDataKeys.TARGET_RESPONSE_EVENT_ID] as? String,
               let responsePairId = event.data?[TargetConstants.EventDataKeys.TARGET_RESPONSE_PAIR_ID] as? String
         else {
             Log.error(label: LOG_TAG, "Missing response pair id for the target request in the response event")

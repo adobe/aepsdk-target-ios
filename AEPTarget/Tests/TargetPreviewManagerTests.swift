@@ -200,12 +200,12 @@ class TargetPreviewManagerTests: XCTestCase {
         mockUIService.fullscreenMessage = fullscreenMessage
         let url = URL(string: TargetTestConstants.TEST_CONFIRM_DEEPLINK)
         var eventDispatched = false
-        XCTAssertTrue(targetPreviewManager.previewConfirmedWithUrl(url!, message: fullscreenMessage, previewLifecycleEventDispatcher: { event in
+        targetPreviewManager.previewConfirmedWithUrl(url!, message: fullscreenMessage, previewLifecycleEventDispatcher: { event in
             eventDispatched = true
             XCTAssertEqual(event.name, "Target Preview Lifecycle")
             XCTAssertTrue(event.data![TargetConstants.EventDataKeys.PREVIEW_INITIATED] as! Bool)
-        }))
 
+        })
         XCTAssertTrue(eventDispatched)
         verifyQaModeParams(targetPreviewManager.previewParameters ?? "")
         XCTAssertTrue(mockUIService.createFullscreenMessageCalled)
@@ -224,11 +224,11 @@ class TargetPreviewManagerTests: XCTestCase {
         setupPreviewMode()
         let url = URL(string: TargetTestConstants.TEST_CANCEL_DEEPLINK)
         var eventDispatched = false
-        XCTAssertTrue(targetPreviewManager.previewConfirmedWithUrl(url!, message: fullscreenMessage, previewLifecycleEventDispatcher: { event in
+        targetPreviewManager.previewConfirmedWithUrl(url!, message: fullscreenMessage, previewLifecycleEventDispatcher: { event in
             eventDispatched = true
             XCTAssertEqual(event.name, "Target Preview Lifecycle")
             XCTAssertFalse(event.data![TargetConstants.EventDataKeys.PREVIEW_INITIATED] as! Bool)
-        }))
+        })
 
         XCTAssertTrue(eventDispatched)
         // Make sure the target preview properties have been reset
@@ -246,9 +246,9 @@ class TargetPreviewManagerTests: XCTestCase {
         let fullscreenMessage = MockFullscreenMessage()
         mockUIService.fullscreenMessage = fullscreenMessage
         let url = URL(string: TargetTestConstants.TEST_CONFIRM_DEEPLINK)
-        XCTAssertFalse(targetPreviewManager.previewConfirmedWithUrl(url!, message: fullscreenMessage, previewLifecycleEventDispatcher: { _ in
+        targetPreviewManager.previewConfirmedWithUrl(url!, message: fullscreenMessage, previewLifecycleEventDispatcher: { _ in
             XCTFail()
-        }))
+        })
         XCTAssertFalse(fullscreenMessage.dismissCalled)
     }
 
@@ -262,9 +262,9 @@ class TargetPreviewManagerTests: XCTestCase {
         mockUIService.floatingButton = button
         setupPreviewMode()
         let incorrectSchemeUrl = URL(string: "bbbinapp://confirm")
-        XCTAssertFalse(targetPreviewManager.previewConfirmedWithUrl(incorrectSchemeUrl!, message: fullscreenMessage, previewLifecycleEventDispatcher: { _ in
+        targetPreviewManager.previewConfirmedWithUrl(incorrectSchemeUrl!, message: fullscreenMessage, previewLifecycleEventDispatcher: { _ in
             XCTFail()
-        }))
+        })
 
         XCTAssertFalse(fullscreenMessage.dismissCalled)
         XCTAssertFalse(button.dismissCalled)
@@ -280,11 +280,11 @@ class TargetPreviewManagerTests: XCTestCase {
         mockUIService.fullscreenMessage = fullscreenMessage
         let url = URL(string: TargetTestConstants.TEST_CONFIRM_DEEPLINK)
         var eventDispatched = false
-        XCTAssertTrue(targetPreviewManager.previewConfirmedWithUrl(url!, message: fullscreenMessage, previewLifecycleEventDispatcher: { event in
+        targetPreviewManager.previewConfirmedWithUrl(url!, message: fullscreenMessage, previewLifecycleEventDispatcher: { event in
             eventDispatched = true
             XCTAssertEqual(event.name, "Target Preview Lifecycle")
             XCTAssertTrue(event.data![TargetConstants.EventDataKeys.PREVIEW_INITIATED] as! Bool)
-        }))
+        })
 
         XCTAssertTrue(eventDispatched)
         verifyQaModeParams(targetPreviewManager.previewParameters ?? "")

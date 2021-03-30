@@ -75,6 +75,9 @@ class TargetV4MigratorTests: XCTestCase {
         // V4 Target data with old keys
         userDefaultsV4.set("id_1", forKey: "ADBMOBILE_TARGET_TNT_ID")
         userDefaultsV4.set("id_2", forKey: "ADBMOBILE_TARGET_3RD_PARTY_ID")
+        userDefaultsV4.set("E621E1F8-C36C-495A-93FC-0C247A3E6E5F", forKey: "ADBMOBILE_TARGET_SESSION_ID")
+        userDefaultsV4.set("edge.host.com", forKey: "ADBMOBILE_TARGET_EDGE_HOST")
+        userDefaultsV4.set(1_615_436_587, forKey: "ADBMOBILE_TARGET_LAST_TIMESTAMP")
         userDefaultsV4.set(true, forKey: "ADBMOBILE_TARGET_DATA_MIGRATED")
 
         TargetV4Migrator.migrate()
@@ -82,6 +85,9 @@ class TargetV4MigratorTests: XCTestCase {
         // V4 Target data keys should be deleted
         guard userDefaultsV4.object(forKey: "ADBMOBILE_TARGET_TNT_ID") == nil,
               userDefaultsV4.object(forKey: "ADBMOBILE_TARGET_3RD_PARTY_ID") == nil,
+              userDefaultsV4.object(forKey: "ADBMOBILE_TARGET_SESSION_ID") == nil,
+              userDefaultsV4.object(forKey: "ADBMOBILE_TARGET_EDGE_HOST") == nil,
+              userDefaultsV4.object(forKey: "ADBMOBILE_TARGET_LAST_TIMESTAMP") == nil,
               userDefaultsV4.object(forKey: "ADBMOBILE_TARGET_DATA_MIGRATED") == nil
         else {
             XCTFail("the old V4 data is not deleted")
@@ -90,8 +96,9 @@ class TargetV4MigratorTests: XCTestCase {
         // verify: Target data with new keys
         XCTAssertEqual("id_1", targetDataStore.getString(key: "tnt.id"))
         XCTAssertEqual("id_2", targetDataStore.getString(key: "thirdparty.id"))
-        XCTAssertEqual(nil, targetDataStore.getString(key: "session.id"))
-        XCTAssertEqual(nil, targetDataStore.getInt(key: "session.timestamp"))
+        XCTAssertEqual("edge.host.com", targetDataStore.getString(key: "edge.host"))
+        XCTAssertEqual("E621E1F8-C36C-495A-93FC-0C247A3E6E5F", targetDataStore.getString(key: "session.id"))
+        XCTAssertEqual(1_615_436_587, targetDataStore.getInt(key: "session.timestamp"))
         XCTAssertEqual(true, targetDataStore.getBool(key: "v4.migration.complete"))
     }
 
@@ -134,6 +141,9 @@ class TargetV4MigratorTests: XCTestCase {
         // V4 Target data with old keys
         userDefaultsV4.set("id_1", forKey: "ADBMOBILE_TARGET_TNT_ID")
         userDefaultsV4.set("id_2", forKey: "ADBMOBILE_TARGET_3RD_PARTY_ID")
+        userDefaultsV4.set("E621E1F8-C36C-495A-93FC-0C247A3E6E5F", forKey: "ADBMOBILE_TARGET_SESSION_ID")
+        userDefaultsV4.set("edge.host.com", forKey: "ADBMOBILE_TARGET_EDGE_HOST")
+        userDefaultsV4.set(1_615_436_587, forKey: "ADBMOBILE_TARGET_LAST_TIMESTAMP")
         userDefaultsV4.set(true, forKey: "ADBMOBILE_TARGET_DATA_MIGRATED")
 
         TargetV4Migrator.migrate()
@@ -141,7 +151,11 @@ class TargetV4MigratorTests: XCTestCase {
         // V4 Target data keys should be deleted
         guard userDefaultsV4.object(forKey: "ADBMOBILE_TARGET_TNT_ID") == nil,
               userDefaultsV4.object(forKey: "ADBMOBILE_TARGET_3RD_PARTY_ID") == nil,
+              userDefaultsV4.object(forKey: "ADBMOBILE_TARGET_SESSION_ID") == nil,
+              userDefaultsV4.object(forKey: "ADBMOBILE_TARGET_EDGE_HOST") == nil,
+              userDefaultsV4.object(forKey: "ADBMOBILE_TARGET_LAST_TIMESTAMP") == nil,
               userDefaultsV4.object(forKey: "ADBMOBILE_TARGET_DATA_MIGRATED") == nil
+
         else {
             XCTFail("the old V4 data is not deleted")
             return
@@ -149,8 +163,9 @@ class TargetV4MigratorTests: XCTestCase {
         // verify: Target data with new keys
         XCTAssertEqual("id_1", targetDataStore.getString(key: "tnt.id"))
         XCTAssertEqual("id_2", targetDataStore.getString(key: "thirdparty.id"))
-        XCTAssertEqual(nil, targetDataStore.getString(key: "session.id"))
-        XCTAssertEqual(nil, targetDataStore.getInt(key: "session.timestamp"))
+        XCTAssertEqual("edge.host.com", targetDataStore.getString(key: "edge.host"))
+        XCTAssertEqual("E621E1F8-C36C-495A-93FC-0C247A3E6E5F", targetDataStore.getString(key: "session.id"))
+        XCTAssertEqual(1_615_436_587, targetDataStore.getInt(key: "session.timestamp"))
         XCTAssertEqual(true, targetDataStore.getBool(key: "v4.migration.complete"))
     }
 
@@ -164,6 +179,9 @@ class TargetV4MigratorTests: XCTestCase {
         UserDefaults.standard.set(true, forKey: "ADBMOBILE_TARGET_DATA_MIGRATED")
         UserDefaults.standard.set("id_1", forKey: "ADBMOBILE_TARGET_TNT_ID")
         UserDefaults.standard.set("id_2", forKey: "ADBMOBILE_TARGET_3RD_PARTY_ID")
+        UserDefaults.standard.set("E621E1F8-C36C-495A-93FC-0C247A3E6E5F", forKey: "ADBMOBILE_TARGET_SESSION_ID")
+        UserDefaults.standard.set("edge.host.com", forKey: "ADBMOBILE_TARGET_EDGE_HOST")
+        UserDefaults.standard.set(1_615_436_587, forKey: "ADBMOBILE_TARGET_LAST_TIMESTAMP")
 
         // set a `app group` value and do data migration
         ServiceProvider.shared.namedKeyValueService.setAppGroup("test_app_group")
@@ -172,6 +190,9 @@ class TargetV4MigratorTests: XCTestCase {
         // verify: V4 Target data will no be migrated
         guard UserDefaults.standard.object(forKey: "ADBMOBILE_TARGET_DATA_MIGRATED") != nil,
               UserDefaults.standard.object(forKey: "ADBMOBILE_TARGET_TNT_ID") != nil,
+              UserDefaults.standard.object(forKey: "ADBMOBILE_TARGET_SESSION_ID") != nil,
+              UserDefaults.standard.object(forKey: "ADBMOBILE_TARGET_EDGE_HOST") != nil,
+              UserDefaults.standard.object(forKey: "ADBMOBILE_TARGET_LAST_TIMESTAMP") != nil,
               UserDefaults.standard.object(forKey: "ADBMOBILE_TARGET_3RD_PARTY_ID") != nil
         else {
             XCTFail("the old V4 data should not be deleted")

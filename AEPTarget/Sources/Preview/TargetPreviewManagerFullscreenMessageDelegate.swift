@@ -37,8 +37,10 @@ extension TargetPreviewManager: FullscreenMessageDelegate {
 
         Log.debug(label: LOG_TAG, "overrideUrlLoad - Target preview override url received: \(url)")
 
-        return previewConfirmedWithUrl(url, message: message, previewLifecycleEventDispatcher: { event in
+        previewConfirmedWithUrl(url, message: message, previewLifecycleEventDispatcher: { event in
             MobileCore.dispatch(event: event)
         })
+
+        return true
     }
 }
