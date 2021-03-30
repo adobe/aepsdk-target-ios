@@ -359,7 +359,7 @@ class TargetIntegrationTests: XCTestCase {
         wait(for: [networkRequestExpectation], timeout: 1)
     }
 
-    func skip_testRetrieveLocationContent() {
+    func testRetrieveLocationContent() {
         let responseString = """
             {
               "status": 200,
@@ -371,21 +371,7 @@ class TargetIntegrationTests: XCTestCase {
               "client": "acopprod3",
               "edgeHost": "mboxedge35.tt.omtrdc.net",
               "prefetch": {
-                "mboxes": [
-                  {
-                    "index": 0,
-                    "name": "t_test_01",
-                    "options": [
-                      {
-                        "content": {
-                          "key1": "value1"
-                        },
-                        "type": "json",
-                        "eventToken": "uR0kIAPO+tZtIPW92S0NnWqipfsIHvVzTQxHolz2IpSCnQ9Y9OaLL2gsdrWQTvE54PwSz67rmXWmSnkXpSSS2Q=="
-                      }
-                    ]
-                  }
-                ]
+                "mboxes": []
               }
             }
         """
@@ -406,13 +392,6 @@ class TargetIntegrationTests: XCTestCase {
             "global.privacy": "optedin",
             "target.server": "amsdk.tt.omtrdc.net",
             "target.clientCode": "amsdk",
-            "analytics.server": "test.analytics.net",
-            "analytics.rsids": "abc",
-            "analytics.batchLimit": 0,
-            "analytics.aamForwardingEnabled": true,
-            "analytics.backdatePreviousSessionInfo": true,
-            "analytics.offlineEnabled": false,
-            "analytics.launchHitDelay": 0,
         ])
 
         let targetRequestExpectation = XCTestExpectation(description: "monitor the target request")
@@ -420,13 +399,13 @@ class TargetIntegrationTests: XCTestCase {
         ServiceProvider.shared.networkService = mockNetworkService
         mockNetworkService.mock { request in
             if request.url.absoluteString.contains("https://amsdk.tt.omtrdc.net/rest/v1/delivery/?client=amsdk&sessionId=") {
-//                targetRequestExpectation.fulfill()
                 return (data: responseString.data(using: .utf8), response: validResponse, error: nil)
             }
             return nil
         }
-        let retrieveRequest = TargetRequest(mboxName: "t_test_01", defaultContent: "content") { content in
-            print(content)
+        let retrieveRequest = TargetRequest(mboxName: "t_test_01", defaultContent: "default_content") { content in
+            XCTAssertEqual("default_content", content)
+            targetRequestExpectation.fulfill()
         }
         Target.retrieveLocationContent(requests: [retrieveRequest], targetParameters: nil)
         wait(for: [targetRequestExpectation], timeout: 1)
