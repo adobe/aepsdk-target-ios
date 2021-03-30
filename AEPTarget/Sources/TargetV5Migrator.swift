@@ -15,6 +15,7 @@ import Foundation
 
 /// Provides functionality for migrating stored data from c++ V5 to Swift V5
 enum TargetV5Migrator {
+    static let LOG_TAG = "TargetV5Migrator"
     private static var userDefaultsV5: UserDefaults {
         if let v5AppGroup = ServiceProvider.shared.namedKeyValueService.getAppGroup(), !v5AppGroup.isEmpty {
             return UserDefaults(suiteName: v5AppGroup) ?? UserDefaults.standard
@@ -32,6 +33,7 @@ enum TargetV5Migrator {
               targetDataStore.getLong(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP) == nil,
               targetDataStore.getString(key: TargetConstants.DataStoreKeys.EDGE_HOST) == nil
         else {
+            Log.trace(label: Target.LOG_TAG, "Found new Target data keys, not need to do V5 data migration.")
             return
         }
 
@@ -52,5 +54,6 @@ enum TargetV5Migrator {
         userDefaultsV5.removeObject(forKey: TargetConstants.V5Migration.SESSION_ID)
         userDefaultsV5.removeObject(forKey: TargetConstants.V5Migration.THIRD_PARTY_ID)
         userDefaultsV5.removeObject(forKey: TargetConstants.V5Migration.TNT_ID)
+        Log.trace(label: Target.LOG_TAG, "Target V5 data migration completed.")
     }
 }

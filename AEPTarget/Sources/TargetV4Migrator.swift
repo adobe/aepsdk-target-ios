@@ -15,6 +15,7 @@ import Foundation
 
 /// Provides functionality for migrating stored data from V4 to Swift V5
 enum TargetV4Migrator {
+    static let LOG_TAG = "TargetV4Migrator"
     private static var userDefaultsV4: UserDefaults {
         if let v4AppGroup = ServiceProvider.shared.namedKeyValueService.getAppGroup(), !v4AppGroup.isEmpty {
             return UserDefaults(suiteName: v4AppGroup) ?? UserDefaults.standard
@@ -33,6 +34,7 @@ enum TargetV4Migrator {
               targetDataStore.getLong(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP) == nil,
               targetDataStore.getString(key: TargetConstants.DataStoreKeys.EDGE_HOST) == nil
         else {
+            Log.trace(label: Target.LOG_TAG, "Found new Target data keys, not need to do V4 data migration.")
             return
         }
 
@@ -52,5 +54,6 @@ enum TargetV4Migrator {
         userDefaultsV4.removeObject(forKey: TargetConstants.V4Migration.SESSION_ID)
         userDefaultsV4.removeObject(forKey: TargetConstants.V4Migration.LAST_TIMESTAMP)
         userDefaultsV4.removeObject(forKey: TargetConstants.V4Migration.V4_DATA_MIGRATED)
+        Log.trace(label: Target.LOG_TAG, "Target V4 data migration completed.")
     }
 }
