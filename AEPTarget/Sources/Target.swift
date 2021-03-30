@@ -209,8 +209,6 @@ public class Target: NSObject, Extension {
                 self.dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Errors returned in Target response: \(error)")
             }
 
-            self.targetState.updateSessionTimestamp()
-
             if let tntId = response.tntId { self.setTntId(tntId: tntId) }
             if let edgeHost = response.edgeHost { self.targetState.updateEdgeHost(edgeHost) }
             self.createSharedState(data: self.targetState.generateSharedState(), event: event)
@@ -456,8 +454,6 @@ public class Target: NSObject, Extension {
             Log.debug(label: Target.LOG_TAG, "Errors returned in Target response with response code: \(String(describing: connection.responseCode))")
         }
 
-        targetState.updateSessionTimestamp()
-
         if let tntId = response.tntId { setTntId(tntId: tntId) }
         if let edgeHost = response.edgeHost { targetState.updateEdgeHost(edgeHost) }
         createSharedState(data: targetState.generateSharedState(), event: event)
@@ -496,7 +492,6 @@ public class Target: NSObject, Extension {
             return
         }
 
-        targetState.updateSessionTimestamp()
         if let tntId = response.tntId { targetState.updateTntId(tntId) }
         if let edgeHost = response.edgeHost { targetState.updateEdgeHost(edgeHost) }
         createSharedState(data: targetState.generateSharedState(), event: nil)
@@ -667,6 +662,7 @@ public class Target: NSObject, Extension {
 
         stopEvents()
         networkService.connectAsync(networkRequest: request) { connection in
+            self.targetState.updateSessionTimestamp()
             if let completionHandler = completionHandler {
                 completionHandler(connection)
             }
