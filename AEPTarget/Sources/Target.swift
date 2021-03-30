@@ -158,6 +158,13 @@ public class Target: NSObject, Extension {
         previewManager.enterPreviewModeWithDeepLink(clientCode: clientCode, deepLink: deeplinkUrl)
     }
 
+    private func getDeliveryResponse(_ data: Data?) -> TargetDeliveryResponse? {
+        guard let data = data, let responseDict = try? JSONDecoder().decode([String: AnyCodable].self, from: data), let dict = AnyCodable.toAnyDictionary(dictionary: responseDict) else {
+            return nil
+        }
+        return TargetDeliveryResponse(responseJson: dict)
+    }
+
     /// Handle prefetch content request
     /// - Parameter event: an event of type target and  source request content is dispatched by the `EventHub`
     private func prefetchContent(_ event: Event) {
@@ -171,49 +178,39 @@ public class Target: NSObject, Extension {
             return
         }
 
-        let targetParameters = event.targetParameters
+        // Check whether request can be sent
+        if let error = prepareForTargetRequest() {
+            dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: error)
+            return
+        }
 
         let lifecycleSharedState = getSharedState(extensionName: TargetConstants.Lifecycle.EXTENSION_NAME, event: event)?.value
         let identitySharedState = getSharedState(extensionName: TargetConstants.Identity.EXTENSION_NAME, event: event)?.value
 
-        // Check whether request can be sent
-        if let error = prepareForTargetRequest() {
-            Log.debug(label: Target.LOG_TAG, "Unable to prefetch mbox content, Error \(error)")
-            return
-        }
-
-        guard targetState.privacyStatusIsOptIn else {
-            dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Privacy status is not opted in")
-            return
-        }
-
         let error = sendTargetRequest(event,
                                       prefetchRequests: targetPrefetchArray,
-                                      targetParameters: targetParameters,
+                                      targetParameters: event.targetParameters,
                                       lifecycleData: lifecycleSharedState,
                                       identityData: identitySharedState) { connection in
-            if connection.responseCode != 200 {
-                self.dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Errors returned in Target response with response code: \(String(describing: connection.responseCode))")
-            }
             // Clear notification
             self.targetState.clearNotifications()
 
-            guard let data = connection.data, let responseDict = try? JSONDecoder().decode([String: AnyCodable].self, from: data), let dict = AnyCodable.toAnyDictionary(dictionary: responseDict) else {
+            let response = self.getDeliveryResponse(connection.data)
+
+            guard connection.responseCode == 200 else {
+                self.dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Errors returned in Target response with response code: \(String(describing: connection.responseCode)), error message : \(String(describing: response?.errorMessage))")
+                return
+            }
+
+            guard let deliveryResponse = response else {
                 self.dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Target response parser initialization failed")
                 return
             }
-            let response = TargetDeliveryResponse(responseJson: dict)
-
-            if let error = response.errorMessage {
-                self.targetState.clearNotifications()
-                self.dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Errors returned in Target response: \(error)")
-            }
-
-            if let tntId = response.tntId { self.setTntId(tntId: tntId) }
-            if let edgeHost = response.edgeHost { self.targetState.updateEdgeHost(edgeHost) }
+            if let tntId = deliveryResponse.tntId { self.setTntId(tntId: tntId) }
+            if let edgeHost = deliveryResponse.edgeHost { self.targetState.updateEdgeHost(edgeHost) }
             self.createSharedState(data: self.targetState.generateSharedState(), event: event)
 
-            if let mboxes = response.prefetchMboxes {
+            if let mboxes = deliveryResponse.prefetchMboxes {
                 var mboxesDictionary = [String: [String: Any]]()
                 for mbox in mboxes {
                     if let name = mbox[TargetResponseConstants.JSONKeys.MBOX_NAME] as? String { mboxesDictionary[name] = mbox }
@@ -522,7 +519,7 @@ public class Target: NSObject, Extension {
     }
 
     private func dispatchPrefetchErrorEvent(triggerEvent: Event, errorMessage: String) {
-        Log.warning(label: Target.LOG_TAG, "dispatch prefetch error event")
+        Log.warning(label: Target.LOG_TAG, "dispatch prefetch error event, error message : \(errorMessage)")
         dispatch(event: triggerEvent.createResponseEvent(name: TargetConstants.EventName.PREFETCH_RESPOND, type: EventType.target, source: EventSource.responseContent, data: [TargetConstants.EventDataKeys.PREFETCH_ERROR: errorMessage]))
     }
 

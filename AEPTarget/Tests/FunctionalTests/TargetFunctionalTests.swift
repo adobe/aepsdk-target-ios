@@ -293,7 +293,33 @@ class TargetFunctionalTests: XCTestCase {
     }
 
     func testPrefetchContent_in_PreviewMode() {
-        // TODO: fix this after the preview PR got merged
+        MockNetworkService.request = nil
+        ServiceProvider.shared.networkService = MockNetworkService()
+
+        let data: [String: Any] = [
+            "prefetch": [String: Any](),
+            "targetparams": TargetParameters(profileParameters: mockProfileParam).asDictionary() as Any,
+        ]
+        let prefetchEvent = Event(name: "", type: "", source: "", data: data)
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: prefetchEvent, data: (value: mockConfigSharedState, status: .set))
+        target.onRegistered()
+        let mockedPreviewManager = MockTargetPreviewManager()
+        mockedPreviewManager.previewParameters = "none empty"
+        target.previewManager = mockedPreviewManager
+
+        if let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] {
+            eventListener(prefetchEvent)
+            XCTAssertNil(MockNetworkService.request)
+            XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
+            XCTAssertEqual("TargetPrefetchResponse", mockRuntime.dispatchedEvents[0].name)
+            XCTAssertEqual("com.adobe.eventType.target", mockRuntime.dispatchedEvents[0].type)
+            XCTAssertEqual("com.adobe.eventSource.responseContent", mockRuntime.dispatchedEvents[0].source)
+            XCTAssertNotNil(mockRuntime.dispatchedEvents[0].data?["prefetcherror"])
+            let errorMessage = mockRuntime.dispatchedEvents[0].data?["prefetcherror"] as? String ?? ""
+            XCTAssertTrue(errorMessage.contains("in preview mode"))
+            return
+        }
+        XCTFail()
     }
 
     func testPrefetchContent_empty_prefetch_array() {
@@ -321,7 +347,7 @@ class TargetFunctionalTests: XCTestCase {
         XCTFail()
     }
 
-    func testPrefetchContent_bad_response() {
+    func testPrefetchContent_error_response() {
         // mocked network response
         let responseString = """
             {
@@ -366,23 +392,229 @@ class TargetFunctionalTests: XCTestCase {
         }
 
         // handles the prefetch event
+        XCTAssertTrue(target.readyForEvent(prefetchEvent))
         eventListener(prefetchEvent)
 
-        // TODO: need to enable the following testing code after fixed the bug in source code
         // verifies the Target's shared state
-        // XCTAssertEqual(0, mockRuntime.createdSharedStates.count)
+        XCTAssertEqual(0, mockRuntime.createdSharedStates.count)
 
         // verifies the dispatched event
-//        XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
-//        XCTAssertEqual("TargetPrefetchResponse", mockRuntime.dispatchedEvents[0].name)
-//        XCTAssertEqual("com.adobe.eventType.target", mockRuntime.dispatchedEvents[0].type)
-//        XCTAssertEqual("com.adobe.eventSource.responseContent", mockRuntime.dispatchedEvents[0].source)
-//        guard let errorMessage = mockRuntime.dispatchedEvents[0].data?["prefetcherror"] as? String else {
-//            XCTFail()
-//            return
-//        }
-//        errorMessage.contains("verify_error_message")
-//        XCTAssertEqual("com.adobe.eventSource.responseContent", errorMessage)
+        XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
+        XCTAssertEqual("TargetPrefetchResponse", mockRuntime.dispatchedEvents[0].name)
+        XCTAssertEqual("com.adobe.eventType.target", mockRuntime.dispatchedEvents[0].type)
+        XCTAssertEqual("com.adobe.eventSource.responseContent", mockRuntime.dispatchedEvents[0].source)
+        let errorMessage = mockRuntime.dispatchedEvents[0].data?["prefetcherror"] as? String ?? ""
+        XCTAssertTrue(errorMessage.contains("verify_error_message"))
+    }
+
+    func testPrefetchContent_bad_response_payload() {
+        // mocked network response
+        let responseString = "not a json string"
+
+        // builds the prefetch event
+        let prefetchDataArray: [[String: Any]?] = [
+            TargetPrefetch(name: "Drink_1", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+            TargetPrefetch(name: "Drink_2", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+        ].map {
+            $0.asDictionary()
+        }
+
+        let data: [String: Any] = [
+            "prefetch": prefetchDataArray,
+            "targetparams": TargetParameters(profileParameters: ["name": "Smith"]).asDictionary() as Any,
+        ]
+        let prefetchEvent = Event(name: "", type: "", source: "", data: data)
+
+        // creates a configuration's shared state
+        let configuration = [
+            "target.clientCode": "code_123",
+            "global.privacy": "optedin",
+        ]
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: prefetchEvent, data: (value: configuration, status: .set))
+
+        // registers the event listeners for Target extension
+        target.onRegistered()
+
+        // override network service
+        let mockNetworkService = TestableNetworkService()
+        ServiceProvider.shared.networkService = mockNetworkService
+        mockNetworkService.mock { _ in
+            let validResponse = HTTPURLResponse(url: URL(string: "https://amsdk.tt.omtrdc.net/rest/v1/delivery")!, statusCode: 200, httpVersion: nil, headerFields: nil)
+            return (data: responseString.data(using: .utf8), response: validResponse, error: nil)
+        }
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
+            XCTFail()
+            return
+        }
+
+        // handles the prefetch event
+        XCTAssertTrue(target.readyForEvent(prefetchEvent))
+        eventListener(prefetchEvent)
+
+        // verifies the Target's shared state
+        XCTAssertEqual(0, mockRuntime.createdSharedStates.count)
+
+        // verifies the dispatched event
+        XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
+        XCTAssertEqual("TargetPrefetchResponse", mockRuntime.dispatchedEvents[0].name)
+        XCTAssertEqual("com.adobe.eventType.target", mockRuntime.dispatchedEvents[0].type)
+        XCTAssertEqual("com.adobe.eventSource.responseContent", mockRuntime.dispatchedEvents[0].source)
+        XCTAssertEqual("Target response parser initialization failed", mockRuntime.dispatchedEvents[0].data?["prefetcherror"] as? String ?? "")
+    }
+
+    func testPrefetchContent_network_timeout() {
+        // builds the prefetch event
+        let prefetchDataArray: [[String: Any]?] = [
+            TargetPrefetch(name: "Drink_1", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+            TargetPrefetch(name: "Drink_2", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+        ].map {
+            $0.asDictionary()
+        }
+
+        let data: [String: Any] = [
+            "prefetch": prefetchDataArray,
+            "targetparams": TargetParameters(profileParameters: ["name": "Smith"]).asDictionary() as Any,
+        ]
+        let prefetchEvent = Event(name: "", type: "", source: "", data: data)
+
+        // creates a configuration's shared state
+        let configuration = [
+            "target.clientCode": "code_123",
+            "global.privacy": "optedin",
+            "target.timeout": 1,
+        ] as [String: Any]
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: prefetchEvent, data: (value: configuration, status: .set))
+
+        // registers the event listeners for Target extension
+        target.onRegistered()
+
+        // override network service
+        let mockNetworkService = TestableNetworkService()
+        ServiceProvider.shared.networkService = mockNetworkService
+
+        mockNetworkService.mock { request in
+            XCTAssertEqual(1, request.readTimeout)
+            sleep(2)
+            return nil
+        }
+
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
+            XCTFail()
+            return
+        }
+
+        // handles the prefetch event
+        XCTAssertTrue(target.readyForEvent(prefetchEvent))
+        eventListener(prefetchEvent)
+
+        // verifies the Target's shared state
+        XCTAssertEqual(0, mockRuntime.createdSharedStates.count)
+
+        // verifies the dispatched event
+        XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
+        XCTAssertEqual("TargetPrefetchResponse", mockRuntime.dispatchedEvents[0].name)
+        XCTAssertEqual("com.adobe.eventType.target", mockRuntime.dispatchedEvents[0].type)
+        XCTAssertEqual("com.adobe.eventSource.responseContent", mockRuntime.dispatchedEvents[0].source)
+        XCTAssertNotNil(mockRuntime.dispatchedEvents[0].data?["prefetcherror"])
+    }
+
+    func testPrefetchContent_no_client_code() {
+        // builds the prefetch event
+        let prefetchDataArray: [[String: Any]?] = [
+            TargetPrefetch(name: "Drink_1", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+            TargetPrefetch(name: "Drink_2", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+        ].map {
+            $0.asDictionary()
+        }
+
+        let data: [String: Any] = [
+            "prefetch": prefetchDataArray,
+            "targetparams": TargetParameters(profileParameters: ["name": "Smith"]).asDictionary() as Any,
+        ]
+        let prefetchEvent = Event(name: "", type: "", source: "", data: data)
+
+        // creates a configuration's shared state
+        let configuration = [
+            "global.privacy": "optedin",
+        ]
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: prefetchEvent, data: (value: configuration, status: .set))
+
+        // registers the event listeners for Target extension
+        target.onRegistered()
+
+        // override network service
+        let mockNetworkService = TestableNetworkService()
+        ServiceProvider.shared.networkService = mockNetworkService
+
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
+            XCTFail()
+            return
+        }
+
+        // handles the prefetch event
+        XCTAssertTrue(target.readyForEvent(prefetchEvent))
+        eventListener(prefetchEvent)
+
+        // verifies the Target's shared state
+        XCTAssertEqual(0, mockRuntime.createdSharedStates.count)
+
+        // verifies the dispatched event
+        XCTAssertEqual(0, mockNetworkService.requests.count)
+        XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
+        XCTAssertEqual("TargetPrefetchResponse", mockRuntime.dispatchedEvents[0].name)
+        XCTAssertEqual("com.adobe.eventType.target", mockRuntime.dispatchedEvents[0].type)
+        XCTAssertEqual("com.adobe.eventSource.responseContent", mockRuntime.dispatchedEvents[0].source)
+        let errorMessage = mockRuntime.dispatchedEvents[0].data?["prefetcherror"] as? String ?? ""
+        XCTAssertEqual("Missing client code", errorMessage)
+    }
+
+    func testPrefetchContent_not_opt_in() {
+        // builds the prefetch event
+        let prefetchDataArray: [[String: Any]?] = [
+            TargetPrefetch(name: "Drink_1", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+            TargetPrefetch(name: "Drink_2", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+        ].map {
+            $0.asDictionary()
+        }
+
+        let data: [String: Any] = [
+            "prefetch": prefetchDataArray,
+            "targetparams": TargetParameters(profileParameters: ["name": "Smith"]).asDictionary() as Any,
+        ]
+        let prefetchEvent = Event(name: "", type: "", source: "", data: data)
+
+        // creates a configuration's shared state
+        let configuration = [
+            "target.clientCode": "code_123",
+        ]
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: prefetchEvent, data: (value: configuration, status: .set))
+
+        // registers the event listeners for Target extension
+        target.onRegistered()
+
+        // override network service
+        let mockNetworkService = TestableNetworkService()
+        ServiceProvider.shared.networkService = mockNetworkService
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
+            XCTFail()
+            return
+        }
+
+        // handles the prefetch event
+        XCTAssertTrue(target.readyForEvent(prefetchEvent))
+        eventListener(prefetchEvent)
+
+        // verifies the Target's shared state
+        XCTAssertEqual(0, mockRuntime.createdSharedStates.count)
+
+        // verifies the dispatched event
+        XCTAssertEqual(0, mockNetworkService.requests.count)
+        XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
+        XCTAssertEqual("TargetPrefetchResponse", mockRuntime.dispatchedEvents[0].name)
+        XCTAssertEqual("com.adobe.eventType.target", mockRuntime.dispatchedEvents[0].type)
+        XCTAssertEqual("com.adobe.eventSource.responseContent", mockRuntime.dispatchedEvents[0].source)
+        let errorMessage = mockRuntime.dispatchedEvents[0].data?["prefetcherror"] as? String ?? ""
+        XCTAssertEqual("Privacy status is not opted in", errorMessage)
     }
 
     // MARK: - Location Displayed
