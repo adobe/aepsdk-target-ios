@@ -15,7 +15,7 @@ import Foundation
 
 /// Provides functionality for migrating stored data from V4 to Swift V5
 enum TargetV4Migrator {
-    private static var userDefaultV4: UserDefaults {
+    private static var userDefaultsV4: UserDefaults {
         if let v4AppGroup = ServiceProvider.shared.namedKeyValueService.getAppGroup(), !v4AppGroup.isEmpty {
             return UserDefaults(suiteName: v4AppGroup) ?? UserDefaults.standard
         }
@@ -27,43 +27,30 @@ enum TargetV4Migrator {
     static func migrate() {
         let targetDataStore = NamedCollectionDataStore(name: TargetConstants.DATASTORE_NAME)
 
-        guard targetDataStore.getBool(key: TargetConstants.DataStoreKeys.V4_MIGRATION_COMPLETE) == nil else {
+        guard targetDataStore.getString(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID) == nil,
+              targetDataStore.getString(key: TargetConstants.DataStoreKeys.TNT_ID) == nil,
+              targetDataStore.getString(key: TargetConstants.DataStoreKeys.SESSION_ID) == nil,
+              targetDataStore.getLong(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP) == nil,
+              targetDataStore.getString(key: TargetConstants.DataStoreKeys.EDGE_HOST) == nil
+        else {
             return
         }
 
-        // save values
-        if targetDataStore.getString(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID) == nil,
-           targetDataStore.getString(key: TargetConstants.DataStoreKeys.TNT_ID) == nil,
-           targetDataStore.getString(key: TargetConstants.DataStoreKeys.SESSION_ID) == nil,
-           targetDataStore.getLong(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP) == nil,
-           targetDataStore.getString(key: TargetConstants.DataStoreKeys.EDGE_HOST) == nil
-        {
-            if let thirdPartyId = userDefaultV4.string(forKey: TargetConstants.V4Migration.THIRD_PARTY_ID) {
-                targetDataStore.set(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID, value: thirdPartyId)
-            }
-            if let tntId = userDefaultV4.string(forKey: TargetConstants.V4Migration.TNT_ID) {
-                targetDataStore.set(key: TargetConstants.DataStoreKeys.TNT_ID, value: tntId)
-            }
-            if let edgeHost = userDefaultV4.string(forKey: TargetConstants.V4Migration.EDGE_HOST) {
-                targetDataStore.set(key: TargetConstants.DataStoreKeys.EDGE_HOST, value: edgeHost)
-            }
-            let timestamp = userDefaultV4.integer(forKey: TargetConstants.V4Migration.LAST_TIMESTAMP)
-            if timestamp > 0 {
-                targetDataStore.set(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP, value: timestamp)
-            }
-            if let sessionId = userDefaultV4.string(forKey: TargetConstants.V4Migration.SESSION_ID) {
-                targetDataStore.set(key: TargetConstants.DataStoreKeys.SESSION_ID, value: sessionId)
-            }
+        targetDataStore.set(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID, value: userDefaultsV4.string(forKey: TargetConstants.V4Migration.THIRD_PARTY_ID))
+        targetDataStore.set(key: TargetConstants.DataStoreKeys.TNT_ID, value: userDefaultsV4.string(forKey: TargetConstants.V4Migration.TNT_ID))
+        targetDataStore.set(key: TargetConstants.DataStoreKeys.EDGE_HOST, value: userDefaultsV4.string(forKey: TargetConstants.V4Migration.EDGE_HOST))
+        let timestamp = userDefaultsV4.integer(forKey: TargetConstants.V4Migration.LAST_TIMESTAMP)
+        if timestamp > 0 {
+            targetDataStore.set(key: TargetConstants.DataStoreKeys.SESSION_TIMESTAMP, value: timestamp)
         }
+        targetDataStore.set(key: TargetConstants.DataStoreKeys.SESSION_ID, value: userDefaultsV4.string(forKey: TargetConstants.V4Migration.SESSION_ID))
 
         // remove old values
-        userDefaultV4.removeObject(forKey: TargetConstants.V4Migration.THIRD_PARTY_ID)
-        userDefaultV4.removeObject(forKey: TargetConstants.V4Migration.TNT_ID)
-        userDefaultV4.removeObject(forKey: TargetConstants.V4Migration.EDGE_HOST)
-        userDefaultV4.removeObject(forKey: TargetConstants.V4Migration.SESSION_ID)
-        userDefaultV4.removeObject(forKey: TargetConstants.V4Migration.LAST_TIMESTAMP)
-        userDefaultV4.removeObject(forKey: TargetConstants.V4Migration.V4_DATA_MIGRATED)
-
-        targetDataStore.set(key: TargetConstants.DataStoreKeys.V4_MIGRATION_COMPLETE, value: true)
+        userDefaultsV4.removeObject(forKey: TargetConstants.V4Migration.THIRD_PARTY_ID)
+        userDefaultsV4.removeObject(forKey: TargetConstants.V4Migration.TNT_ID)
+        userDefaultsV4.removeObject(forKey: TargetConstants.V4Migration.EDGE_HOST)
+        userDefaultsV4.removeObject(forKey: TargetConstants.V4Migration.SESSION_ID)
+        userDefaultsV4.removeObject(forKey: TargetConstants.V4Migration.LAST_TIMESTAMP)
+        userDefaultsV4.removeObject(forKey: TargetConstants.V4Migration.V4_DATA_MIGRATED)
     }
 }

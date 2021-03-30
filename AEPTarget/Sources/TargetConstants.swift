@@ -142,8 +142,6 @@ enum TargetConstants {
         static let TNT_ID = "tnt.id"
         static let EDGE_HOST = "edge.host"
         static let THIRD_PARTY_ID = "thirdparty.id"
-        static let V5_MIGRATION_COMPLETE = "v5.migration.complete"
-        static let V4_MIGRATION_COMPLETE = "v4.migration.complete"
     }
 
     enum TargetRequestValue {

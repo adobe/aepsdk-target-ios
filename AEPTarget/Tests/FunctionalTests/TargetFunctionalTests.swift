@@ -83,8 +83,8 @@ class TargetFunctionalTests: XCTestCase {
     }
 
     private func getUserDefaults() -> UserDefaults {
-        if let v5AppGroup = ServiceProvider.shared.namedKeyValueService.getAppGroup(), !v5AppGroup.isEmpty {
-            return UserDefaults(suiteName: v5AppGroup) ?? UserDefaults.standard
+        if let appGroup = ServiceProvider.shared.namedKeyValueService.getAppGroup(), !appGroup.isEmpty {
+            return UserDefaults(suiteName: appGroup) ?? UserDefaults.standard
         }
 
         return UserDefaults.standard
@@ -124,8 +124,6 @@ class TargetFunctionalTests: XCTestCase {
         let userDefaultsV5 = getUserDefaults()
         let targetDataStore = getTargetDataStore()
         cleanUserDefaults()
-        XCTAssertEqual(nil, targetDataStore.getBool(key: "v5.migration.complete"))
-        XCTAssertEqual(nil, targetDataStore.getBool(key: "v4.migration.complete"))
 
         let timestamp = Date().getUnixTimeInSeconds()
         userDefaultsV5.set("edge.host.com", forKey: "Adobe.ADOBEMOBILE_TARGET.EDGE_HOST")
@@ -135,8 +133,6 @@ class TargetFunctionalTests: XCTestCase {
         userDefaultsV5.set(timestamp, forKey: "Adobe.ADOBEMOBILE_TARGET.SESSION_TIMESTAMP")
 
         let target = Target(runtime: mockRuntime)
-        XCTAssertEqual(true, targetDataStore.getBool(key: "v5.migration.complete"))
-        XCTAssertEqual(true, targetDataStore.getBool(key: "v4.migration.complete"))
         XCTAssertEqual("edge.host.com", target?.targetState.edgeHost)
         XCTAssertEqual("id_1", target?.targetState.tntId)
         XCTAssertEqual("id_2", target?.targetState.thirdPartyId)
@@ -148,18 +144,20 @@ class TargetFunctionalTests: XCTestCase {
         let userDefaultsV4 = getUserDefaults()
         let targetDataStore = getTargetDataStore()
         cleanUserDefaults()
-        XCTAssertEqual(nil, targetDataStore.getBool(key: "v5.migration.complete"))
-        XCTAssertEqual(nil, targetDataStore.getBool(key: "v4.migration.complete"))
 
         userDefaultsV4.set("id_1", forKey: "ADBMOBILE_TARGET_TNT_ID")
         userDefaultsV4.set("id_2", forKey: "ADBMOBILE_TARGET_3RD_PARTY_ID")
         userDefaultsV4.set(true, forKey: "ADBMOBILE_TARGET_DATA_MIGRATED")
+        userDefaultsV4.set("E621E1F8-C36C-495A-93FC-0C247A3E6E5F", forKey: "ADBMOBILE_TARGET_SESSION_ID")
+        userDefaultsV4.set("edge.host.com", forKey: "ADBMOBILE_TARGET_EDGE_HOST")
+        userDefaultsV4.set(1_615_436_587, forKey: "ADBMOBILE_TARGET_LAST_TIMESTAMP")
 
         let target = Target(runtime: mockRuntime)
-        XCTAssertEqual(true, targetDataStore.getBool(key: "v5.migration.complete"))
-        XCTAssertEqual(true, targetDataStore.getBool(key: "v4.migration.complete"))
         XCTAssertEqual("id_1", target?.targetState.tntId)
         XCTAssertEqual("id_2", target?.targetState.thirdPartyId)
+        XCTAssertEqual("edge.host.com", targetDataStore.getString(key: "edge.host"))
+        XCTAssertEqual("E621E1F8-C36C-495A-93FC-0C247A3E6E5F", targetDataStore.getString(key: "session.id"))
+        XCTAssertEqual(1_615_436_587, targetDataStore.getInt(key: "session.timestamp"))
     }
 
     // MARK: - Prefetch

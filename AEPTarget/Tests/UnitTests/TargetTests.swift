@@ -44,8 +44,8 @@ class TargetTests: XCTestCase {
     }
 
     private func getUserDefaults() -> UserDefaults {
-        if let v5AppGroup = ServiceProvider.shared.namedKeyValueService.getAppGroup(), !v5AppGroup.isEmpty {
-            return UserDefaults(suiteName: v5AppGroup) ?? UserDefaults.standard
+        if let appGroup = ServiceProvider.shared.namedKeyValueService.getAppGroup(), !appGroup.isEmpty {
+            return UserDefaults(suiteName: appGroup) ?? UserDefaults.standard
         }
 
         return UserDefaults.standard

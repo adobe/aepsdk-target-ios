@@ -50,7 +50,6 @@ class TargetV4MigratorTests: XCTestCase {
     /// No V4 data exists
     func testNoV4Data() {
         let targetDataStore = getTargetDataStore()
-        XCTAssertEqual(nil, targetDataStore.getBool(key: "v4.migration.complete"))
 
         TargetV4Migrator.migrate()
 
@@ -70,7 +69,6 @@ class TargetV4MigratorTests: XCTestCase {
     func testDataMigration() {
         let userDefaultsV4 = getUserDefaultsV4()
         let targetDataStore = getTargetDataStore()
-        XCTAssertEqual(nil, targetDataStore.getBool(key: "v4.migration.complete"))
 
         // V4 Target data with old keys
         userDefaultsV4.set("id_1", forKey: "ADBMOBILE_TARGET_TNT_ID")
@@ -99,14 +97,12 @@ class TargetV4MigratorTests: XCTestCase {
         XCTAssertEqual("edge.host.com", targetDataStore.getString(key: "edge.host"))
         XCTAssertEqual("E621E1F8-C36C-495A-93FC-0C247A3E6E5F", targetDataStore.getString(key: "session.id"))
         XCTAssertEqual(1_615_436_587, targetDataStore.getInt(key: "session.timestamp"))
-        XCTAssertEqual(true, targetDataStore.getBool(key: "v4.migration.complete"))
     }
 
     /// Migrates part of the supported V4 data keys to the new data keys
     func testDataMigrationPartial() {
         let userDefaultsV4 = getUserDefaultsV4()
         let targetDataStore = getTargetDataStore()
-        XCTAssertEqual(nil, targetDataStore.getBool(key: "v4.migration.complete"))
         // V4 Target data with old keys
         userDefaultsV4.set("id_1", forKey: "ADBMOBILE_TARGET_TNT_ID")
         userDefaultsV4.set(true, forKey: "ADBMOBILE_TARGET_DATA_MIGRATED")
@@ -128,7 +124,6 @@ class TargetV4MigratorTests: XCTestCase {
         XCTAssertEqual(nil, targetDataStore.getString(key: "thirdparty.id"))
         XCTAssertEqual(nil, targetDataStore.getString(key: "session.id"))
         XCTAssertEqual(nil, targetDataStore.getInt(key: "session.timestamp"))
-        XCTAssertEqual(true, targetDataStore.getBool(key: "v4.migration.complete"))
     }
 
     /// Migrate V4 data if using `app group` in the SDK
@@ -136,7 +131,6 @@ class TargetV4MigratorTests: XCTestCase {
         ServiceProvider.shared.namedKeyValueService.setAppGroup(appGroup)
         let userDefaultsV4 = getUserDefaultsV4()
         let targetDataStore = getTargetDataStore()
-        XCTAssertEqual(nil, targetDataStore.getBool(key: "v4.migration.complete"))
 
         // V4 Target data with old keys
         userDefaultsV4.set("id_1", forKey: "ADBMOBILE_TARGET_TNT_ID")
@@ -166,14 +160,12 @@ class TargetV4MigratorTests: XCTestCase {
         XCTAssertEqual("edge.host.com", targetDataStore.getString(key: "edge.host"))
         XCTAssertEqual("E621E1F8-C36C-495A-93FC-0C247A3E6E5F", targetDataStore.getString(key: "session.id"))
         XCTAssertEqual(1_615_436_587, targetDataStore.getInt(key: "session.timestamp"))
-        XCTAssertEqual(true, targetDataStore.getBool(key: "v4.migration.complete"))
     }
 
     /// Migrate V4 data if using a new `app group` in the SDK
     /// The `app group` is not stored in V4 ACPCore code, this bug is logged in Jira (AMSDK-11223)
     func testDataMigrationInNewAppGroup() {
         let targetDataStore = getTargetDataStore()
-        XCTAssertEqual(nil, targetDataStore.getBool(key: "v4.migration.complete"))
 
         // V4 Target data with old keys
         UserDefaults.standard.set(true, forKey: "ADBMOBILE_TARGET_DATA_MIGRATED")
@@ -208,6 +200,5 @@ class TargetV4MigratorTests: XCTestCase {
             XCTFail("should not do data migration if app group changed")
             return
         }
-        XCTAssertEqual(true, targetDataStore.getBool(key: "v4.migration.complete"))
     }
 }
