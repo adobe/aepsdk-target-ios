@@ -543,7 +543,7 @@ public class Target: NSObject, Extension {
     }
 
     private func getTargetDeliveryURL(targetServer: String?, clientCode: String) -> String {
-        if let targetServer = targetServer {
+        if let targetServer = targetServer, !targetServer.isEmpty {
             return String(format: TargetConstants.DELIVERY_API_URL_BASE, targetServer, clientCode, targetState.sessionId)
         }
 
