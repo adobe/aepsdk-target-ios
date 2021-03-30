@@ -295,11 +295,6 @@ public class Target: NSObject, Extension {
             return
         }
 
-        guard let mboxNames = eventData[TargetConstants.EventDataKeys.MBOX_NAMES] as? [String] else {
-            Log.warning(label: Target.LOG_TAG, "Location displayed unsuccessful \(TargetError.ERROR_MBOX_NAMES_NULL_OR_EMPTY)")
-            return
-        }
-
         Log.trace(label: Target.LOG_TAG, "Handling Locations Displayed - event \(event.name) type: \(event.type) source: \(event.source) ")
 
         // Check whether request can be sent
@@ -310,6 +305,11 @@ public class Target: NSObject, Extension {
 
         let lifecycleSharedState = getSharedState(extensionName: TargetConstants.Lifecycle.EXTENSION_NAME, event: event)?.value
         let identitySharedState = getSharedState(extensionName: TargetConstants.Identity.EXTENSION_NAME, event: event)?.value
+
+        guard let mboxNames = eventData[TargetConstants.EventDataKeys.MBOX_NAMES] as? [String], !mboxNames.isEmpty else {
+            Log.warning(label: Target.LOG_TAG, "Location displayed unsuccessful \(TargetError.ERROR_MBOX_NAMES_NULL_OR_EMPTY)")
+            return
+        }
 
         for mboxName in mboxNames {
             // If loadedMbox contains mboxName then do not send analytics request again
@@ -433,12 +433,9 @@ public class Target: NSObject, Extension {
     ///     - event: event which triggered this network call
     ///     - connection: `NetworkService.HttpConnection` instance
     private func processNotificationResponse(event: Event, connection: HttpConnection) {
-        if connection.responseCode != 200 {
+        if connection.responseCode == 200 {
             targetState.clearNotifications()
-            Log.debug(label: Target.LOG_TAG, "Errors returned in Target response with response code: \(String(describing: connection.responseCode))")
         }
-
-        targetState.clearNotifications()
 
         guard let data = connection.data, let responseDict = try? JSONDecoder().decode([String: AnyCodable].self, from: data), let dict: [String: Any] = AnyCodable.toAnyDictionary(dictionary: responseDict) else {
             Log.debug(label: Target.LOG_TAG, "Target response parser initialization failed")
@@ -447,8 +444,16 @@ public class Target: NSObject, Extension {
         let response = TargetDeliveryResponse(responseJson: dict)
 
         if let error = response.errorMessage {
-            targetState.clearNotifications()
+            if error.contains(TargetError.ERROR_NOTIFICATION_TAG) {
+                targetState.clearNotifications()
+            }
+
             Log.debug(label: Target.LOG_TAG, "Errors returned in Target response: \(error)")
+            return
+        }
+
+        if connection.responseCode != 200 {
+            Log.debug(label: Target.LOG_TAG, "Errors returned in Target response with response code: \(String(describing: connection.responseCode))")
         }
 
         targetState.updateSessionTimestamp()
@@ -464,22 +469,31 @@ public class Target: NSObject, Extension {
     ///     - event: event which triggered this network call
     ///     - connection: `NetworkService.HttpConnection` instance
     private func processTargetRequestResponse(batchRequests: [TargetRequest], event: Event, connection: HttpConnection) {
-        if connection.responseCode != 200 {
-            dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Errors returned in Target response with response code: \(String(describing: connection.responseCode))")
+        if connection.responseCode == 200 {
+            targetState.clearNotifications()
         }
-
-        // clear notifications
-        targetState.clearNotifications()
 
         guard let data = connection.data, let responseDict = try? JSONDecoder().decode([String: AnyCodable].self, from: data), let dict = AnyCodable.toAnyDictionary(dictionary: responseDict) else {
-            dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Target response parser initialization failed")
+            Log.debug(label: Target.LOG_TAG, "Target response parser initialization failed")
+            runDefaultCallbacks(event: event, batchRequests: batchRequests)
             return
         }
+
         let response = TargetDeliveryResponse(responseJson: dict)
 
         if let error = response.errorMessage {
-            targetState.clearNotifications()
-            dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Errors returned in Target request response: \(error)")
+            if error.contains(TargetError.ERROR_NOTIFICATION_TAG) {
+                targetState.clearNotifications()
+            }
+            Log.debug(label: Target.LOG_TAG, "Errors returned in Target request response: \(error)")
+            runDefaultCallbacks(event: event, batchRequests: batchRequests)
+            return
+        }
+
+        if connection.responseCode != 200 {
+            Log.debug(label: Target.LOG_TAG, "Errors returned in Target response with response code: \(String(describing: connection.responseCode))")
+            runDefaultCallbacks(event: event, batchRequests: batchRequests)
+            return
         }
 
         targetState.updateSessionTimestamp()
@@ -762,7 +776,7 @@ public class Target: NSObject, Extension {
     private func dispatchMboxContent(event: Event, content: String, responsePairId: String) {
         Log.trace(label: Target.LOG_TAG, "dispatchMboxContent - " + TargetError.ERROR_TARGET_EVENT_DISPATCH_MESSAGE)
 
-        let responseEvent = event.createResponseEvent(name: TargetConstants.EventName.TARGET_REQUEST_RESPONSE, type: EventType.target, source: EventSource.responseContent, data: [TargetConstants.EventDataKeys.TARGET_CONTENT: content, TargetConstants.EventDataKeys.TARGET_RESPONSE_PAIR_ID: responsePairId])
+        let responseEvent = Event(name: TargetConstants.EventName.TARGET_REQUEST_RESPONSE, type: EventType.target, source: EventSource.responseContent, data: [TargetConstants.EventDataKeys.TARGET_CONTENT: content, TargetConstants.EventDataKeys.TARGET_RESPONSE_PAIR_ID: responsePairId, TargetConstants.EventDataKeys.TARGET_RESPONSE_EVENT_ID: event.id.uuidString])
 
         MobileCore.dispatch(event: responseEvent)
     }

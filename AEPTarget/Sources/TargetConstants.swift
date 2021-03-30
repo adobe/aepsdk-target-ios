@@ -176,6 +176,7 @@ enum TargetConstants {
         static let PROFILE_PARAMETERS = "profileparameters"
         static let TARGET_CONTENT = "content"
         static let TARGET_RESPONSE_PAIR_ID = "responsePairId"
+        static let TARGET_RESPONSE_EVENT_ID = "responseEventId"
         // shared sate
         static let TNT_ID = "tntid"
         static let PREVIEW_INITIATED = "ispreviewinitiated"
