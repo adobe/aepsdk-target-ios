@@ -642,7 +642,7 @@ public class Target: NSObject, Extension {
     {
         let tntId = targetState.tntId
         let thirdPartyId = targetState.thirdPartyId
-        let environmentId = targetState.environmentId
+        let environmentId = Int64(targetState.environmentId)
         let lifecycleContextData = getLifecycleDataForTarget(lifecycleData: lifecycleData)
         let propToken = targetState.propertyToken
 
