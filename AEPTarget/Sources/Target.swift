@@ -48,6 +48,7 @@ public class Target: NSObject, Extension {
     public required init?(runtime: ExtensionRuntime) {
         self.runtime = runtime
         TargetV5Migrator.migrate()
+        TargetV4Migrator.migrate()
         targetState = TargetState()
         super.init()
     }

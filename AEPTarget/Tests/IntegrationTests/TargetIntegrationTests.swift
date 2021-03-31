@@ -148,7 +148,7 @@ class TargetIntegrationTests: XCTestCase {
             "target.server": "amsdk.tt.omtrdc.net",
             "target.clientCode": "amsdk",
         ])
-        guard let config = waitForLatestSettledSharedState("com.adobe.module.configuration", timeout: 2) else {
+        guard let config = waitForLatestSettledSharedState("com.adobe.module.configuration", timeout: 5) else {
             XCTFail("failed to retrieve the latest configuration (.set)")
             return
         }
@@ -173,7 +173,7 @@ class TargetIntegrationTests: XCTestCase {
         Identity.syncIdentifiers(identifiers: ["vid_type_1": "vid_id_1", "vid_type_2": "vid_id_2"], authenticationState: .authenticated)
 
         // verify the identity's shared state
-        guard let identity = waitForLatestSettledSharedState("com.adobe.module.identity", timeout: 2) else {
+        guard let identity = waitForLatestSettledSharedState("com.adobe.module.identity", timeout: 5) else {
             XCTFail()
             return
         }

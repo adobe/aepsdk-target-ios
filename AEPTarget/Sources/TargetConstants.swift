@@ -127,13 +127,21 @@ enum TargetConstants {
         static let SESSION_TIMESTAMP = "Adobe.ADOBEMOBILE_TARGET.SESSION_TIMESTAMP"
     }
 
+    enum V4Migration {
+        static let TNT_ID = "ADBMOBILE_TARGET_TNT_ID"
+        static let THIRD_PARTY_ID = "ADBMOBILE_TARGET_3RD_PARTY_ID"
+        static let SESSION_ID = "ADBMOBILE_TARGET_SESSION_ID"
+        static let EDGE_HOST = "ADBMOBILE_TARGET_EDGE_HOST"
+        static let LAST_TIMESTAMP = "ADBMOBILE_TARGET_LAST_TIMESTAMP"
+        static let V4_DATA_MIGRATED = "ADBMOBILE_TARGET_DATA_MIGRATED"
+    }
+
     enum DataStoreKeys {
         static let SESSION_TIMESTAMP = "session.timestamp"
         static let SESSION_ID = "session.id"
         static let TNT_ID = "tnt.id"
         static let EDGE_HOST = "edge.host"
         static let THIRD_PARTY_ID = "thirdparty.id"
-        static let V5_MIGRATION_COMPLETE = "v5.migration.complete"
     }
 
     enum TargetRequestValue {

@@ -14,6 +14,7 @@
 #import <UIKit/UIKit.h>
 @import AEPTarget;
 @import AEPAssurance;
+@import AEPCore;
 
 @interface ViewController : UIViewController
 

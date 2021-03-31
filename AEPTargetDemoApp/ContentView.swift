@@ -150,9 +150,7 @@ struct ContentView: View {
     }
 
     func enterPreview() {
-        let eventData = ["deeplink": "com.adobe.targetpreview://?at_preview_token=yOrxbuHy8B3o80U0bnL8N5b1pDr5x7_lW-haGSc5zt4"]
-        let event = Event(name: "deeplink", type: EventType.genericData, source: EventSource.os, data: eventData)
-        MobileCore.dispatch(event: event)
+        MobileCore.collectLaunchInfo(["adb_deeplink": "com.adobe.targetpreview://?at_preview_token=yOrxbuHy8B3o80U0bnL8N5b1pDr5x7_lW-haGSc5zt4"])
     }
 }
 

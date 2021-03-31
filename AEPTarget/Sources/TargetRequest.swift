@@ -12,11 +12,11 @@
 import Foundation
 @objc(AEPTargetRequestObject)
 public class TargetRequest: NSObject, Codable {
-    public let name: String
-    public let defaultContent: String
-    public let targetParameters: TargetParameters?
-    let responsePairId: String
-    var contentCallback: ((String?) -> Void)?
+    @objc public let name: String
+    @objc public let defaultContent: String
+    @objc public let targetParameters: TargetParameters?
+    @objc let responsePairId: String
+    @objc var contentCallback: ((String?) -> Void)?
 
     /// Instantiate a `TargetRequest` object
     /// - Parameters:
@@ -24,7 +24,7 @@ public class TargetRequest: NSObject, Codable {
     ///   - defaultContent: `String` default content for this request
     ///   - targetParameters: `TargetParameters` for this request
     ///   - contentCallback: which will get called with target mbox content
-    public init(mboxName: String, defaultContent: String, targetParameters: TargetParameters? = nil, contentCallback: ((String?) -> Void)? = nil) {
+    @objc public init(mboxName: String, defaultContent: String, targetParameters: TargetParameters? = nil, contentCallback: ((String?) -> Void)? = nil) {
         name = mboxName
         self.defaultContent = defaultContent
         self.targetParameters = targetParameters
