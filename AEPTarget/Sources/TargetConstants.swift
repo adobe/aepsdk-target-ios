@@ -169,6 +169,7 @@ enum TargetConstants {
         static let TARGET_PARAMETERS = "targetparams"
         static let PREFETCH_REQUESTS = "prefetch"
         static let PREFETCH_ERROR = "prefetcherror"
+        static let PREFETCH_RESULT = "prefetchresult"
         static let LOAD_REQUESTS = "request"
         static let THIRD_PARTY_ID = "thirdpartyid"
         static let RESET_EXPERIENCE = "resetexperience"

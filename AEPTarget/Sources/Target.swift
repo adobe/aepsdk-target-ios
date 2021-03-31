@@ -224,7 +224,7 @@ public class Target: NSObject, Extension {
                 self.targetState.removeLoadedMbox(mboxName: k)
             }
 
-            self.dispatch(event: event.createResponseEvent(name: TargetConstants.EventName.PREFETCH_RESPOND, type: EventType.target, source: EventSource.responseContent, data: nil))
+            self.dispatch(event: event.createResponseEvent(name: TargetConstants.EventName.PREFETCH_RESPOND, type: EventType.target, source: EventSource.responseContent, data: [TargetConstants.EventDataKeys.PREFETCH_RESULT: true]))
         }
 
         if let err = error {
@@ -521,7 +521,7 @@ public class Target: NSObject, Extension {
 
     private func dispatchPrefetchErrorEvent(triggerEvent: Event, errorMessage: String) {
         Log.warning(label: Target.LOG_TAG, "dispatch prefetch error event, error message : \(errorMessage)")
-        dispatch(event: triggerEvent.createResponseEvent(name: TargetConstants.EventName.PREFETCH_RESPOND, type: EventType.target, source: EventSource.responseContent, data: [TargetConstants.EventDataKeys.PREFETCH_ERROR: errorMessage]))
+        dispatch(event: triggerEvent.createResponseEvent(name: TargetConstants.EventName.PREFETCH_RESPOND, type: EventType.target, source: EventSource.responseContent, data: [TargetConstants.EventDataKeys.PREFETCH_ERROR: errorMessage, TargetConstants.EventDataKeys.PREFETCH_RESULT: false]))
     }
 
     private func dispatchRequestIdentityResponse(triggerEvent: Event) {
