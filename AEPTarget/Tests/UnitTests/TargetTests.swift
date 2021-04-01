@@ -68,10 +68,3 @@ class TargetTests: XCTestCase {
         XCTAssertFalse(target.readyForEvent(Event(name: "", type: "", source: "", data: nil)))
     }
 }
-
-private class MockNetworkService: Networking {
-    static var request: NetworkRequest?
-    func connectAsync(networkRequest request: NetworkRequest, completionHandler _: ((HttpConnection) -> Void)?) {
-        MockNetworkService.request = request
-    }
-}
