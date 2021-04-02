@@ -29,18 +29,7 @@ class TargetIntegrationTests: XCTestCase {
         EventHub.reset()
     }
 
-    override func tearDown() {
-//        let unregisterExpectation = XCTestExpectation(description: "unregister extensions")
-//        unregisterExpectation.expectedFulfillmentCount = 2
-//        MobileCore.unregisterExtension(Target.self) {
-//            unregisterExpectation.fulfill()
-//        }
-//        MobileCore.unregisterExtension(Identity.self) {
-//            unregisterExpectation.fulfill()
-//        }
-//
-//        wait(for: [unregisterExpectation], timeout: 2)
-    }
+    override func tearDown() {}
 
     private func waitForLatestSettledSharedState(_ extensionName: String, timeout: Double = 1, triggerEvent: Event? = nil) -> [String: Any]? {
         var sharedState: [String: Any]?
@@ -98,14 +87,6 @@ class TargetIntegrationTests: XCTestCase {
             return " \(eventData as AnyObject)"
         }
         return prettyPrintedString
-    }
-
-    func testPre() {
-        for _ in 1 ... 10 {
-            setUp()
-            testPrefetch()
-            tearDown()
-        }
     }
 
     func testPrefetch() {
