@@ -31,7 +31,7 @@ install-swiftlint:
 	HOMEBREW_NO_AUTO_UPDATE=1 brew install swiftlint && brew cleanup swiftlint
 
 install-swiftformat:
-	(brew install swiftformat) 
+	HOMEBREW_NO_AUTO_UPDATE=1 brew install swiftformat && brew cleanup swiftformat
 
 pod-update: pod-repo-update
 	(pod update)

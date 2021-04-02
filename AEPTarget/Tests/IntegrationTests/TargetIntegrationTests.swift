@@ -30,29 +30,30 @@ class TargetIntegrationTests: XCTestCase {
     }
 
     override func tearDown() {
-        let unregisterExpectation = XCTestExpectation(description: "unregister extensions")
-        unregisterExpectation.expectedFulfillmentCount = 1
-        MobileCore.unregisterExtension(Target.self) {
-            unregisterExpectation.fulfill()
-        }
-
-        wait(for: [unregisterExpectation], timeout: 2)
+//        let unregisterExpectation = XCTestExpectation(description: "unregister extensions")
+//        unregisterExpectation.expectedFulfillmentCount = 2
+//        MobileCore.unregisterExtension(Target.self) {
+//            unregisterExpectation.fulfill()
+//        }
+//        MobileCore.unregisterExtension(Identity.self) {
+//            unregisterExpectation.fulfill()
+//        }
+//
+//        wait(for: [unregisterExpectation], timeout: 2)
     }
 
-    private func waitForLatestSettledSharedState(_ extensionName: String, timeout: Double = 1) -> [String: Any]? {
+    private func waitForLatestSettledSharedState(_ extensionName: String, timeout: Double = 1, triggerEvent: Event? = nil) -> [String: Any]? {
         var sharedState: [String: Any]?
         let sharedStateExpectation = XCTestExpectation(description: "wait for the latest shared state of \(extensionName)")
         sharedStateExpectation.expectedFulfillmentCount = 1
         MobileCore.registerEventListener(type: "com.adobe.eventType.hub", source: "com.adobe.eventSource.sharedState") { event in
             if let data = event.data, data["stateowner"] as? String == extensionName {
-                self.dispatchQueue.async {
-                    let result = EventHub.shared.getSharedState(extensionName: extensionName, event: event)
-                    if let result = result, result.status == .set {
-                        sharedState = result.value
-                        sharedStateExpectation.fulfill()
-                    } else {
-                        Log.error(label: self.T_LOG_TAG, "[\(extensionName)'s shared state: \n status = \(String(describing: result?.status.rawValue)) \n value = \(String(describing: result?.value))]")
-                    }
+                let result = EventHub.shared.getSharedState(extensionName: extensionName, event: triggerEvent != nil ? triggerEvent : event)
+                if let result = result, result.status == .set {
+                    sharedState = result.value
+                    sharedStateExpectation.fulfill()
+                } else {
+                    Log.error(label: self.T_LOG_TAG, "[\(extensionName)'s shared state: \n status = \(String(describing: result?.status.rawValue)) \n value = \(String(describing: result?.value))]")
                 }
             }
         }
@@ -97,6 +98,14 @@ class TargetIntegrationTests: XCTestCase {
             return " \(eventData as AnyObject)"
         }
         return prettyPrintedString
+    }
+
+    func testPre() {
+        for _ in 1 ... 10 {
+            setUp()
+            testPrefetch()
+            tearDown()
+        }
     }
 
     func testPrefetch() {
@@ -148,7 +157,7 @@ class TargetIntegrationTests: XCTestCase {
             "target.server": "amsdk.tt.omtrdc.net",
             "target.clientCode": "amsdk",
         ])
-        guard let config = waitForLatestSettledSharedState("com.adobe.module.configuration", timeout: 5) else {
+        guard let config = waitForLatestSettledSharedState("com.adobe.module.configuration", timeout: 2) else {
             XCTFail("failed to retrieve the latest configuration (.set)")
             return
         }
@@ -171,12 +180,14 @@ class TargetIntegrationTests: XCTestCase {
 
         // syncIdentifiers (v_ids)
         Identity.syncIdentifiers(identifiers: ["vid_type_1": "vid_id_1", "vid_type_2": "vid_id_2"], authenticationState: .authenticated)
-
+        let triggerEvent = Event(name: "trigger event", type: "test.type", source: "test.source", data: nil)
+        MobileCore.dispatch(event: triggerEvent)
         // verify the identity's shared state
-        guard let identity = waitForLatestSettledSharedState("com.adobe.module.identity", timeout: 5) else {
+        guard let identity = waitForLatestSettledSharedState("com.adobe.module.identity", timeout: 2, triggerEvent: triggerEvent) else {
             XCTFail()
             return
         }
+
         Log.debug(label: T_LOG_TAG, "identity :\n \(identity as AnyObject)")
         XCTAssertTrue(identity.keys.contains("mid"))
         XCTAssertTrue(identity.keys.contains("visitoridslist"))
