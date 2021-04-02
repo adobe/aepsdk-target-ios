@@ -631,8 +631,7 @@ public class Target: NSObject, Extension {
                                    targetParameters: TargetParameters? = nil,
                                    lifecycleData: [String: Any]? = nil,
                                    identityData: [String: Any]? = nil,
-                                   completionHandler: ((HttpConnection) -> Void)?) -> String?
-    {
+                                   completionHandler: ((HttpConnection) -> Void)?) -> String? {
         let tntId = targetState.tntId
         let thirdPartyId = targetState.thirdPartyId
         let environmentId = Int64(targetState.environmentId)
