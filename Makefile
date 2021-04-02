@@ -13,7 +13,7 @@ lint:
 	swiftlint lint
 
 check-format:
-	swiftformat --lint AEPTarget/Sources
+	swiftformat --lint AEPTarget/Sources --swiftversion 5.1
 	
 format:
 	swiftformat .
