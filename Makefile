@@ -38,7 +38,7 @@ pod-update: pod-repo-update
 
 open:
 	open $(PROJECT_NAME).xcworkspace
-
+	
 clean:
 	(rm -rf build)
 
