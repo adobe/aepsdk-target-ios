@@ -771,8 +771,7 @@ public class Target: NSObject, Extension {
         Log.trace(label: Target.LOG_TAG, "dispatchMboxContent - " + TargetError.ERROR_TARGET_EVENT_DISPATCH_MESSAGE)
 
         let responseEvent = Event(name: TargetConstants.EventName.TARGET_REQUEST_RESPONSE, type: EventType.target, source: EventSource.responseContent, data: [TargetConstants.EventDataKeys.TARGET_CONTENT: content, TargetConstants.EventDataKeys.TARGET_RESPONSE_PAIR_ID: responsePairId, TargetConstants.EventDataKeys.TARGET_RESPONSE_EVENT_ID: event.id.uuidString])
-
-        MobileCore.dispatch(event: responseEvent)
+        dispatch(event: responseEvent)
     }
 
     /// Checks if the cached mboxs contain the data for each of the `TargetRequest` in the input List.
