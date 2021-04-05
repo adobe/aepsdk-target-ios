@@ -15,7 +15,7 @@
 @testable import AEPTarget
 import XCTest
 
-class TargetPrefetchFunctionalTests: TargetFunctionalTests {
+class TargetPrefetchFunctionalTests: TargetFunctionalTestsBase {
     // MARK: - Prefetch
 
     func testPrefetchContent() {

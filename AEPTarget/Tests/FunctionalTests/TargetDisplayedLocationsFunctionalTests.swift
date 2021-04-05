@@ -15,7 +15,7 @@
 @testable import AEPTarget
 import XCTest
 
-class TargetDisplayedLocationsFunctionalTests: TargetFunctionalTests {
+class TargetDisplayedLocationsFunctionalTests: TargetFunctionalTestsBase {
     // MARK: - Location Displayed
 
     func testLocationDisplayed() {

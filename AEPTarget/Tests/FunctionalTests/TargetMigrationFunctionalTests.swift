@@ -15,7 +15,7 @@
 @testable import AEPTarget
 import XCTest
 
-class TargetMigrationFunctionalTests: TargetFunctionalTests {
+class TargetMigrationFunctionalTests: TargetFunctionalTestsBase {
     // MARK: - Data Migration
 
     func testRegisterExtension_registersWithoutAnyErrorOrCrash() {
