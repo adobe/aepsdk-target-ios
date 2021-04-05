@@ -580,4 +580,64 @@ class TargetLoadRequestsFunctionalTests: TargetFunctionalTestsBase {
 
         XCTAssertEqual(0, target.targetState.loadedMboxJsonDicts.count)
     }
+
+    func testLoadRequestContent_returnNullContent() {
+        let responseString = """
+            {
+              "status": 200,
+              "id": {
+                "tntId": "DE03D4AD-1FFE-421F-B2F2-303BF26822C1.35_0",
+                "marketingCloudVisitorId": "61055260263379929267175387965071996926"
+              },
+              "requestId": "01d4a408-6978-48f7-95c6-03f04160b257",
+              "client": "acopprod3",
+              "edgeHost": "mboxedge35.tt.omtrdc.net",
+              "prefetch": {
+                "mboxes": []
+              }
+            }
+        """
+        let requestDataArray: [[String: Any]?] = [
+            TargetRequest(mboxName: "t_test_01", defaultContent: "default"),
+            TargetRequest(mboxName: "t_test_02", defaultContent: "default2"),
+        ].map {
+            $0.asDictionary()
+        }
+
+        let data: [String: Any] = [
+            "request": requestDataArray,
+            "targetparams": TargetParameters(profileParameters: mockProfileParam).asDictionary() as Any,
+        ]
+        let loadRequestEvent = Event(name: "", type: "", source: "", data: data)
+
+        // creates a configuration's shared state
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: loadRequestEvent, data: (value: mockConfigSharedState, status: .set))
+        // registers the event listeners for Target extension
+        target.onRegistered()
+
+        // override network service
+        let mockNetworkService = TestableNetworkService()
+        ServiceProvider.shared.networkService = mockNetworkService
+        mockNetworkService.mock { request in
+            // verifies network request
+            XCTAssertNotNil(request)
+            guard let _ = self.payloadAsDictionary(request.connectPayload) else {
+                XCTFail()
+                return nil
+            }
+            XCTAssertTrue(request.url.absoluteString.contains("https://code_123.tt.omtrdc.net/rest/v1/delivery/?client=code_123&sessionId="))
+            let validResponse = HTTPURLResponse(url: URL(string: "https://amsdk.tt.omtrdc.net/rest/v1/delivery")!, statusCode: 200, httpVersion: nil, headerFields: nil)
+            return (data: responseString.data(using: .utf8), response: validResponse, error: nil)
+        }
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
+            XCTFail()
+            return
+        }
+        XCTAssertTrue(target.readyForEvent(loadRequestEvent))
+        // handles the prefetch event
+        eventListener(loadRequestEvent)
+
+        // verifies the content of network response was stored correctly
+        XCTAssertEqual(2, mockRuntime.dispatchedEvents.count)
+    }
 }
