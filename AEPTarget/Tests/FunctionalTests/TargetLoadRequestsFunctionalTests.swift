@@ -135,6 +135,14 @@ class TargetLoadRequestsFunctionalTests: TargetFunctionalTestsBase {
             XCTAssertTrue(Set(prefetchDictionary.keys) == Set([
                 "mboxes",
             ]))
+
+            guard let mboxes = prefetchDictionary["mboxes"] as? [[String: Any]] else {
+                XCTFail()
+                return nil
+            }
+            XCTAssertEqual(2, mboxes.count)
+            XCTAssertEqual(0, mboxes[0]["index"] as? Int ?? -1)
+            XCTAssertEqual(1, mboxes[1]["index"] as? Int ?? -1)
             let prefetchJson = self.prettify(prefetchDictionary)
             XCTAssertTrue(prefetchJson.contains("\"name\" : \"t_test_01\""))
             XCTAssertTrue(prefetchJson.contains("\"name\" : \"t_test_02\""))
@@ -598,8 +606,7 @@ class TargetLoadRequestsFunctionalTests: TargetFunctionalTestsBase {
             }
         """
         let requestDataArray: [[String: Any]?] = [
-            TargetRequest(mboxName: "t_test_01", defaultContent: "default"),
-            TargetRequest(mboxName: "t_test_02", defaultContent: "default2"),
+            TargetRequest(mboxName: "t_test_01", defaultContent: "default_content_123"),
         ].map {
             $0.asDictionary()
         }
@@ -638,6 +645,206 @@ class TargetLoadRequestsFunctionalTests: TargetFunctionalTestsBase {
         eventListener(loadRequestEvent)
 
         // verifies the content of network response was stored correctly
-        XCTAssertEqual(2, mockRuntime.dispatchedEvents.count)
+        XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
+        XCTAssertNotNil(mockRuntime.dispatchedEvents[0].data)
+        XCTAssertEqual("default_content_123", mockRuntime.dispatchedEvents[0].data?["content"] as? String ?? "")
+    }
+
+    func testLoadRequestContent_sendLoadRequestIfPrefetchFails() {
+        // mocked network response
+        let responseString = """
+            {
+              "message": "verify_error_message"
+            }
+        """
+
+        // builds the prefetch event
+        let prefetchDataArray: [[String: Any]?] = [
+            TargetPrefetch(name: "Drink_1"),
+            TargetPrefetch(name: "Drink_2"),
+        ].map {
+            $0.asDictionary()
+        }
+
+        let data: [String: Any] = [
+            "prefetch": prefetchDataArray,
+            "targetparams": TargetParameters(profileParameters: ["name": "Smith"]).asDictionary() as Any,
+        ]
+        let prefetchEvent = Event(name: "", type: "", source: "", data: data)
+
+        // creates a configuration's shared state
+        let configuration = [
+            "target.clientCode": "code_123",
+            "global.privacy": "optedin",
+        ]
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: prefetchEvent, data: (value: configuration, status: .set))
+
+        // registers the event listeners for Target extension
+        target.onRegistered()
+
+        // override network service
+        let networkRequestExpectation = XCTestExpectation(description: "monitor the prefetch request")
+        networkRequestExpectation.expectedFulfillmentCount = 2
+        let mockNetworkService = TestableNetworkService()
+        ServiceProvider.shared.networkService = mockNetworkService
+        mockNetworkService.mock { _ in
+            let badResponse = HTTPURLResponse(url: URL(string: "https://amsdk.tt.omtrdc.net/rest/v1/delivery")!, statusCode: 500, httpVersion: nil, headerFields: nil)
+            networkRequestExpectation.fulfill()
+            return (data: responseString.data(using: .utf8), response: badResponse, error: nil)
+        }
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
+            XCTFail()
+            return
+        }
+
+        // handles the prefetch event
+        XCTAssertTrue(target.readyForEvent(prefetchEvent))
+        eventListener(prefetchEvent)
+        XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
+        mockRuntime.resetDispatchedEventAndCreatedSharedStates()
+        let requestDataArray: [[String: Any]?] = [
+            TargetRequest(mboxName: "t_test_01", defaultContent: "default_content_123"),
+        ].map {
+            $0.asDictionary()
+        }
+
+        let loadRequestData: [String: Any] = [
+            "request": requestDataArray,
+            "targetparams": TargetParameters(profileParameters: mockProfileParam).asDictionary() as Any,
+        ]
+        let loadRequestEvent = Event(name: "", type: "", source: "", data: loadRequestData)
+        // handles the loadRequest event
+        eventListener(loadRequestEvent)
+        wait(for: [networkRequestExpectation], timeout: 1)
+        // verifies the content of network response was stored correctly
+        XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
+        XCTAssertNotNil(mockRuntime.dispatchedEvents[0].data)
+        XCTAssertEqual("default_content_123", mockRuntime.dispatchedEvents[0].data?["content"] as? String ?? "")
+    }
+
+    func testLoadRequestContent_withPartialMboxPrefetched() {
+        let responseString = """
+            {
+              "status": 200,
+              "id": {
+                "tntId": "DE03D4AD-1FFE-421F-B2F2-303BF26822C1.35_0",
+                "marketingCloudVisitorId": "61055260263379929267175387965071996926"
+              },
+              "requestId": "01d4a408-6978-48f7-95c6-03f04160b257",
+              "client": "acopprod3",
+              "edgeHost": "mboxedge35.tt.omtrdc.net",
+              "execute": {
+                "mboxes": [
+                  {
+                    "index": 0,
+                    "name": "Drink_1",
+                    "options": [
+                      {
+                        "content": {
+                          "key1": "value1"
+                        },
+                        "type": "json",
+                        "eventToken": "uR0kIAPO+tZtIPW92S0NnWqipfsIHvVzTQxHolz2IpSCnQ9Y9OaLL2gsdrWQTvE54PwSz67rmXWmSnkXpSSS2Q=="
+                      }
+                    ],
+                    "analytics": {
+                      "payload": {
+                        "pe": "tnt",
+                        "tnta": "33333:1:0|12121|1,38711:1:0|1|1"
+                      }
+                    }
+                  },
+                  {
+                    "index": 1,
+                    "name": "Drink_2",
+                    "options": [
+                      {
+                        "content": {
+                          "key2": "value2"
+                        },
+                        "type": "json",
+                        "eventToken": "uR0kIAPO+tZtIPW92S0NnWqipfsIHvVzTQxHolz2IpSCnQ9Y9OaLL2gsdrWQTvE54PwSz67rmXWmSnkXpSSS2Q=="
+                      }
+                    ],
+                    "analytics": {
+                      "payload": {
+                        "pe": "tnt",
+                        "tnta": "33333:1:0|12121|1,38711:1:0|1|1"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+        """
+
+        // builds the prefetch event
+        let prefetchDataArray: [[String: Any]?] = [
+            TargetPrefetch(name: "Drink_1"),
+            TargetPrefetch(name: "Drink_2"),
+        ].map {
+            $0.asDictionary()
+        }
+
+        let data: [String: Any] = [
+            "prefetch": prefetchDataArray,
+            "targetparams": TargetParameters(profileParameters: ["name": "Smith"]).asDictionary() as Any,
+        ]
+        let prefetchEvent = Event(name: "", type: "", source: "", data: data)
+
+        // creates a configuration's shared state
+        let configuration = [
+            "target.clientCode": "code_123",
+            "global.privacy": "optedin",
+        ]
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: prefetchEvent, data: (value: configuration, status: .set))
+
+        // registers the event listeners for Target extension
+        target.onRegistered()
+
+        // override network service
+        let networkRequestExpectation = XCTestExpectation(description: "monitor the prefetch request")
+        networkRequestExpectation.expectedFulfillmentCount = 2
+        let mockNetworkService = TestableNetworkService()
+        ServiceProvider.shared.networkService = mockNetworkService
+        mockNetworkService.mock { _ in
+            let badResponse = HTTPURLResponse(url: URL(string: "https://amsdk.tt.omtrdc.net/rest/v1/delivery")!, statusCode: 200, httpVersion: nil, headerFields: nil)
+            networkRequestExpectation.fulfill()
+            return (data: responseString.data(using: .utf8), response: badResponse, error: nil)
+        }
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
+            XCTFail()
+            return
+        }
+
+        // handles the prefetch event
+        XCTAssertTrue(target.readyForEvent(prefetchEvent))
+        eventListener(prefetchEvent)
+        XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
+        mockRuntime.resetDispatchedEventAndCreatedSharedStates()
+        let requestDataArray: [[String: Any]?] = [
+            TargetRequest(mboxName: "Drink_1", defaultContent: "default_content"),
+            TargetRequest(mboxName: "Drink_2", defaultContent: "default_content"),
+            TargetRequest(mboxName: "Drink_3", defaultContent: "default_content_123"),
+        ].map {
+            $0.asDictionary()
+        }
+
+        let loadRequestData: [String: Any] = [
+            "request": requestDataArray,
+            "targetparams": TargetParameters(profileParameters: mockProfileParam).asDictionary() as Any,
+        ]
+        let loadRequestEvent = Event(name: "", type: "", source: "", data: loadRequestData)
+        // handles the loadRequest event
+        eventListener(loadRequestEvent)
+        wait(for: [networkRequestExpectation], timeout: 1)
+        // verifies the content of network response was stored correctly
+        XCTAssertEqual(3, mockRuntime.dispatchedEvents.count)
+        XCTAssertNotNil(mockRuntime.dispatchedEvents[0].data)
+        XCTAssertEqual("{\n  \"key1\" : \"value1\"\n}", mockRuntime.dispatchedEvents[0].data?["content"] as? String ?? "")
+        XCTAssertNotNil(mockRuntime.dispatchedEvents[1].data)
+        XCTAssertEqual("{\n  \"key2\" : \"value2\"\n}", mockRuntime.dispatchedEvents[1].data?["content"] as? String ?? "")
+        XCTAssertNotNil(mockRuntime.dispatchedEvents[2].data)
+//        XCTAssertEqual("default_content_123", mockRuntime.dispatchedEvents[2].data?["content"] as? String ?? "")
     }
 }
