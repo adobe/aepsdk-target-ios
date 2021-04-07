@@ -6,7 +6,7 @@ PODS:
     - AEPRulesEngine
     - AEPServices
     - AEPSignal
-  - AEPAnalytics (3.0.0):
+  - AEPAnalytics (3.0.1):
     - AEPCore
     - AEPServices
   - AEPAssurance (1.1.0):
@@ -25,44 +25,47 @@ PODS:
   - AEPServices (3.1.0)
   - AEPSignal (3.1.0):
     - AEPCore (= 3.1.0)
+  - SwiftyJSON (4.3.0)
 
 DEPENDENCIES:
   - ACPCore (from `https://github.com/adobe/aepsdk-compatibility-ios.git`, branch `main`)
   - AEPAnalytics
   - AEPAssurance
-  - AEPCore (from `https://github.com/adobe/aepsdk-core-ios.git`, branch `dev-v3.1.0`)
-  - AEPIdentity (from `https://github.com/adobe/aepsdk-core-ios.git`, branch `dev-v3.1.0`)
-  - AEPLifecycle (from `https://github.com/adobe/aepsdk-core-ios.git`, branch `dev-v3.1.0`)
+  - AEPCore (from `https://github.com/adobe/aepsdk-core-ios.git`, branch `main`)
+  - AEPIdentity (from `https://github.com/adobe/aepsdk-core-ios.git`, branch `main`)
+  - AEPLifecycle (from `https://github.com/adobe/aepsdk-core-ios.git`, branch `main`)
   - AEPRulesEngine (from `https://github.com/adobe/aepsdk-rulesengine-ios.git`, branch `main`)
-  - AEPServices (from `https://github.com/adobe/aepsdk-core-ios.git`, branch `dev-v3.1.0`)
-  - AEPSignal (from `https://github.com/adobe/aepsdk-core-ios.git`, branch `dev-v3.1.0`)
+  - AEPServices (from `https://github.com/adobe/aepsdk-core-ios.git`, branch `main`)
+  - AEPSignal (from `https://github.com/adobe/aepsdk-core-ios.git`, branch `main`)
+  - SwiftyJSON (~> 4.0)
 
 SPEC REPOS:
   trunk:
     - AEPAnalytics
     - AEPAssurance
+    - SwiftyJSON
 
 EXTERNAL SOURCES:
   ACPCore:
     :branch: main
     :git: https://github.com/adobe/aepsdk-compatibility-ios.git
   AEPCore:
-    :branch: dev-v3.1.0
+    :branch: main
     :git: https://github.com/adobe/aepsdk-core-ios.git
   AEPIdentity:
-    :branch: dev-v3.1.0
+    :branch: main
     :git: https://github.com/adobe/aepsdk-core-ios.git
   AEPLifecycle:
-    :branch: dev-v3.1.0
+    :branch: main
     :git: https://github.com/adobe/aepsdk-core-ios.git
   AEPRulesEngine:
     :branch: main
     :git: https://github.com/adobe/aepsdk-rulesengine-ios.git
   AEPServices:
-    :branch: dev-v3.1.0
+    :branch: main
     :git: https://github.com/adobe/aepsdk-core-ios.git
   AEPSignal:
-    :branch: dev-v3.1.0
+    :branch: main
     :git: https://github.com/adobe/aepsdk-core-ios.git
 
 CHECKOUT OPTIONS:
@@ -70,27 +73,27 @@ CHECKOUT OPTIONS:
     :commit: deec3800bce117f7f760eb6644af4559489c2aae
     :git: https://github.com/adobe/aepsdk-compatibility-ios.git
   AEPCore:
-    :commit: 84f7c9c0abf7c1dbc589d3a017dc2f9a28ca7f66
+    :commit: 6e8c14693c78fe0ce858e5edfa483649e560e62a
     :git: https://github.com/adobe/aepsdk-core-ios.git
   AEPIdentity:
-    :commit: 84f7c9c0abf7c1dbc589d3a017dc2f9a28ca7f66
+    :commit: 6e8c14693c78fe0ce858e5edfa483649e560e62a
     :git: https://github.com/adobe/aepsdk-core-ios.git
   AEPLifecycle:
-    :commit: 84f7c9c0abf7c1dbc589d3a017dc2f9a28ca7f66
+    :commit: 6e8c14693c78fe0ce858e5edfa483649e560e62a
     :git: https://github.com/adobe/aepsdk-core-ios.git
   AEPRulesEngine:
     :commit: 1e270654b330b9f07a6b1ec374e686f2e631e039
     :git: https://github.com/adobe/aepsdk-rulesengine-ios.git
   AEPServices:
-    :commit: 84f7c9c0abf7c1dbc589d3a017dc2f9a28ca7f66
+    :commit: 6e8c14693c78fe0ce858e5edfa483649e560e62a
     :git: https://github.com/adobe/aepsdk-core-ios.git
   AEPSignal:
-    :commit: 84f7c9c0abf7c1dbc589d3a017dc2f9a28ca7f66
+    :commit: 6e8c14693c78fe0ce858e5edfa483649e560e62a
     :git: https://github.com/adobe/aepsdk-core-ios.git
 
 SPEC CHECKSUMS:
   ACPCore: 67e4b855bf16cfb6a63024a4ddb73d15c0fd30e5
-  AEPAnalytics: a36c1483c5f47340374f791d2f3a329f64d37318
+  AEPAnalytics: 13353b3ea333be0af7cfc4845830d87d360726e2
   AEPAssurance: c9c21b7e57bf993db210766631db2ef3732d4fa4
   AEPCore: 026568b04d8c302ad801a6b4ed6ec3c160817ef6
   AEPIdentity: 2ca611ed7f2bf081657b311cbffb210900558fa8
@@ -98,7 +101,8 @@ SPEC CHECKSUMS:
   AEPRulesEngine: 8bbc694fce6900cd33b2496c7d4b33ee2eeffc46
   AEPServices: cc1ec2987185ab01d62f6d41be0bb94a1b892efb
   AEPSignal: 68dce891ed648057d0282b137040a5766a95c963
+  SwiftyJSON: 6faa0040f8b59dead0ee07436cbf76b73c08fd08
 
-PODFILE CHECKSUM: 12ad7dfe9f547d7a0fb48301ffa62635341320ed
+PODFILE CHECKSUM: 12b5d538eb4160448ca4a83c9cbf68182fe9d5c4
 
 COCOAPODS: 1.10.1

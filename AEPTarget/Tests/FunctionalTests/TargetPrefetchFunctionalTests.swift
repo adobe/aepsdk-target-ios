@@ -13,6 +13,7 @@
 @testable import AEPCore
 @testable import AEPServices
 @testable import AEPTarget
+import SwiftyJSON
 import XCTest
 
 class TargetPrefetchFunctionalTests: TargetFunctionalTestsBase {
@@ -56,8 +57,8 @@ class TargetPrefetchFunctionalTests: TargetFunctionalTestsBase {
 
         // builds the prefetch event
         let prefetchDataArray: [[String: Any]?] = [
-            TargetPrefetch(name: "Drink_1", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
-            TargetPrefetch(name: "Drink_2", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+            TargetPrefetch(name: "Drink_1", targetParameters: TargetParameters(parameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+            TargetPrefetch(name: "Drink_2", targetParameters: TargetParameters(parameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
         ].map {
             $0.asDictionary()
         }
@@ -137,14 +138,26 @@ class TargetPrefetchFunctionalTests: TargetFunctionalTestsBase {
             XCTAssertTrue(Set(prefetchDictionary.keys) == Set([
                 "mboxes",
             ]))
-            let prefetchJson = self.prettify(prefetchDictionary)
-            XCTAssertTrue(prefetchJson.contains("\"name\" : \"Drink_2\""))
-            XCTAssertTrue(prefetchJson.contains("\"name\" : \"Drink_1\""))
-            XCTAssertTrue(prefetchJson.contains("\"mbox-parameter-key1\" : \"mbox-parameter-value1\""))
-            XCTAssertTrue(prefetchJson.contains("\"a.OSVersion\""))
-            XCTAssertTrue(prefetchJson.contains("\"a.DeviceName\""))
-            XCTAssertTrue(prefetchJson.contains("\"a.AppID\""))
-            XCTAssertTrue(prefetchJson.contains("\"a.locale\""))
+
+            let prefetchJson = JSON(parseJSON: self.prettify(prefetchDictionary))
+            XCTAssertEqual(prefetchJson["mboxes"][0]["name"].stringValue, "Drink_1")
+            XCTAssertEqual(prefetchJson["mboxes"][0]["index"].intValue, 0)
+            XCTAssertEqual(prefetchJson["mboxes"][0]["parameters"]["mbox-parameter-key1"].stringValue, "mbox-parameter-value1")
+            XCTAssertNotNil(prefetchJson["mboxes"][0]["parameters"]["a.OSVersion"].stringValue)
+            XCTAssertNotNil(prefetchJson["mboxes"][0]["parameters"]["a.Resolution"].stringValue)
+            XCTAssertNotNil(prefetchJson["mboxes"][0]["parameters"]["a.DeviceName"].stringValue)
+            XCTAssertNotNil(prefetchJson["mboxes"][0]["parameters"]["a.RunMode"].stringValue)
+            XCTAssertNotNil(prefetchJson["mboxes"][0]["parameters"]["a.AppID"].stringValue)
+            XCTAssertNotNil(prefetchJson["mboxes"][0]["parameters"]["a.locale"].stringValue)
+            XCTAssertEqual(prefetchJson["mboxes"][1]["name"].stringValue, "Drink_2")
+            XCTAssertEqual(prefetchJson["mboxes"][1]["index"].intValue, 1)
+            XCTAssertEqual(prefetchJson["mboxes"][0]["parameters"]["mbox-parameter-key1"].stringValue, "mbox-parameter-value1")
+            XCTAssertNotNil(prefetchJson["mboxes"][0]["parameters"]["a.OSVersion"].stringValue)
+            XCTAssertNotNil(prefetchJson["mboxes"][0]["parameters"]["a.Resolution"].stringValue)
+            XCTAssertNotNil(prefetchJson["mboxes"][0]["parameters"]["a.DeviceName"].stringValue)
+            XCTAssertNotNil(prefetchJson["mboxes"][0]["parameters"]["a.RunMode"].stringValue)
+            XCTAssertNotNil(prefetchJson["mboxes"][0]["parameters"]["a.AppID"].stringValue)
+            XCTAssertNotNil(prefetchJson["mboxes"][0]["parameters"]["a.locale"].stringValue)
             let validResponse = HTTPURLResponse(url: URL(string: "https://amsdk.tt.omtrdc.net/rest/v1/delivery")!, statusCode: 200, httpVersion: nil, headerFields: nil)
             return (data: responseString.data(using: .utf8), response: validResponse, error: nil)
         }
@@ -161,8 +174,11 @@ class TargetPrefetchFunctionalTests: TargetFunctionalTestsBase {
         XCTAssertEqual("mboxedge35.tt.omtrdc.net", target.targetState.edgeHost)
         XCTAssertEqual(2, target.targetState.prefetchedMboxJsonDicts.count)
         let mboxJson = prettify(target.targetState.prefetchedMboxJsonDicts["Drink_1"])
-        XCTAssertTrue(mboxJson.contains("\"eventToken\" : \"uR0kIAPO+tZtIPW92S0NnWqipfsIHvVzTQxHolz2IpSCnQ9Y9OaLL2gsdrWQTvE54PwSz67rmXWmSnkXpSSS2Q==\""))
-
+        let drink1Json = JSON(parseJSON: mboxJson)
+        XCTAssertEqual(drink1Json["options"][0]["content"]["key1"].stringValue, "value1")
+        XCTAssertEqual(drink1Json["options"][0]["type"].stringValue, "json")
+        XCTAssertEqual(drink1Json["options"][0]["eventToken"].stringValue, "uR0kIAPO+tZtIPW92S0NnWqipfsIHvVzTQxHolz2IpSCnQ9Y9OaLL2gsdrWQTvE54PwSz67rmXWmSnkXpSSS2Q==")
+        XCTAssertEqual(drink1Json["name"].stringValue, "Drink_1")
         // verifies the Target's shared state
         XCTAssertEqual(1, mockRuntime.createdSharedStates.count)
         XCTAssertEqual("DE03D4AD-1FFE-421F-B2F2-303BF26822C1.35_0", mockRuntime.createdSharedStates[0]?["tntid"] as? String)
@@ -204,9 +220,8 @@ class TargetPrefetchFunctionalTests: TargetFunctionalTestsBase {
                 XCTFail()
                 return nil
             }
-            let payloadJson = self.prettify(payloadDictionary)
-            XCTAssertTrue(payloadJson.contains("\"mbox_parameter_key\" : \"mbox_parameter_value_global\""))
-            XCTAssertFalse(payloadJson.contains("\"mbox_parameter_key\" : \"mbox_parameter_value\""))
+            let payloadJson = JSON(parseJSON: self.prettify(payloadDictionary))
+            XCTAssertEqual(payloadJson["prefetch"]["mboxes"][0]["parameters"]["mbox_parameter_key"].stringValue, "mbox_parameter_value_global")
             return nil
         }
         guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
@@ -248,9 +263,9 @@ class TargetPrefetchFunctionalTests: TargetFunctionalTestsBase {
                 XCTFail()
                 return nil
             }
-            let payloadJson = self.prettify(payloadDictionary)
-            XCTAssertTrue(payloadJson.contains("\"name\" : \"Smith\""))
-            XCTAssertFalse(payloadJson.contains("\"name\" : \"Jackson\""))
+
+            let payloadJson = JSON(parseJSON: self.prettify(payloadDictionary))
+            XCTAssertEqual(payloadJson["prefetch"]["mboxes"][0]["profileParameters"]["name"].stringValue, "Smith")
             return nil
         }
         guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
@@ -292,9 +307,10 @@ class TargetPrefetchFunctionalTests: TargetFunctionalTestsBase {
                 XCTFail()
                 return nil
             }
-            let payloadJson = self.prettify(payloadDictionary)
-            XCTAssertTrue(payloadJson.contains("\"id\" : \"o_id_1\""))
-            XCTAssertFalse(payloadJson.contains("\"id\" : \"o_id\""))
+            let payloadJson = JSON(parseJSON: self.prettify(payloadDictionary))
+            XCTAssertEqual(payloadJson["prefetch"]["mboxes"][0]["order"]["id"].stringValue, "o_id_1")
+            XCTAssertEqual(payloadJson["prefetch"]["mboxes"][0]["order"]["total"].doubleValue, 11.0)
+            XCTAssertEqual(payloadJson["prefetch"]["mboxes"][0]["order"]["purchasedProductIds"].arrayValue, ["D", "E", "F"])
             return nil
         }
         guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
@@ -336,9 +352,10 @@ class TargetPrefetchFunctionalTests: TargetFunctionalTestsBase {
                 XCTFail()
                 return nil
             }
-            let payloadJson = self.prettify(payloadDictionary)
-            XCTAssertTrue(payloadJson.contains("\"categoryId\" : \"Offline\""))
-            XCTAssertFalse(payloadJson.contains("\"categoryId\" : \"Online\""))
+            let payloadJson = JSON(parseJSON: self.prettify(payloadDictionary))
+            XCTAssertEqual(payloadJson["prefetch"]["mboxes"][0]["name"].stringValue, "Drink_1")
+            XCTAssertEqual(payloadJson["prefetch"]["mboxes"][0]["product"]["id"].stringValue, "p_id_1")
+            XCTAssertEqual(payloadJson["prefetch"]["mboxes"][0]["product"]["categoryId"].stringValue, "Offline")
             return nil
         }
         guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
@@ -474,8 +491,9 @@ class TargetPrefetchFunctionalTests: TargetFunctionalTestsBase {
 
         // verifies the content of network response was stored correctly
         XCTAssertEqual(1, target.targetState.prefetchedMboxJsonDicts.count)
-        let mboxJson = prettify(target.targetState.prefetchedMboxJsonDicts["Drink_1"])
-        XCTAssertTrue(mboxJson.contains("\"key1\" : \"value1\""))
+        let mboxJson = JSON(parseJSON: prettify(target.targetState.prefetchedMboxJsonDicts["Drink_1"]))
+        XCTAssertEqual(mboxJson["options"][0]["content"]["key1"].stringValue, "value1")
+        XCTAssertEqual(mboxJson["name"].stringValue, "Drink_1")
 
         // verifies the Target's shared state
         XCTAssertEqual(1, mockRuntime.createdSharedStates.count)
@@ -610,8 +628,9 @@ class TargetPrefetchFunctionalTests: TargetFunctionalTestsBase {
 
         // verifies the content of network response was stored correctly
         XCTAssertEqual(1, target.targetState.prefetchedMboxJsonDicts.count)
-        let mboxJson = prettify(target.targetState.prefetchedMboxJsonDicts["Drink_1"])
-        XCTAssertTrue(mboxJson.contains("\"key1\" : \"value1\""))
+        let mboxJson = JSON(parseJSON: prettify(target.targetState.prefetchedMboxJsonDicts["Drink_1"]))
+        XCTAssertEqual(mboxJson["options"][0]["content"]["key1"].stringValue, "value1")
+        XCTAssertEqual(mboxJson["name"].stringValue, "Drink_1")
 
         mockNetworkService.resolvers.removeAll()
         mockNetworkService.mock { _ in
@@ -620,8 +639,10 @@ class TargetPrefetchFunctionalTests: TargetFunctionalTestsBase {
         }
         eventListener(prefetchEvent2)
         XCTAssertEqual(1, target.targetState.prefetchedMboxJsonDicts.count)
-        let mboxJsonNew = prettify(target.targetState.prefetchedMboxJsonDicts["Drink_1"])
-        XCTAssertTrue(mboxJsonNew.contains("\"key2\" : \"value2\""))
+        let mboxJsonNew = JSON(parseJSON: prettify(target.targetState.prefetchedMboxJsonDicts["Drink_1"]))
+        XCTAssertEqual(mboxJsonNew["options"][0]["content"]["key2"].stringValue, "value2")
+        XCTAssertFalse(mboxJsonNew["options"][0]["content"]["key1"].exists())
+        XCTAssertEqual(mboxJsonNew["name"].stringValue, "Drink_1")
     }
 
     func testPrefetchContent_in_PreviewMode() {

@@ -13,6 +13,7 @@
 @testable import AEPCore
 @testable import AEPServices
 @testable import AEPTarget
+import SwiftyJSON
 import XCTest
 
 class TargetLoadRequestsFunctionalTests: TargetFunctionalTestsBase {
@@ -54,8 +55,8 @@ class TargetLoadRequestsFunctionalTests: TargetFunctionalTestsBase {
         """
 
         let requestDataArray: [[String: Any]?] = [
-            TargetRequest(mboxName: "t_test_01", defaultContent: "default", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
-            TargetRequest(mboxName: "t_test_02", defaultContent: "default2", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+            TargetRequest(mboxName: "t_test_01", defaultContent: "default", targetParameters: TargetParameters(parameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
+            TargetRequest(mboxName: "t_test_02", defaultContent: "default2", targetParameters: TargetParameters(parameters: ["mbox-parameter-key2": "mbox-parameter-value2"])),
         ].map {
             $0.asDictionary()
         }
@@ -126,31 +127,40 @@ class TargetLoadRequestsFunctionalTests: TargetFunctionalTestsBase {
                 "timeOffsetInMinutes",
             ]))
 
-            // verifies payloadDictionary["prefetch"]
-            guard let prefetchDictionary = payloadDictionary["execute"] as? [String: Any] else {
+            guard let executeDictionary = payloadDictionary["execute"] as? [String: Any] else {
                 XCTFail()
                 return nil
             }
 
-            XCTAssertTrue(Set(prefetchDictionary.keys) == Set([
+            XCTAssertTrue(Set(executeDictionary.keys) == Set([
                 "mboxes",
             ]))
-
-            guard let mboxes = prefetchDictionary["mboxes"] as? [[String: Any]] else {
+            guard let mboxes = executeDictionary["mboxes"] as? [[String: Any]] else {
                 XCTFail()
                 return nil
             }
             XCTAssertEqual(2, mboxes.count)
-            XCTAssertEqual(0, mboxes[0]["index"] as? Int ?? -1)
-            XCTAssertEqual(1, mboxes[1]["index"] as? Int ?? -1)
-            let prefetchJson = self.prettify(prefetchDictionary)
-            XCTAssertTrue(prefetchJson.contains("\"name\" : \"t_test_01\""))
-            XCTAssertTrue(prefetchJson.contains("\"name\" : \"t_test_02\""))
-            XCTAssertTrue(prefetchJson.contains("\"mbox-parameter-key1\" : \"mbox-parameter-value1\""))
-            XCTAssertTrue(prefetchJson.contains("\"a.OSVersion\""))
-            XCTAssertTrue(prefetchJson.contains("\"a.DeviceName\""))
-            XCTAssertTrue(prefetchJson.contains("\"a.AppID\""))
-            XCTAssertTrue(prefetchJson.contains("\"a.locale\""))
+            let executeJson = JSON(parseJSON: self.prettify(executeDictionary))
+            XCTAssertEqual(executeJson["mboxes"][0]["index"].intValue, 0)
+            XCTAssertEqual(executeJson["mboxes"][0]["name"].stringValue, "t_test_01")
+            XCTAssertEqual(executeJson["mboxes"][0]["profileParameters"]["name"].stringValue, "Smith")
+            XCTAssertNotNil(executeJson["mboxes"][0]["parameters"]["a.Resolution"].stringValue)
+            XCTAssertNotNil(executeJson["mboxes"][0]["parameters"]["a.DeviceName"].stringValue)
+            XCTAssertNotNil(executeJson["mboxes"][0]["parameters"]["a.RunMode"].stringValue)
+            XCTAssertNotNil(executeJson["mboxes"][0]["parameters"]["a.locale"].stringValue)
+            XCTAssertNotNil(executeJson["mboxes"][0]["parameters"]["a.OSVersion"].stringValue)
+            XCTAssertNotNil(executeJson["mboxes"][0]["parameters"]["a.AppID"].stringValue)
+            XCTAssertEqual(executeJson["mboxes"][0]["parameters"]["mbox-parameter-key1"].stringValue, "mbox-parameter-value1")
+            XCTAssertEqual(executeJson["mboxes"][1]["index"].intValue, 1)
+            XCTAssertEqual(executeJson["mboxes"][1]["name"].stringValue, "t_test_02")
+            XCTAssertEqual(executeJson["mboxes"][1]["profileParameters"]["name"].stringValue, "Smith")
+            XCTAssertNotNil(executeJson["mboxes"][1]["parameters"]["a.Resolution"].stringValue)
+            XCTAssertNotNil(executeJson["mboxes"][1]["parameters"]["a.DeviceName"].stringValue)
+            XCTAssertNotNil(executeJson["mboxes"][1]["parameters"]["a.RunMode"].stringValue)
+            XCTAssertNotNil(executeJson["mboxes"][1]["parameters"]["a.locale"].stringValue)
+            XCTAssertNotNil(executeJson["mboxes"][1]["parameters"]["a.OSVersion"].stringValue)
+            XCTAssertNotNil(executeJson["mboxes"][1]["parameters"]["a.AppID"].stringValue)
+            XCTAssertEqual(executeJson["mboxes"][1]["parameters"]["mbox-parameter-key2"].stringValue, "mbox-parameter-value2")
             let validResponse = HTTPURLResponse(url: URL(string: "https://amsdk.tt.omtrdc.net/rest/v1/delivery")!, statusCode: 200, httpVersion: nil, headerFields: nil)
             return (data: responseString.data(using: .utf8), response: validResponse, error: nil)
         }
