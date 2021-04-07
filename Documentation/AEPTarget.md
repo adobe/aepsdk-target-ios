@@ -71,6 +71,13 @@
     - [Objective C](#objective-c-9)
       - [Syntax](#syntax-19)
       - [Example](#example-19)
+  - [Viaual preview](#viaual-preview)
+    - [Swift](#swift-10)
+      - [Syntax](#syntax-20)
+      - [Example](#example-20)
+    - [Objective C](#objective-c-10)
+      - [Syntax](#syntax-21)
+      - [Example](#example-21)
 
 # Target API reference
 This document details all the APIs provided by Target, along with sample code snippets on how to properly use the APIs.
@@ -601,4 +608,39 @@ static func clickedLocation(name: String, targetParameters: TargetParameters?)
     AEPTargetProduct *product =[[AEPTargetProduct alloc] initWithProductId:@"24D334" categoryId:@"Stationary"];
     AEPTargetParameters * targetParams = [[AEPTargetParameters alloc] initWithParameters:nil profileParameters:nil order:order product:product];
     [AEPMobileTarget displayedLocations:@[@"mboxName1", @"mboxName2"] withTargetParameters:targetParams];
+```
+
+
+## Viaual preview
+
+The visual preview mode allows you to easily perform end-to-end QA activities by enrolling and previewing these activities on your device. This mode does not require a specialized testing set up. To get started, set up a URL scheme and generate the preview links.
+
+To enter the preview visual mode, use the `collectLaunchInfo` API to enable the mode and click the red floating button that appears on the app screen.
+
+### Swift 
+
+#### Syntax 
+
+```swift
+public static func collectLaunchInfo(_ userInfo: [String: Any])
+```
+
+#### Example
+
+```swift
+    MobileCore.collectLaunchInfo(["adb_deeplink" : "com.adobe.targetpreview://app.adobetarget.com?at_preview_token=tokenFromTarget"])
+```
+
+### Objective C
+
+#### Syntax 
+
+```objectivec
++ (void) collectLaunchInfo: (nonnull NSDictionary*) userInfo;
+```
+
+#### Example
+
+```objectivec
+    [AEPMobileCore collectLaunchInfo: @{@"adb_deeplink":@"com.adobe.targetpreview://app.adobetarget.com?at_preview_token=tokenFromTarget"}];
 ```
