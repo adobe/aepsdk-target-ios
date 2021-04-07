@@ -21,6 +21,7 @@ class TargetError: Error, CustomStringConvertible {
     static let ERROR_MBOX_NAME_NULL_OR_EMPTY = "MboxName is either nil or empty"
     static let ERROR_NO_CLIENT_CODE = "Missing client code"
     static let ERROR_OPTED_OUT = "Privacy status is opted out"
+    static let ERROR_NOT_OPTED_IN = "Privacy status is not opted in"
     static let ERROR_DISPLAY_NOTIFICATION_SEND_FAILED = "Unable to send display notification: "
     static let ERROR_DISPLAY_NOTIFICATION_NOT_SENT = "No display notifications are available to send"
     static let ERROR_CLICK_NOTIFICATION_NOT_SENT = "No click notifications are available to send"
@@ -34,6 +35,7 @@ class TargetError: Error, CustomStringConvertible {
     static let ERROR_NULL_EMPTY_REQUEST_MESSAGE = "The provided request list for mboxes is empty or null"
     static let ERROR_TARGET_EVENT_DISPATCH_MESSAGE = "Dispatching - Target response content event"
     static let ERROR_BATCH_REQUEST_SEND_FAILED = "Unable to send batch requests: "
+    static let ERROR_NOTIFICATION_TAG = "Notification"
 
     init(message: String) {
         self.message = message

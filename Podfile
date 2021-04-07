@@ -20,6 +20,7 @@ target 'AEPTargetDemoApp' do
   pod 'AEPSignal', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'dev-v3.1.0'
   pod 'ACPCore', :git => 'https://github.com/adobe/aepsdk-compatibility-ios.git', :branch => 'main'
   pod 'AEPAssurance'
+  pod 'AEPAnalytics'
 end
   
 target 'AEPTargetDemoObjCApp' do
@@ -30,6 +31,7 @@ target 'AEPTargetDemoObjCApp' do
   pod 'AEPLifecycle', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'dev-v3.1.0'
   pod 'ACPCore', :git => 'https://github.com/adobe/aepsdk-compatibility-ios.git', :branch => 'main'
   pod 'AEPAssurance'
+  pod 'AEPAnalytics'
 end
 
 target 'AEPTargetTests' do
@@ -38,4 +40,5 @@ target 'AEPTargetTests' do
   pod 'AEPRulesEngine', :git => 'https://github.com/adobe/aepsdk-rulesengine-ios.git', :branch => 'main'
   pod 'AEPIdentity', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'dev-v3.1.0'
   pod 'AEPLifecycle', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'dev-v3.1.0'
+  pod 'AEPAnalytics'
 end

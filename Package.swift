@@ -14,19 +14,19 @@
 import PackageDescription
 
 let package = Package(
-    name: "AEPTarget",
-    platforms: [.iOS(.v10)],
-    products: [
-        .library(name: "AEPTarget", targets: ["AEPTarget"]),
-        .library(name: "AEPTargetStatic", type: .static, targets: ["AEPTarget"]),
-        .library(name: "AEPTargetDynamic", type: .dynamic, targets: ["AEPTarget"]),
-    ],
-    dependencies: [
-        .package(url: "https://github.com/adobe/aepsdk-core-ios.git", .branch("main")),
-    ],
-    targets: [
-        .target(name: "AEPTarget",
-                dependencies: ["AEPCore", "AEPServices"],
-                path: "AEPTarget/Sources"),
-    ]
+ name: "AEPTarget",
+ platforms: [.iOS(.v10)],
+ products: [
+  .library(name: "AEPTarget", targets: ["AEPTarget"]),
+  .library(name: "AEPTargetStatic", type: .static, targets: ["AEPTarget"]),
+  .library(name: "AEPTargetDynamic", type: .dynamic, targets: ["AEPTarget"]),
+ ],
+ dependencies: [
+  .package(url: "https://github.com/adobe/aepsdk-core-ios.git", .branch("main")),
+ ],
+ targets: [
+  .target(name: "AEPTarget",
+          dependencies: ["AEPCore", "AEPServices"],
+          path: "AEPTarget/Sources"),
+ ]
 )

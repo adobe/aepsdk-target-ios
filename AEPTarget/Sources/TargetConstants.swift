@@ -127,13 +127,21 @@ enum TargetConstants {
         static let SESSION_TIMESTAMP = "Adobe.ADOBEMOBILE_TARGET.SESSION_TIMESTAMP"
     }
 
+    enum V4Migration {
+        static let TNT_ID = "ADBMOBILE_TARGET_TNT_ID"
+        static let THIRD_PARTY_ID = "ADBMOBILE_TARGET_3RD_PARTY_ID"
+        static let SESSION_ID = "ADBMOBILE_TARGET_SESSION_ID"
+        static let EDGE_HOST = "ADBMOBILE_TARGET_EDGE_HOST"
+        static let LAST_TIMESTAMP = "ADBMOBILE_TARGET_LAST_TIMESTAMP"
+        static let V4_DATA_MIGRATED = "ADBMOBILE_TARGET_DATA_MIGRATED"
+    }
+
     enum DataStoreKeys {
         static let SESSION_TIMESTAMP = "session.timestamp"
         static let SESSION_ID = "session.id"
         static let TNT_ID = "tnt.id"
         static let EDGE_HOST = "edge.host"
         static let THIRD_PARTY_ID = "thirdparty.id"
-        static let V5_MIGRATION_COMPLETE = "v5.migration.complete"
     }
 
     enum TargetRequestValue {
@@ -161,6 +169,7 @@ enum TargetConstants {
         static let TARGET_PARAMETERS = "targetparams"
         static let PREFETCH_REQUESTS = "prefetch"
         static let PREFETCH_ERROR = "prefetcherror"
+        static let PREFETCH_RESULT = "prefetchresult"
         static let LOAD_REQUESTS = "request"
         static let THIRD_PARTY_ID = "thirdpartyid"
         static let RESET_EXPERIENCE = "resetexperience"
@@ -176,6 +185,7 @@ enum TargetConstants {
         static let PROFILE_PARAMETERS = "profileparameters"
         static let TARGET_CONTENT = "content"
         static let TARGET_RESPONSE_PAIR_ID = "responsePairId"
+        static let TARGET_RESPONSE_EVENT_ID = "responseEventId"
         // shared sate
         static let TNT_ID = "tntid"
         static let PREVIEW_INITIATED = "ispreviewinitiated"
@@ -271,6 +281,6 @@ enum TargetConstants {
     }
 
     enum NetworkConnection {
-        static let DEFAULT_CONNECTION_TIMEOUT_SEC = TimeInterval(2)
+        static let DEFAULT_CONNECTION_TIMEOUT_SEC = TimeInterval(5)
     }
 }

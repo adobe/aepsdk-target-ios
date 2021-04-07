@@ -50,7 +50,6 @@ class TargetV5MigratorTests: XCTestCase {
     /// No V5 data exists
     func testNoV5Data() {
         let targetDataStore = getTargetDataStore()
-        XCTAssertEqual(nil, targetDataStore.getBool(key: "v5.migration.complete"))
 
         TargetV5Migrator.migrate()
 
@@ -70,7 +69,6 @@ class TargetV5MigratorTests: XCTestCase {
     func testDataMigration() {
         let userDefaultsV5 = getUserDefaultsV5()
         let targetDataStore = getTargetDataStore()
-        XCTAssertEqual(nil, targetDataStore.getBool(key: "v5.migration.complete"))
         // V5 Target data with old keys
         userDefaultsV5.set("edge.host.com", forKey: "Adobe.ADOBEMOBILE_TARGET.EDGE_HOST")
         userDefaultsV5.set("id_1", forKey: "Adobe.ADOBEMOBILE_TARGET.TNT_ID")
@@ -96,14 +94,12 @@ class TargetV5MigratorTests: XCTestCase {
         XCTAssertEqual("id_2", targetDataStore.getString(key: "thirdparty.id"))
         XCTAssertEqual("E621E1F8-C36C-495A-93FC-0C247A3E6E5F", targetDataStore.getString(key: "session.id"))
         XCTAssertEqual(1_615_436_587, targetDataStore.getLong(key: "session.timestamp"))
-        XCTAssertEqual(true, targetDataStore.getBool(key: "v5.migration.complete"))
     }
 
     /// Migrates part of the supported V5 data keys to the new data keys
     func testDataMigrationPartial() {
         let userDefaultsV5 = getUserDefaultsV5()
         let targetDataStore = getTargetDataStore()
-        XCTAssertEqual(nil, targetDataStore.getBool(key: "v5.migration.complete"))
         // V5 Target data with old keys
         userDefaultsV5.set("edge.host.com", forKey: "Adobe.ADOBEMOBILE_TARGET.EDGE_HOST")
         userDefaultsV5.set("id_1", forKey: "Adobe.ADOBEMOBILE_TARGET.TNT_ID")
@@ -128,7 +124,6 @@ class TargetV5MigratorTests: XCTestCase {
         XCTAssertEqual("id_2", targetDataStore.getString(key: "thirdparty.id"))
         XCTAssertEqual(nil, targetDataStore.getString(key: "session.id"))
         XCTAssertEqual(nil, targetDataStore.getLong(key: "session.timestamp"))
-        XCTAssertEqual(true, targetDataStore.getBool(key: "v5.migration.complete"))
     }
 
     /// Migrate V5 data if using `app group` in the SDK
@@ -136,7 +131,6 @@ class TargetV5MigratorTests: XCTestCase {
         ServiceProvider.shared.namedKeyValueService.setAppGroup(appGroup)
         let userDefaultsV5 = getUserDefaultsV5()
         let targetDataStore = getTargetDataStore()
-        XCTAssertEqual(nil, targetDataStore.getBool(key: "v5.migration.complete"))
 
         // V5 Target data with old keys
         userDefaultsV5.set("edge.host.com", forKey: "Adobe.ADOBEMOBILE_TARGET.EDGE_HOST")
@@ -162,14 +156,12 @@ class TargetV5MigratorTests: XCTestCase {
         XCTAssertEqual("id_2", targetDataStore.getString(key: "thirdparty.id"))
         XCTAssertEqual("E621E1F8-C36C-495A-93FC-0C247A3E6E5F", targetDataStore.getString(key: "session.id"))
         XCTAssertEqual(1_615_436_587, targetDataStore.getLong(key: "session.timestamp"))
-        XCTAssertEqual(true, targetDataStore.getBool(key: "v5.migration.complete"))
     }
 
     /// Migrate V5 data if using a new `app group` in the SDK
     /// The `app group` is not stored in V5 ACPCore code, this bug is logged in Jira (AMSDK-11223)
     func testDataMigrationInNewAppGroup() {
         let targetDataStore = getTargetDataStore()
-        XCTAssertEqual(nil, targetDataStore.getBool(key: "v5.migration.complete"))
 
         // V5 Target data with old keys
         UserDefaults.standard.set("edge.host.com", forKey: "Adobe.ADOBEMOBILE_TARGET.EDGE_HOST")
@@ -202,6 +194,5 @@ class TargetV5MigratorTests: XCTestCase {
             XCTFail("should not do data migration if app group changed")
             return
         }
-        XCTAssertEqual(true, targetDataStore.getBool(key: "v5.migration.complete"))
     }
 }

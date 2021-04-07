@@ -36,6 +36,16 @@
     }];
 }
 
+- (IBAction)loadRequest:(id)sender {
+    AEPTargetRequestObject *request1 = [[AEPTargetRequestObject alloc] initWithMboxName:@"aep-loc-1" defaultContent:@"defaultContent" targetParameters:nil contentCallback:^(NSString * _Nullable content) {
+        NSLog(@"Content is >> %@", content ?: @"nope");
+    }];
+    AEPTargetRequestObject *request2 = [[AEPTargetRequestObject alloc] initWithMboxName:@"aep-loc-2" defaultContent:@"defaultContent2" targetParameters:nil contentCallback:^(NSString * _Nullable content) {
+        NSLog(@"Content is >> %@", content ?: @"nope");
+    }];
+    [AEPMobileTarget retrieveLocationContent:@[request1, request2] withParameters:nil];
+}
+
 - (IBAction)locationDisplayedClicked:(id)sender {
     AEPTargetOrder *order = [[AEPTargetOrder alloc] initWithId:@"id1" total:1.0 purchasedProductIds:@[@"ppId1"]];
     AEPTargetProduct *product =[[AEPTargetProduct alloc] initWithProductId:@"pId1" categoryId:@"cId1"];
@@ -53,6 +63,10 @@
 
 - (IBAction)resetExperienceClicked:(id)sender {
     [AEPMobileTarget resetExperience];
+}
+
+- (IBAction)clearPrefetch:(id)sender {
+    [AEPMobileTarget clearPrefetchCache];
 }
 
 - (IBAction)getThirdPartyClicked:(id)sender {
@@ -81,6 +95,14 @@
     if(![_griffonUrl.text isEqualToString:@""]) {
         [AEPAssurance startSession:[NSURL URLWithString:_griffonUrl.text]];
     }
+}
+
+- (IBAction)enterPreviewMode:(id)sender {
+    [AEPMobileCore collectLaunchInfo:@{@"adb_deeplink":@"com.adobe.targetpreview://?at_preview_token=yOrxbuHy8B3o80U0bnL8N5b1pDr5x7_lW-haGSc5zt4"}];
+}
+
+- (IBAction)setPreviewRestartDeeplink:(id)sender {
+    [AEPMobileTarget setPreviewRestartDeepLink:[NSURL URLWithString:(@"http://www.adobe.com")]];
 }
 
 @end

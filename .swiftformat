@@ -1,1 +1,2 @@
---swiftversion 5.0
+--disable indent
+--disable braces

@@ -19,6 +19,7 @@
 @import AEPTarget;
 @import AEPAssurance;
 @import ACPCore;
+@import AEPAnalytics;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 

@@ -25,11 +25,33 @@ class TargetTests: XCTestCase {
         target.onRegistered()
     }
 
-    // MARK: - Unit Tests
-
-    func testRegisterExtension_registersWithoutAnyErrorOrCrash() {
-        XCTAssertNoThrow(MobileCore.registerExtensions([Target.self]))
+    private func cleanUserDefaults() {
+        for _ in 0 ... 5 {
+            for key in getUserDefaults().dictionaryRepresentation().keys {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
+        }
+        for _ in 0 ... 5 {
+            for key in UserDefaults.standard.dictionaryRepresentation().keys {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
+        }
+        ServiceProvider.shared.namedKeyValueService.setAppGroup(nil)
     }
+
+    private func getTargetDataStore() -> NamedCollectionDataStore {
+        return NamedCollectionDataStore(name: "com.adobe.module.target")
+    }
+
+    private func getUserDefaults() -> UserDefaults {
+        if let appGroup = ServiceProvider.shared.namedKeyValueService.getAppGroup(), !appGroup.isEmpty {
+            return UserDefaults(suiteName: appGroup) ?? UserDefaults.standard
+        }
+
+        return UserDefaults.standard
+    }
+
+    // MARK: - Unit Tests
 
     func testRegisterExtension() {
         target.onRegistered()
@@ -42,20 +64,7 @@ class TargetTests: XCTestCase {
         XCTAssertTrue(target.readyForEvent(event))
     }
 
-    func testReadyForEvent_no_clientCode() {
-        let event = Event(name: "", type: "", source: "", data: nil)
-        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: event, data: (value: ["k": "v"], status: .set))
-        XCTAssertFalse(target.readyForEvent(event))
-    }
-
     func testReadyForEvent_no_configuration() {
         XCTAssertFalse(target.readyForEvent(Event(name: "", type: "", source: "", data: nil)))
-    }
-}
-
-private class MockNetworkService: Networking {
-    static var request: NetworkRequest?
-    func connectAsync(networkRequest request: NetworkRequest, completionHandler _: ((HttpConnection) -> Void)?) {
-        MockNetworkService.request = request
     }
 }

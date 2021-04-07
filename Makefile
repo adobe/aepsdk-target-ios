@@ -13,13 +13,10 @@ lint:
 	swiftlint lint
 
 check-format:
-	swiftformat --lint AEPTarget/Sources
+	swiftformat --lint AEPTarget/Sources --swiftversion 5.1
 	
 format:
 	swiftformat .
-
-generate-lcov:
-	xcrun llvm-cov export -format="lcov" .build/debug/AEPRulesEnginePackageTests.xctest/Contents/MacOS/AEPRulesEnginePackageTests -instr-profile .build/debug/codecov/default.profdata > info.lcov
 
 pod-install:
 	(pod install --repo-update)
@@ -34,14 +31,14 @@ install-swiftlint:
 	HOMEBREW_NO_AUTO_UPDATE=1 brew install swiftlint && brew cleanup swiftlint
 
 install-swiftformat:
-	(brew install swiftformat) 
+	HOMEBREW_NO_AUTO_UPDATE=1 brew install swiftformat && brew cleanup swiftformat 
 
 pod-update: pod-repo-update
 	(pod update)
 
 open:
 	open $(PROJECT_NAME).xcworkspace
-
+	
 clean:
 	(rm -rf build)
 
