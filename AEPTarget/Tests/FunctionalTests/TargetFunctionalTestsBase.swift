@@ -111,4 +111,17 @@ class TargetFunctionalTestsBase: XCTestCase {
         }
         return nil
     }
+
+    func getQueryMap(url: String) -> [String: String] {
+          let params: [String] = url.components(separatedBy: "&")
+          var map = [String: String]()
+
+          for string in params {
+              let name = string.components(separatedBy: "=")[0]
+              let value = string.components(separatedBy: "=")[1]
+              map[name] = value
+          }
+
+          return map
+      }
 }
