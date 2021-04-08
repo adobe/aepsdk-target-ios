@@ -185,6 +185,25 @@ class TargetPublicAPITests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testSetThirdPartyId_withNil() throws {
+        let expectation = XCTestExpectation(description: "Should dispatch a target request reset identity event for setting third party id")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.eventListeners.clear()
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.target, source: EventSource.requestIdentity) { event in
+            guard let eventData = event.data else {
+                XCTFail("Event data is nil")
+                expectation.fulfill()
+                return
+            }
+            let id = eventData[TargetConstants.EventDataKeys.THIRD_PARTY_ID] as? String
+            XCTAssertEqual(id, "")
+            expectation.fulfill()
+        }
+
+        Target.setThirdPartyId(nil)
+        wait(for: [expectation], timeout: 1)
+    }
+
     func testGetThirdPartyId() throws {
         let expectation = XCTestExpectation(description: "Should dispatch a target request reset identity event for getting third Party id")
         expectation.assertForOverFulfill = true
