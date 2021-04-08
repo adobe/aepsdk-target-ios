@@ -79,6 +79,23 @@ class TargetThirdPartyIdFunctionalTests: TargetFunctionalTestsBase {
         targetRequestListener(loadRequestEvent)
     }
 
+    func testSetThirdPartyId_emptyString() {
+        let data: [String: Any] = [
+            TargetConstants.EventDataKeys.THIRD_PARTY_ID: "",
+        ]
+
+        let setThirdPartyIdEvent = Event(name: "", type: "", source: "", data: data)
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: setThirdPartyIdEvent, data: (value: mockConfigSharedState, status: .set))
+        target.onRegistered()
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestIdentity"] else {
+            XCTFail()
+            return
+        }
+        eventListener(setThirdPartyIdEvent)
+        XCTAssertNotNil(target.targetState.thirdPartyId)
+        XCTAssertEqual(target.targetState.thirdPartyId, "")
+    }
+
     func testNotSetThirdPartyId() {
         XCTAssertNil(target.targetState.thirdPartyId)
 
