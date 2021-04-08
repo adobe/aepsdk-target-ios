@@ -16,46 +16,46 @@ import Foundation
 extension Event {
     /// Reads an array`TargetPrefetch` from the event data
     var prefetchObjectArray: [TargetPrefetch]? {
-        TargetPrefetch.from(dictionaries: data?[TargetConstants.EventDataKeys.PREFETCH_REQUESTS] as? [[String: Any]])
+        return TargetPrefetch.from(dictionaries: data?[TargetConstants.EventDataKeys.PREFETCH_REQUESTS] as? [[String: Any]])
     }
 
     /// Reads the `TargetParameters` from the event data
     var targetParameters: TargetParameters? {
-        TargetParameters.from(dictionary: data?[TargetConstants.EventDataKeys.TARGET_PARAMETERS] as? [String: Any])
+        return TargetParameters.from(dictionary: data?[TargetConstants.EventDataKeys.TARGET_PARAMETERS] as? [String: Any])
     }
 
     /// Returns true if this event is a prefetch request event
     var isPrefetchEvent: Bool {
-        data?[TargetConstants.EventDataKeys.PREFETCH_REQUESTS] != nil
+        return data?[TargetConstants.EventDataKeys.PREFETCH_REQUESTS] != nil
     }
 
     /// Returns true if this event is a load request event
     var isLoadRequest: Bool {
-        data?[TargetConstants.EventDataKeys.LOAD_REQUESTS] != nil
+        return data?[TargetConstants.EventDataKeys.LOAD_REQUESTS] != nil
     }
 
     /// Reads an array`TargetRequest` from the event data
     var targetRequests: [TargetRequest]? {
-        TargetRequest.from(dictionaries: data?[TargetConstants.EventDataKeys.LOAD_REQUESTS] as? [[String: Any]])
+        return TargetRequest.from(dictionaries: data?[TargetConstants.EventDataKeys.LOAD_REQUESTS] as? [[String: Any]])
     }
 
     /// Returns true if the event is location display request event
     var isLocationsDisplayedEvent: Bool {
-        data?[TargetConstants.EventDataKeys.IS_LOCATION_DISPLAYED] as? Bool ?? false
+        return data?[TargetConstants.EventDataKeys.IS_LOCATION_DISPLAYED] as? Bool ?? false
     }
 
     /// Returns true if the event is location clicked request event
     var isLocationClickedEvent: Bool {
-        data?[TargetConstants.EventDataKeys.IS_LOCATION_CLICKED] as? Bool ?? false
+        return data?[TargetConstants.EventDataKeys.IS_LOCATION_CLICKED] as? Bool ?? false
     }
 
     /// Returns true if this event is a reset experience request event
     var isResetExperienceEvent: Bool {
-        data?[TargetConstants.EventDataKeys.RESET_EXPERIENCE] as? Bool ?? false
+        return data?[TargetConstants.EventDataKeys.RESET_EXPERIENCE] as? Bool ?? false
     }
 
     /// Returns true if this event is a clear prefetch request event
     var isClearPrefetchCache: Bool {
-        data?[TargetConstants.EventDataKeys.CLEAR_PREFETCH_CACHE] as? Bool ?? false
+        return data?[TargetConstants.EventDataKeys.CLEAR_PREFETCH_CACHE] as? Bool ?? false
     }
 }
