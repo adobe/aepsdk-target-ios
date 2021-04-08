@@ -239,7 +239,7 @@ class TargetClickedLocationFunctionalTests: TargetFunctionalTestsBase {
         eventListener(locationClickedEvent)
     }
 
-    func testLocationClicked_withNoPrefetchedMbox() {
+    func testLocationClicked_withoutPrefetchedMbox() {
         // mocked network response
         let responseString = """
             {
