@@ -6,7 +6,7 @@ on:
       tag:
         description: 'tag/version'     
         required: true
-        default: '1.0.0'
+        default: '3.0.0'
       
       action_tag:
         description: 'create tag ("no" to skip)'     
@@ -14,7 +14,7 @@ on:
         default: 'yes'
 
 jobs:
-  release_profile:
+  release_target:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2

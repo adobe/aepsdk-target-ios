@@ -1,5 +1,15 @@
 #!/bin/bash
 
+#Copyright 2021 Adobe. All rights reserved.
+#This file is licensed to you under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License. You may obtain a copy
+#of the License at http://www.apache.org/licenses/LICENSE-2.0
+
+#Unless required by applicable law or agreed to in writing, software distributed under
+#the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+#OF ANY KIND, either express or implied. See the License for the specific language
+#governing permissions and limitations under the License.
+
 set -e # Any subsequent(*) commands which fail will cause the shell script to exit immediately
 
 PROJECT_NAME=TestProject
@@ -18,10 +28,10 @@ echo "
 platform :ios, '10.0'
 target '$PROJECT_NAME' do
   use_frameworks!
-  pod 'AEPCore', '~> 3.0.0'
-  pod 'AEPIdentity', '~> 3.0.0'
-  pod 'AEPLifecycle', '~> 3.0.0'
-  pod 'AEPServices', '~> 3.0.0'
+  pod 'AEPCore', '>= 3.1.0'
+  pod 'AEPIdentity', '>= 3.1.0'
+  pod 'AEPLifecycle', '>= 3.1.0'
+  pod 'AEPServices', '>= 3.1.0'
   pod 'AEPRulesEngine', '~> 1.0.0'
   pod 'AEPTarget', :path => '../'
 end

@@ -12,6 +12,7 @@
 
 import AEPCore
 import AEPServices
+import Foundation
 
 ///
 /// TargetPreviewManager FullscreenMessageDelegate meant to handle FullscreenMessage delegate calls

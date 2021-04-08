@@ -27,8 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         MobileCore.setLogLevel(.trace)
         MobileCore.registerExtensions([Lifecycle.self, Identity.self, Target.self, Signal.self, Analytics.self])
-        // https://experience.adobe.com/#/@obumobile5/launch/companies/COe866eac9a46b406fb25e1576ddb40375/properties/PRa0cdd30c31c1444ab6287bdbb5e28a65/overview
-        MobileCore.configureWith(appId: "launch-ENc28aaf2fb6934cff830c8d3ddc5465b1-development")
+        MobileCore.configureWith(appId: TestConstants.LAUNCH_ID)
         MobileCore.updateConfigurationWith(configDict: ["target.previewEnabled": true])
 
         // register AEPAssurance
@@ -44,7 +43,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options _: UIScene.ConnectionOptions) -> UISceneConfiguration {
         // Called when a new scene session is being created.
         // Use this method to select a configuration to create the new scene with.
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+        UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
     }
 
     func application(_: UIApplication, didDiscardSceneSessions _: Set<UISceneSession>) {

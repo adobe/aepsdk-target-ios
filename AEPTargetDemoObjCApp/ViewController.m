@@ -98,7 +98,7 @@
 }
 
 - (IBAction)enterPreviewMode:(id)sender {
-    [AEPMobileCore collectLaunchInfo:@{@"adb_deeplink":@"com.adobe.targetpreview://?at_preview_token=yOrxbuHy8B3o80U0bnL8N5b1pDr5x7_lW-haGSc5zt4"}];
+    [AEPMobileCore collectLaunchInfo:@{@"adb_deeplink":@""}];
 }
 
 - (IBAction)setPreviewRestartDeeplink:(id)sender {

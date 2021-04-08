@@ -12,6 +12,7 @@
 
 import AEPCore
 import AEPServices
+import Foundation
 
 ///
 /// Preview Manager manages Target Preview Modes

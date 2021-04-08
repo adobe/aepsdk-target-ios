@@ -19,7 +19,7 @@ struct ContentView: View {
     @State var thirdPartyId: String = ""
     @State var updatedThirdPartyId: String = ""
     @State var tntId: String = ""
-    @State var griffonUrl: String = "targetsdk://?adb_validation_sessionid=860de10f-acd1-40eb-be31-f7dca4e650f3"
+    @State var griffonUrl: String = TestConstants.GRIFFON_URL
     @State var fullscreenMessage: FullscreenPresentable?
     var body: some View {
         ScrollView {
@@ -153,7 +153,7 @@ struct ContentView: View {
     }
 
     func enterPreview() {
-        MobileCore.collectLaunchInfo(["adb_deeplink": "com.adobe.targetpreview://?at_preview_token=yOrxbuHy8B3o80U0bnL8N5b1pDr5x7_lW-haGSc5zt4"])
+        MobileCore.collectLaunchInfo(["adb_deeplink": TestConstants.DEEP_LINK])
     }
 }
 

@@ -21,7 +21,7 @@ public class Target: NSObject, Extension {
     private(set) var targetState: TargetState
 
     private var networkService: Networking {
-        return ServiceProvider.shared.networkService
+        ServiceProvider.shared.networkService
     }
 
     private var isInPreviewMode: Bool {
@@ -564,7 +564,7 @@ public class Target: NSObject, Extension {
     }
 
     private func retrieveLatestConfiguration(_ event: Event) -> [String: Any]? {
-        return getSharedState(extensionName: TargetConstants.Configuration.EXTENSION_NAME, event: event)?.value
+        getSharedState(extensionName: TargetConstants.Configuration.EXTENSION_NAME, event: event)?.value
     }
 
     /// Adds the display notification for the given mbox to the {@link #notifications} list

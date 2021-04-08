@@ -75,6 +75,7 @@
 		BB47C01025547D8300EC6FB5 /* TargetProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C00F25547D8300EC6FB5 /* TargetProduct.swift */; };
 		BB47C01225547DAE00EC6FB5 /* TargetRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB47C01125547DAE00EC6FB5 /* TargetRequest.swift */; };
 		BB4CAD18260CF9F00000711E /* TargetStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB4CAD17260CF9F00000711E /* TargetStateTests.swift */; };
+		BB6F43F0261FBA930093488D /* TestConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB6F43EF261FBA930093488D /* TestConstants.swift */; };
 		BB861104261B663B00A39187 /* TargetFunctionalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB861103261B663B00A39187 /* TargetFunctionalTests.swift */; };
 		BB861114261B73DC00A39187 /* TargetThirdPartyIdFunctionalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB861113261B73DC00A39187 /* TargetThirdPartyIdFunctionalTests.swift */; };
 		BB8FF0EE2602A705006C80D9 /* TargetIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB8FF0ED2602A705006C80D9 /* TargetIntegrationTests.swift */; };
@@ -227,6 +228,7 @@
 		BB47C00F25547D8300EC6FB5 /* TargetProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetProduct.swift; sourceTree = "<group>"; };
 		BB47C01125547DAE00EC6FB5 /* TargetRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetRequest.swift; sourceTree = "<group>"; };
 		BB4CAD17260CF9F00000711E /* TargetStateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TargetStateTests.swift; sourceTree = "<group>"; };
+		BB6F43EF261FBA930093488D /* TestConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestConstants.swift; sourceTree = "<group>"; };
 		BB861103261B663B00A39187 /* TargetFunctionalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetFunctionalTests.swift; sourceTree = "<group>"; };
 		BB861113261B73DC00A39187 /* TargetThirdPartyIdFunctionalTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TargetThirdPartyIdFunctionalTests.swift; sourceTree = "<group>"; };
 		BB8FF0ED2602A705006C80D9 /* TargetIntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TargetIntegrationTests.swift; sourceTree = "<group>"; };
@@ -438,6 +440,7 @@
 				92C44A8925DB0D3C000175FB /* LaunchScreen.storyboard */,
 				92C44A8C25DB0D3C000175FB /* Info.plist */,
 				92C44A8625DB0D3C000175FB /* Preview Content */,
+				BB6F43EF261FBA930093488D /* TestConstants.swift */,
 			);
 			path = AEPTargetDemoApp;
 			sourceTree = "<group>";
@@ -934,6 +937,7 @@
 				92C44A7F25DB0D39000175FB /* AppDelegate.swift in Sources */,
 				92C44A8125DB0D39000175FB /* SceneDelegate.swift in Sources */,
 				92C44A8325DB0D39000175FB /* ContentView.swift in Sources */,
+				BB6F43F0261FBA930093488D /* TestConstants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1154,7 +1158,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.0.beta.1;
+				MARKETING_VERSION = 3.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.aep.target;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1186,7 +1190,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.0.beta.1;
+				MARKETING_VERSION = 3.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.aep.target;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
