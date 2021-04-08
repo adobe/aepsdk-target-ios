@@ -1,2 +1,3 @@
 --disable indent
 --disable braces
+--disable redundantReturn
