@@ -439,6 +439,10 @@ public class Target: NSObject, Extension {
         }
         let response = TargetDeliveryResponse(responseJson: dict)
 
+        if connection.responseCode != 200 {
+            Log.debug(label: Target.LOG_TAG, "Errors returned in Target response with response code: \(String(describing: connection.responseCode))")
+        }
+
         if let error = response.errorMessage {
             if error.contains(TargetError.ERROR_NOTIFICATION_TAG) {
                 targetState.clearNotifications()
@@ -446,10 +450,6 @@ public class Target: NSObject, Extension {
 
             Log.debug(label: Target.LOG_TAG, "Errors returned in Target response: \(error)")
             return
-        }
-
-        if connection.responseCode != 200 {
-            Log.debug(label: Target.LOG_TAG, "Errors returned in Target response with response code: \(String(describing: connection.responseCode))")
         }
 
         if let tntId = response.tntId { setTntId(tntId: tntId) }

@@ -150,6 +150,57 @@ class TargetDisplayedLocationsFunctionalTests: TargetFunctionalTestsBase {
         XCTAssertEqual("DE03D4AD-1FFE-421F-B2F2-303BF26822C1.35_0", mockRuntime.createdSharedStates[0]?["tntid"] as? String)
     }
 
+    func testLocationDisplayed_errorResponse() {
+        // mocked network response
+        let responseString = """
+            {
+              "message": "error to process Notification request"
+            }
+        """
+
+        // Build the location data
+        let data: [String: Any] = [
+            "names": mockMBox,
+            "targetparams": TargetParameters(profileParameters: mockProfileParam).asDictionary() as Any,
+            TargetConstants.EventDataKeys.IS_LOCATION_DISPLAYED: true,
+        ]
+        let locationDisplayedEvent = Event(name: "", type: "", source: "", data: data)
+
+        // creates a configuration's shared state
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.configuration", event: locationDisplayedEvent, data: (value: mockConfigSharedState, status: .set))
+
+        // creates a lifecycle's shared state
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.lifecycle", event: locationDisplayedEvent, data: (value: mockLifecycleData, status: .set))
+
+        // creates an identity's shared state
+        mockRuntime.simulateSharedState(extensionName: "com.adobe.module.identity", event: locationDisplayedEvent, data: (value: mockIdentityData, status: .set))
+
+        // target state has mock prefetch mboxes
+        target.targetState.mergePrefetchedMboxJson(mboxesDictionary: mockMBoxJson)
+
+        // registers the event listeners for Target extension
+        target.onRegistered()
+
+        // override network service
+        let mockNetworkService = TestableNetworkService()
+        ServiceProvider.shared.networkService = mockNetworkService
+        mockNetworkService.mock { _ in
+
+            let errorResponse = HTTPURLResponse(url: URL(string: "https://amsdk.tt.omtrdc.net/rest/v1/delivery")!, statusCode: 400, httpVersion: nil, headerFields: nil)
+            return (data: responseString.data(using: .utf8), response: errorResponse, error: nil)
+        }
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
+            XCTFail()
+            return
+        }
+        XCTAssertTrue(target.readyForEvent(locationDisplayedEvent))
+        // handles the location display event
+        eventListener(locationDisplayedEvent)
+
+        // Check the notifications are cleared
+        XCTAssertTrue(target.targetState.notifications.isEmpty)
+    }
+
     func testLocationDisplayed_afterRetrievedTheSameLocationContent() {
         // mocked network response
         let responseString = """
