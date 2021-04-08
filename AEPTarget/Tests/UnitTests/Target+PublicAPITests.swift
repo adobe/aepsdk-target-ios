@@ -122,6 +122,32 @@ class TargetPublicAPITests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testLocationDisplayed_withEmptyMboxName() throws {
+        var dispatchedEvent = false
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.eventListeners.clear()
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.target, source: EventSource.requestContent) { event in
+            if let eventData = event.data, let _ = eventData[TargetConstants.EventDataKeys.MBOX_NAMES] as? [String] {
+                dispatchedEvent = true
+            }
+        }
+
+        Target.displayedLocations(names: [], targetParameters: nil)
+        XCTAssertFalse(dispatchedEvent)
+    }
+
+    func testLocationClicked_withEmptyMboxName() throws {
+        var dispatchedEvent = false
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.eventListeners.clear()
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.target, source: EventSource.requestContent) { event in
+            if let eventData = event.data, let _ = eventData[TargetConstants.EventDataKeys.MBOX_NAME] as? [String] {
+                dispatchedEvent = true
+            }
+        }
+
+        Target.clickedLocation(name: "", targetParameters: nil)
+        XCTAssertFalse(dispatchedEvent)
+    }
+
     func testLocationClicked() throws {
         let expectation = XCTestExpectation(description: "Should dispatch a target request content event for location clicked")
         expectation.assertForOverFulfill = true
@@ -185,6 +211,25 @@ class TargetPublicAPITests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testSetThirdPartyId_withNil() throws {
+        let expectation = XCTestExpectation(description: "Should dispatch a target request reset identity event for setting third party id")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.eventListeners.clear()
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.target, source: EventSource.requestIdentity) { event in
+            guard let eventData = event.data else {
+                XCTFail("Event data is nil")
+                expectation.fulfill()
+                return
+            }
+            let id = eventData[TargetConstants.EventDataKeys.THIRD_PARTY_ID] as? String
+            XCTAssertEqual(id, "")
+            expectation.fulfill()
+        }
+
+        Target.setThirdPartyId(nil)
+        wait(for: [expectation], timeout: 1)
+    }
+
     func testGetThirdPartyId() throws {
         let expectation = XCTestExpectation(description: "Should dispatch a target request reset identity event for getting third Party id")
         expectation.assertForOverFulfill = true
@@ -200,8 +245,24 @@ class TargetPublicAPITests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testGetThirdPartyId_withNilResponseEventData() throws {
+        let expectation = XCTestExpectation(description: "Should dispatch a GetThirdPartyId event")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.eventListeners.clear()
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.target, source: EventSource.requestIdentity) {
+            event in
+            MobileCore.dispatch(event: event.createResponseEvent(name: TargetConstants.EventName.IDENTITY_RESPONSE, type: EventType.target, source: EventSource.responseIdentity, data: nil))
+        }
+        Target.getThirdPartyId(completion: { id, error in
+            XCTAssertNil(id)
+            XCTAssertNotNil(error)
+            expectation.fulfill()
+        })
+        wait(for: [expectation], timeout: 1)
+    }
+
     func testGetTntId() throws {
-        let expectation = XCTestExpectation(description: "Should dispatch a target request reset identity event for getting tnt id")
+        let expectation = XCTestExpectation(description: "Should dispatch a GetTntId event")
         expectation.assertForOverFulfill = true
         EventHub.shared.getExtensionContainer(MockExtension.self)?.eventListeners.clear()
         EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.target, source: EventSource.requestIdentity) {
@@ -213,6 +274,53 @@ class TargetPublicAPITests: XCTestCase {
             expectation.fulfill()
         })
         wait(for: [expectation], timeout: 1)
+    }
+
+    func testGetTntId_withNilResponseEventData() throws {
+        let expectation = XCTestExpectation(description: "Should dispatch a GetTntId event")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.eventListeners.clear()
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.target, source: EventSource.requestIdentity) {
+            event in
+            MobileCore.dispatch(event: event.createResponseEvent(name: TargetConstants.EventName.IDENTITY_RESPONSE, type: EventType.target, source: EventSource.responseIdentity, data: nil))
+        }
+        Target.getTntId(completion: { id, error in
+            XCTAssertNil(id)
+            XCTAssertNotNil(error)
+            expectation.fulfill()
+        })
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func test_retrieveLocationContent_withEmptyArray() throws {
+        var dispatchedRetrieveEvent = false
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.target, source: EventSource.requestContent) { event in
+            if let eventData = event.data, let _ = eventData[TargetConstants.EventDataKeys.LOAD_REQUESTS] {
+                dispatchedRetrieveEvent = true
+            }
+        }
+        Target.retrieveLocationContent(requests: [], targetParameters: nil)
+        XCTAssertFalse(dispatchedRetrieveEvent)
+    }
+
+    func test_retrieveLocationContent_withEmptyMboxName() throws {
+        let expectation = XCTestExpectation(description: "retrieveLocationContent should return default content if the given mbox name is empty")
+        var dispatchedRetrieveEvent = false
+        let request = TargetRequest(mboxName: "", defaultContent: "DefaultValue", targetParameters: nil, contentCallback: { content in
+            XCTAssertTrue(content == "DefaultValue")
+            expectation.fulfill()
+        })
+
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.target, source: EventSource.requestContent) { event in
+            if let eventData = event.data, let _ = eventData[TargetConstants.EventDataKeys.LOAD_REQUESTS] {
+                dispatchedRetrieveEvent = true
+            }
+        }
+
+        Target.retrieveLocationContent(requests: [request], targetParameters: nil)
+
+        wait(for: [expectation], timeout: 1)
+        XCTAssertFalse(dispatchedRetrieveEvent)
     }
 
     func test_retrieveLocationContent() throws {
@@ -260,5 +368,40 @@ class TargetPublicAPITests: XCTestCase {
         Target.retrieveLocationContent(requests: [tr1, tr2], targetParameters: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"]))
 
         wait(for: [expectation1, expectation2], timeout: 1)
+    }
+
+    func test_clearPrefetchCache() {
+        let expectation = XCTestExpectation(description: "Should dispatch a clearPrefetchCache event")
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.eventListeners.clear()
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: "com.adobe.eventType.target", source: "com.adobe.eventSource.requestReset") { event in
+            guard let eventData = event.data else {
+                XCTFail("Event data is nil")
+                expectation.fulfill()
+                return
+            }
+            XCTAssertTrue(eventData["clearcache"] as? Bool ?? false)
+            expectation.fulfill()
+        }
+
+        Target.clearPrefetchCache()
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func test_setPreviewRestartDeepLink() {
+        let expectation = XCTestExpectation(description: "Should dispatch a setPreviewRestartDeepLink event")
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.eventListeners.clear()
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: "com.adobe.eventType.target", source: "com.adobe.eventSource.requestContent") { event in
+            guard let eventData = event.data else {
+                XCTFail("Event data is nil")
+                expectation.fulfill()
+                return
+            }
+
+            XCTAssertEqual("com.adobe.targetpreview://?at_preview_token=yOrxbuHy8B3o80U0bnL8N5b1pDr5x7_lW-haGSc5zt4", eventData["restartdeeplink"] as? String ?? "")
+            expectation.fulfill()
+        }
+
+        Target.setPreviewRestartDeepLink(deeplink: URL(string: "com.adobe.targetpreview://?at_preview_token=yOrxbuHy8B3o80U0bnL8N5b1pDr5x7_lW-haGSc5zt4")!)
+        wait(for: [expectation], timeout: 1)
     }
 }

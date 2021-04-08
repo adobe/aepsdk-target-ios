@@ -141,8 +141,8 @@ import Foundation
     /// is saved and restored during the standard application backup process, and is removed at uninstall or
     /// when AEPTarget::resetExperience is called.
     /// - Parameter thirdPartyId: a string pointer containing the value of the third party id (custom visitor id)
-    static func setThirdPartyId(_ id: String) {
-        let eventData = [TargetConstants.EventDataKeys.THIRD_PARTY_ID: id]
+    static func setThirdPartyId(_ id: String?) {
+        let eventData = [TargetConstants.EventDataKeys.THIRD_PARTY_ID: id ?? ""]
         let event = Event(name: TargetConstants.EventName.REQUEST_IDENTITY, type: EventType.target, source: EventSource.requestIdentity, data: eventData)
         MobileCore.dispatch(event: event)
     }

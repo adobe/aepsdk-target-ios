@@ -247,11 +247,11 @@ enum TargetDeliveryRequestBuilder {
     }
 
     private static func getProduct(product: TargetProduct?, globalProduct: TargetProduct?) -> Product? {
-        if let product = product {
-            return product.toInternalProduct()
-        }
         if let globalProduct = globalProduct {
             return globalProduct.toInternalProduct()
+        }
+        if let product = product {
+            return product.toInternalProduct()
         }
         return nil
     }

@@ -11,6 +11,7 @@
  */
 
 import ACPCore
+import AEPAnalytics
 import AEPAssurance
 import AEPCore
 import AEPIdentity
@@ -25,7 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
 
         MobileCore.setLogLevel(.trace)
-        MobileCore.registerExtensions([Lifecycle.self, Identity.self, Target.self, Signal.self])
+        MobileCore.registerExtensions([Lifecycle.self, Identity.self, Target.self, Signal.self, Analytics.self])
         // https://experience.adobe.com/#/@obumobile5/launch/companies/COe866eac9a46b406fb25e1576ddb40375/properties/PRa0cdd30c31c1444ab6287bdbb5e28a65/overview
         MobileCore.configureWith(appId: "launch-ENc28aaf2fb6934cff830c8d3ddc5465b1-development")
         MobileCore.updateConfigurationWith(configDict: ["target.previewEnabled": true])

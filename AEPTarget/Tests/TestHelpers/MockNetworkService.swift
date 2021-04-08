@@ -10,19 +10,12 @@
  governing permissions and limitations under the License.
  */
 
+@testable import AEPCore
+@testable import AEPServices
 
-#import <UIKit/UIKit.h>
-@import AEPCore;
-@import AEPLifecycle;
-@import AEPIdentity;
-@import AEPServices;
-@import AEPTarget;
-@import AEPAssurance;
-@import ACPCore;
-@import AEPAnalytics;
-
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
-
-
-@end
-
+class MockNetworkService: Networking {
+    static var request: NetworkRequest?
+    func connectAsync(networkRequest request: NetworkRequest, completionHandler _: ((HttpConnection) -> Void)?) {
+        MockNetworkService.request = request
+    }
+}

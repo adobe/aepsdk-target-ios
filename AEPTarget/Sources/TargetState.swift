@@ -25,7 +25,7 @@ class TargetState {
     private(set) var tntId: String?
     private(set) var sessionTimestampInSeconds: Int64?
 
-    private var storedSessionId: String
+    private(set) var storedSessionId: String
 
     private let LOADED_MBOX_ACCEPTED_KEYS = [TargetConstants.TargetJson.Mbox.NAME, TargetConstants.TargetJson.METRICS]
 
@@ -79,7 +79,7 @@ class TargetState {
         return storedSessionId
     }
 
-    private var storedEdgeHost: String?
+    private(set) var storedEdgeHost: String?
     var edgeHost: String? {
         if isSessionExpired() {
             updateEdgeHost(nil)
