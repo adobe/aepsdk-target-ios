@@ -85,29 +85,28 @@ struct ContentView: View {
 
     func prefetch() {
         Target.prefetchContent(
-            prefetchObjectArray: [
+            [
                 TargetPrefetch(name: "aep-loc-1", targetParameters: nil),
                 TargetPrefetch(name: "aep-loc-2", targetParameters: nil),
             ],
-            targetParameters: nil, completion: nil
+            nil
         )
     }
 
     func getLocations() {
-        Target.retrieveLocationContent(requests:
-            [TargetRequest(mboxName: "aep-loc-1", defaultContent: "DefaultValue", targetParameters: nil, contentCallback: { content in
+        Target.retrieveLocationContent([TargetRequest(mboxName: "aep-loc-1", defaultContent: "DefaultValue", targetParameters: nil, contentCallback: { content in
                 print("------")
                 print(content ?? "")
             }),
-             TargetRequest(mboxName: "aep-loc-2", defaultContent: "DefaultValue2", targetParameters: nil, contentCallback: { content in
+                                        TargetRequest(mboxName: "aep-loc-2", defaultContent: "DefaultValue2", targetParameters: nil, contentCallback: { content in
                 print("------")
                 print(content ?? "")
             }),
-             TargetRequest(mboxName: "aep-loc-x", defaultContent: "DefaultValuex", targetParameters: nil, contentCallback: { content in
+                                        TargetRequest(mboxName: "aep-loc-x", defaultContent: "DefaultValuex", targetParameters: nil, contentCallback: { content in
                print("------")
                print(content ?? "")
            })],
-                                       targetParameters: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"], order: TargetOrder(id: "id1", total: 1.0, purchasedProductIds: ["ppId1"]), product: TargetProduct(productId: "pId1", categoryId: "cId1")))
+                                       with: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"], order: TargetOrder(id: "id1", total: 1.0, purchasedProductIds: ["ppId1"]), product: TargetProduct(productId: "pId1", categoryId: "cId1")))
     }
 
     func locationDisplayed() {
