@@ -33,7 +33,7 @@ import Foundation
     ///   - targetParameters: a TargetParameters object containing parameters for all the mboxes in the request array
     ///   - completion: the callback `closure` which will be called after the prefetch is complete.  The parameter in the callback will be nil if the prefetch completed successfully, or will contain error message otherwise
     @objc(prefetchContent:withParameters:callback:)
-    static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters?, _ completion: ((Error?) -> Void)?) {
+    static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters? = nil, _ completion: ((Error?) -> Void)?) {
         let completion = completion ?? { _ in }
 
         guard !prefetchArray.isEmpty else {
@@ -82,7 +82,7 @@ import Foundation
     ///   - requestArray:  An array of AEPTargetRequestObject objects to retrieve content
     ///   - targetParameters: a TargetParameters object containing parameters for all locations in the requests array
     @objc(retrieveLocationContent:withParameters:)
-    static func retrieveLocationContent(_ requestArray: [TargetRequest], with targetParameters: TargetParameters?) {
+    static func retrieveLocationContent(_ requestArray: [TargetRequest], with targetParameters: TargetParameters? = nil) {
         if requestArray.isEmpty {
             Log.error(label: Target.LOG_TAG, "Failed to retrieve location content target request \(TargetError.ERROR_NULL_EMPTY_REQUEST_MESSAGE)")
             return

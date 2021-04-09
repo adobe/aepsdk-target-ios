@@ -90,7 +90,7 @@ This API sends a prefetch request to your configured Target server with the pref
 #### Syntax 
 
 ```swift
-static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters?, _ completion: ((Error?) -> Void)?)
+static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters? = nil, _ completion: ((Error?) -> Void)?)
 ```
 
   - *prefetchArray* - is an array of `TargetPrefetch` objects for various mbox locations.
@@ -196,7 +196,7 @@ For mbox locations in the Target requests list that are not already prefetched, 
 #### Syntax 
 
 ```swift
-static func retrieveLocationContent(_ requestArray: [TargetRequest], with targetParameters: TargetParameters?)
+static func retrieveLocationContent(_ requestArray: [TargetRequest], with targetParameters: TargetParameters? = nil)
 ```
 
   - *requestArray* : an array of `TargetRequest` objects to retrieve content

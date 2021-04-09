@@ -399,7 +399,7 @@ class TargetIntegrationTests: XCTestCase {
             XCTAssertEqual("default_content", content)
             targetRequestExpectation.fulfill()
         }
-        Target.retrieveLocationContent([retrieveRequest], with: nil)
+        Target.retrieveLocationContent([retrieveRequest])
         wait(for: [targetRequestExpectation], timeout: 1)
     }
 
@@ -624,7 +624,6 @@ class TargetIntegrationTests: XCTestCase {
         }
         Target.prefetchContent(
             [TargetPrefetch(name: "mboxName1", targetParameters: nil), TargetPrefetch(name: "mboxName2", targetParameters: nil)],
-            with: nil,
             nil
         )
         Target.displayedLocations(
@@ -745,7 +744,6 @@ class TargetIntegrationTests: XCTestCase {
         }
         Target.prefetchContent(
             [TargetPrefetch(name: "mboxName1", targetParameters: nil), TargetPrefetch(name: "mboxName2", targetParameters: nil)],
-            with: nil,
             nil
         )
 

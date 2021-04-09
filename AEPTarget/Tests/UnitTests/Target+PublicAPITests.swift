@@ -299,7 +299,7 @@ class TargetPublicAPITests: XCTestCase {
                 dispatchedRetrieveEvent = true
             }
         }
-        Target.retrieveLocationContent([], with: nil)
+        Target.retrieveLocationContent([])
         XCTAssertFalse(dispatchedRetrieveEvent)
     }
 
@@ -317,7 +317,7 @@ class TargetPublicAPITests: XCTestCase {
             }
         }
 
-        Target.retrieveLocationContent([request], with: nil)
+        Target.retrieveLocationContent([request])
 
         wait(for: [expectation], timeout: 1)
         XCTAssertFalse(dispatchedRetrieveEvent)
