@@ -356,7 +356,7 @@ ACPTarget.getThirdPartyId({id, err in
 #### Example
 
 ```objectivec
-    [AEPMobileTarget getThirdPartyIdWithCompletion:^(NSString *thirdPartyID, NSError *error){
+    [AEPMobileTarget getThirdPartyId:^(NSString *thirdPartyID, NSError *error){
         // read Target thirdPartyId
     }];
 ```
@@ -398,7 +398,7 @@ static func getTntId(_ completion: @escaping (String?, Error?) -> Void)
 #### Example
 
 ```objectivec
-    [AEPMobileTarget getTntIdWithCompletion:^(NSString *tntID, NSError *error){
+    [AEPMobileTarget getTntId:^(NSString *tntID, NSError *error){
         // read target's tntId 
     }];
 ```
