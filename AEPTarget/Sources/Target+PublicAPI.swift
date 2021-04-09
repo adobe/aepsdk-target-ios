@@ -150,7 +150,7 @@ import Foundation
     /// Gets the custom visitor ID for Target
     /// This ID will be reset  when the `resetExperience()` API is called.
     /// - Parameter completion:  the callback `closure` will be invoked to return the thirdPartyId value or `nil` if no third-party ID is set
-    static func getThirdPartyId(completion: @escaping (String?, Error?) -> Void) {
+    static func getThirdPartyId(_ completion: @escaping (String?, Error?) -> Void) {
         let event = Event(name: TargetConstants.EventName.REQUEST_IDENTITY, type: EventType.target, source: EventSource.requestIdentity, data: nil)
         MobileCore.dispatch(event: event) { responseEvent in
             guard let responseEvent = responseEvent else {
@@ -183,7 +183,7 @@ import Foundation
     /// backup process, and is removed at uninstall or when AEPTarget::resetExperience is called.
     ///
     /// - Parameter completion:  the callback `closure` invoked with the current tnt id or `nil` if no tnt id is set.
-    static func getTntId(completion: @escaping (String?, Error?) -> Void) {
+    static func getTntId(_ completion: @escaping (String?, Error?) -> Void) {
         let event = Event(name: TargetConstants.EventName.REQUEST_IDENTITY, type: EventType.target, source: EventSource.requestIdentity, data: nil)
         MobileCore.dispatch(event: event) { responseEvent in
             guard let responseEvent = responseEvent else {
@@ -228,7 +228,7 @@ import Foundation
     /// Set the Target preview URL to be displayed when the preview mode is restarted.
     /// - Parameter deeplink:  the URL which will be set for preview restart
     @objc(setPreviewRestartDeepLink:)
-    static func setPreviewRestartDeepLink(deeplink: URL) {
+    static func setPreviewRestartDeepLink(_ deeplink: URL) {
         let eventData = [TargetConstants.EventDataKeys.PREVIEW_RESTART_DEEP_LINK: deeplink.absoluteString]
         let event = Event(name: TargetConstants.EventName.SET_PREVIEW_DEEPLINK, type: EventType.target, source: EventSource.requestContent, data: eventData)
         MobileCore.dispatch(event: event)
@@ -236,10 +236,10 @@ import Foundation
 
     /// Sends a display notification to Target for given prefetched mboxes. This helps Target record location display events.
     /// - Parameters:
-    ///   - mboxNames:  (required) an array of displayed location names
+    ///   - names:  (required) an array of displayed location names
     ///   - targetParameters: for the displayed location
     @objc(displayedLocations:withTargetParameters:)
-    static func displayedLocations(names: [String], targetParameters: TargetParameters?) {
+    static func displayedLocations(_ names: [String], targetParameters: TargetParameters? = nil) {
         if names.isEmpty {
             Log.error(label: LOG_TAG, "Failed to send display notification, List of Mbox names must not be empty.")
             return
@@ -263,7 +263,7 @@ import Foundation
     ///   - mboxName:  NSString value representing the name for location/mbox
     ///   - targetParameters:  a TargetParameters object containing parameters for the location clicked
     @objc(clickedLocation:withTargetParameters:)
-    static func clickedLocation(name: String, targetParameters: TargetParameters?) {
+    static func clickedLocation(_ name: String, targetParameters: TargetParameters? = nil) {
         if name.isEmpty {
             Log.error(label: LOG_TAG, "Failed to send click notification, Mbox name must not be empty or nil.")
             return

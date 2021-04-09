@@ -118,7 +118,7 @@ class TargetPublicAPITests: XCTestCase {
             expectation.fulfill()
         }
 
-        Target.displayedLocations(names: ["Drink_1", "Drink_2"], targetParameters: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"]))
+        Target.displayedLocations(["Drink_1", "Drink_2"], targetParameters: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"]))
         wait(for: [expectation], timeout: 1)
     }
 
@@ -131,7 +131,7 @@ class TargetPublicAPITests: XCTestCase {
             }
         }
 
-        Target.displayedLocations(names: [], targetParameters: nil)
+        Target.displayedLocations([], targetParameters: nil)
         XCTAssertFalse(dispatchedEvent)
     }
 
@@ -144,7 +144,7 @@ class TargetPublicAPITests: XCTestCase {
             }
         }
 
-        Target.clickedLocation(name: "", targetParameters: nil)
+        Target.clickedLocation("", targetParameters: nil)
         XCTAssertFalse(dispatchedEvent)
     }
 
@@ -169,7 +169,7 @@ class TargetPublicAPITests: XCTestCase {
             expectation.fulfill()
         }
 
-        Target.clickedLocation(name: "Drink_1", targetParameters: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"]))
+        Target.clickedLocation("Drink_1", targetParameters: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"]))
         wait(for: [expectation], timeout: 1)
     }
 
@@ -238,10 +238,10 @@ class TargetPublicAPITests: XCTestCase {
             event in
             MobileCore.dispatch(event: event.createResponseEvent(name: TargetConstants.EventName.IDENTITY_RESPONSE, type: EventType.target, source: EventSource.responseIdentity, data: [TargetConstants.EventDataKeys.THIRD_PARTY_ID: "mockId"]))
         }
-        Target.getThirdPartyId(completion: { id, _ in
+        Target.getThirdPartyId { id, _ in
             XCTAssertEqual(id, "mockId")
             expectation.fulfill()
-        })
+        }
         wait(for: [expectation], timeout: 1)
     }
 
@@ -253,11 +253,11 @@ class TargetPublicAPITests: XCTestCase {
             event in
             MobileCore.dispatch(event: event.createResponseEvent(name: TargetConstants.EventName.IDENTITY_RESPONSE, type: EventType.target, source: EventSource.responseIdentity, data: nil))
         }
-        Target.getThirdPartyId(completion: { id, error in
+        Target.getThirdPartyId { id, error in
             XCTAssertNil(id)
             XCTAssertNotNil(error)
             expectation.fulfill()
-        })
+        }
         wait(for: [expectation], timeout: 1)
     }
 
@@ -269,10 +269,10 @@ class TargetPublicAPITests: XCTestCase {
             event in
             MobileCore.dispatch(event: event.createResponseEvent(name: TargetConstants.EventName.IDENTITY_RESPONSE, type: EventType.target, source: EventSource.responseIdentity, data: [TargetConstants.EventDataKeys.TNT_ID: "mockId"]))
         }
-        Target.getTntId(completion: { id, _ in
+        Target.getTntId { id, _ in
             XCTAssertEqual(id, "mockId")
             expectation.fulfill()
-        })
+        }
         wait(for: [expectation], timeout: 1)
     }
 
@@ -284,11 +284,11 @@ class TargetPublicAPITests: XCTestCase {
             event in
             MobileCore.dispatch(event: event.createResponseEvent(name: TargetConstants.EventName.IDENTITY_RESPONSE, type: EventType.target, source: EventSource.responseIdentity, data: nil))
         }
-        Target.getTntId(completion: { id, error in
+        Target.getTntId { id, error in
             XCTAssertNil(id)
             XCTAssertNotNil(error)
             expectation.fulfill()
-        })
+        }
         wait(for: [expectation], timeout: 1)
     }
 
@@ -401,7 +401,7 @@ class TargetPublicAPITests: XCTestCase {
             expectation.fulfill()
         }
 
-        Target.setPreviewRestartDeepLink(deeplink: URL(string: "com.adobe.targetpreview://?at_preview_token=yOrxbuHy8B3o80U0bnL8N5b1pDr5x7_lW-haGSc5zt4")!)
+        Target.setPreviewRestartDeepLink(URL(string: "com.adobe.targetpreview://?at_preview_token=yOrxbuHy8B3o80U0bnL8N5b1pDr5x7_lW-haGSc5zt4")!)
         wait(for: [expectation], timeout: 1)
     }
 }

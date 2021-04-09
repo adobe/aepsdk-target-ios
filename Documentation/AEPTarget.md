@@ -330,7 +330,7 @@ This API gets the custom visitor ID for Target. If no `third-party` ID was previ
 #### Syntax 
 
 ```swift
-static func getThirdPartyId(completion: @escaping (String?, Error?) -> Void)
+static func getThirdPartyId(_ completion: @escaping (String?, Error?) -> Void)
 ```
 
   - *completion* : invoked with the `thirdPartyId` value. If no `third-party` ID was set, this value will be `nil`.
@@ -372,7 +372,7 @@ This API gets the Target user identifier. Target returns the tntId with a succes
 #### Syntax 
 
 ```swift
-static func getTntId(completion: @escaping (String?, Error?) -> Void)
+static func getTntId(_ completion: @escaping (String?, Error?) -> Void)
 ```
 
   - *completion* : invoked with the `tntId` value. If no Target ID was set, this value will be `nil`.
@@ -514,7 +514,7 @@ Use this API to send a location (mbox) display notification to the configured Ta
 #### Syntax 
 
 ```swift
-static func displayedLocations(names: [String], targetParameters: TargetParameters?)
+static func displayedLocations(_ names: [String], targetParameters: TargetParameters?)
 ```
 
   - *names* : is an array of the mbox locations for which the display notification will be sent to Target.
@@ -569,7 +569,7 @@ This API sends a location (mbox) click notification to the configured Target ser
 #### Syntax 
 
 ```swift
-static func clickedLocation(name: String, targetParameters: TargetParameters?)
+static func clickedLocation(_ name: String, targetParameters: TargetParameters?)
 ```
 
   - *name* : a `String` that contains the mbox location for which the click notification will be sent to Target.

@@ -70,7 +70,7 @@
 }
 
 - (IBAction)getThirdPartyClicked:(id)sender {
-    [AEPMobileTarget getThirdPartyIdWithCompletion:^(NSString *thirdPartyID, NSError *error){
+    [AEPMobileTarget getThirdPartyId:^(NSString *thirdPartyID, NSError *error){
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.lblThirdParty setText:thirdPartyID];
         });
@@ -78,7 +78,7 @@
 }
 
 - (IBAction)getTntIDClicked:(id)sender {
-    [AEPMobileTarget getTntIdWithCompletion:^(NSString *tntID, NSError *error){
+    [AEPMobileTarget getTntId:^(NSString *tntID, NSError *error){
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.lblTntId setText:tntID];
         });

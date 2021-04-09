@@ -627,7 +627,7 @@ class TargetIntegrationTests: XCTestCase {
             nil
         )
         Target.displayedLocations(
-            names: ["mboxName1", "mboxName2"],
+            ["mboxName1", "mboxName2"],
             targetParameters: TargetParameters(
                 parameters: nil,
                 profileParameters: nil,
@@ -748,7 +748,7 @@ class TargetIntegrationTests: XCTestCase {
         )
 
         Target.clickedLocation(
-            name: "mboxName1",
+            "mboxName1",
             targetParameters: TargetParameters(
                 parameters: nil,
                 profileParameters: nil,
