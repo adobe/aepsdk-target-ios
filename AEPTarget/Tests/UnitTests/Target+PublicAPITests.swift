@@ -397,11 +397,11 @@ class TargetPublicAPITests: XCTestCase {
                 return
             }
 
-            XCTAssertEqual("com.adobe.targetpreview://?at_preview_token=yOrxbuHy8B3o80U0bnL8N5b1pDr5x7_lW-haGSc5zt4", eventData["restartdeeplink"] as? String ?? "")
+            XCTAssertEqual("com.adobe.targetpreview://?at_preview_token=123_xggdfeTGa", eventData["restartdeeplink"] as? String ?? "")
             expectation.fulfill()
         }
 
-        Target.setPreviewRestartDeepLink(URL(string: "com.adobe.targetpreview://?at_preview_token=yOrxbuHy8B3o80U0bnL8N5b1pDr5x7_lW-haGSc5zt4")!)
+        Target.setPreviewRestartDeepLink(URL(string: "com.adobe.targetpreview://?at_preview_token=123_xggdfeTGa")!)
         wait(for: [expectation], timeout: 1)
     }
 }
