@@ -139,8 +139,8 @@ import Foundation
     /// Sets the custom visitor ID for Target.
     /// Sets a custom ID to identify visitors (profiles). This ID is preserved between app upgrades,
     /// is saved and restored during the standard application backup process, and is removed at uninstall or
-    /// when AEPTarget::resetExperience is called.
-    /// - Parameter thirdPartyId: a string pointer containing the value of the third party id (custom visitor id)
+    /// when AEPTarget.resetExperience is called.
+    /// - Parameter id: a string pointer containing the value of the third party id (custom visitor id)
     static func setThirdPartyId(_ id: String?) {
         let eventData = [TargetConstants.EventDataKeys.THIRD_PARTY_ID: id ?? ""]
         let event = Event(name: TargetConstants.EventName.REQUEST_IDENTITY, type: EventType.target, source: EventSource.requestIdentity, data: eventData)
@@ -180,7 +180,7 @@ import Foundation
     /// Mobile SDK after a successful call to prefetch content or load requests.
     ///
     /// This ID is preserved between app upgrades, is saved and restored during the standard application
-    /// backup process, and is removed at uninstall or when AEPTarget::resetExperience is called.
+    /// backup process, and is removed at uninstall or when AEPTarget.resetExperience is called.
     ///
     /// - Parameter completion:  the callback `closure` invoked with the current tnt id or `nil` if no tnt id is set.
     static func getTntId(_ completion: @escaping (String?, Error?) -> Void) {
@@ -260,7 +260,7 @@ import Foundation
     /// location before, indicating that the mbox was viewed. This request helps Target record the clicked event for the given location or mbox.
     ///
     /// - Parameters:
-    ///   - mboxName:  NSString value representing the name for location/mbox
+    ///   - mboxName:  String value representing the name for location/mbox
     ///   - targetParameters:  a TargetParameters object containing parameters for the location clicked
     @objc(clickedLocation:withTargetParameters:)
     static func clickedLocation(_ name: String, targetParameters: TargetParameters? = nil) {
