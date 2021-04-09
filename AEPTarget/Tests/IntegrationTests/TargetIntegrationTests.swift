@@ -337,11 +337,11 @@ class TargetIntegrationTests: XCTestCase {
         }
 
         Target.prefetchContent(
-            prefetchObjectArray: [
+            [
                 TargetPrefetch(name: "Drink_1", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
                 TargetPrefetch(name: "Drink_2", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
             ],
-            targetParameters: TargetParameters(profileParameters: ["name": "Smith"])
+            with: TargetParameters(profileParameters: ["name": "Smith"])
         ) { error in
             if let error = error {
                 Log.error(label: self.T_LOG_TAG, "Target.prefetchContent - failed, error:  \(String(describing: error))")
@@ -399,7 +399,7 @@ class TargetIntegrationTests: XCTestCase {
             XCTAssertEqual("default_content", content)
             targetRequestExpectation.fulfill()
         }
-        Target.retrieveLocationContent(requests: [retrieveRequest], targetParameters: nil)
+        Target.retrieveLocationContent([retrieveRequest], with: nil)
         wait(for: [targetRequestExpectation], timeout: 1)
     }
 
@@ -623,9 +623,9 @@ class TargetIntegrationTests: XCTestCase {
             return nil
         }
         Target.prefetchContent(
-            prefetchObjectArray: [TargetPrefetch(name: "mboxName1", targetParameters: nil), TargetPrefetch(name: "mboxName2", targetParameters: nil)],
-            targetParameters: nil,
-            completion: nil
+            [TargetPrefetch(name: "mboxName1", targetParameters: nil), TargetPrefetch(name: "mboxName2", targetParameters: nil)],
+            with: nil,
+            nil
         )
         Target.displayedLocations(
             names: ["mboxName1", "mboxName2"],
@@ -744,9 +744,9 @@ class TargetIntegrationTests: XCTestCase {
             return nil
         }
         Target.prefetchContent(
-            prefetchObjectArray: [TargetPrefetch(name: "mboxName1", targetParameters: nil), TargetPrefetch(name: "mboxName2", targetParameters: nil)],
-            targetParameters: nil,
-            completion: nil
+            [TargetPrefetch(name: "mboxName1", targetParameters: nil), TargetPrefetch(name: "mboxName2", targetParameters: nil)],
+            with: nil,
+            nil
         )
 
         Target.clickedLocation(

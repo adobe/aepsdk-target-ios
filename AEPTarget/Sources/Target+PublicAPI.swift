@@ -33,18 +33,18 @@ import Foundation
     ///   - targetParameters: a TargetParameters object containing parameters for all the mboxes in the request array
     ///   - completion: the callback `closure` which will be called after the prefetch is complete.  The parameter in the callback will be nil if the prefetch completed successfully, or will contain error message otherwise
     @objc(prefetchContent:withParameters:callback:)
-    static func prefetchContent(prefetchObjectArray: [TargetPrefetch], targetParameters: TargetParameters?, completion: ((Error?) -> Void)?) {
+    static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters?, _ completion: ((Error?) -> Void)?) {
         let completion = completion ?? { _ in }
 
-        guard !prefetchObjectArray.isEmpty else {
+        guard !prefetchArray.isEmpty else {
             Log.error(label: Target.LOG_TAG, "Failed to prefetch Target request (the provided request list for mboxes is empty or nil)")
             completion(TargetError(message: TargetError.ERROR_EMPTY_PREFETCH_LIST))
             return
         }
-        var prefetchArray = [[String: Any]]()
-        for prefetch in prefetchObjectArray {
+        var prefetchDataArray = [[String: Any]]()
+        for prefetch in prefetchArray {
             if let dict = prefetch.asDictionary() {
-                prefetchArray.append(dict)
+                prefetchDataArray.append(dict)
 
             } else {
                 Log.error(label: Target.LOG_TAG, "Failed to prefetch Target request (the provided prefetch object can't be converted to [String: Any] dictionary), prefetch => \(prefetch)")
@@ -53,7 +53,7 @@ import Foundation
             }
         }
 
-        var eventData: [String: Any] = [TargetConstants.EventDataKeys.PREFETCH_REQUESTS: prefetchArray]
+        var eventData: [String: Any] = [TargetConstants.EventDataKeys.PREFETCH_REQUESTS: prefetchDataArray]
         if let targetParametersDict = targetParameters?.asDictionary() {
             eventData[TargetConstants.EventDataKeys.TARGET_PARAMETERS] = targetParametersDict
         }
@@ -82,8 +82,8 @@ import Foundation
     ///   - requests:  An array of AEPTargetRequestObject objects to retrieve content
     ///   - targetParameters: a TargetParameters object containing parameters for all locations in the requests array
     @objc(retrieveLocationContent:withParameters:)
-    static func retrieveLocationContent(requests: [TargetRequest], targetParameters: TargetParameters?) {
-        if requests.isEmpty {
+    static func retrieveLocationContent(_ requestArray: [TargetRequest], with targetParameters: TargetParameters?) {
+        if requestArray.isEmpty {
             Log.error(label: Target.LOG_TAG, "Failed to retrieve location content target request \(TargetError.ERROR_NULL_EMPTY_REQUEST_MESSAGE)")
             return
         }
@@ -91,7 +91,7 @@ import Foundation
         var targetRequestsArray = [[String: Any]]()
         var tempIdToRequest: [String: TargetRequest] = [:]
 
-        for request in requests {
+        for request in requestArray {
             if request.name.isEmpty {
                 // If the callback is present call with default content
                 if let callback = request.contentCallback {

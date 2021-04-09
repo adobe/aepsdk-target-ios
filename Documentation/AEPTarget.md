@@ -90,10 +90,10 @@ This API sends a prefetch request to your configured Target server with the pref
 #### Syntax 
 
 ```swift
-static func prefetchContent(prefetchObjectArray: [TargetPrefetch],    targetParameters: TargetParameters?, completion: ((Error?) -> Void)?)
+static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters?, _ completion: ((Error?) -> Void)?)
 ```
 
-  - *prefetchObjectArray* - is an array of `TargetPrefetch` objects for various mbox locations.
+  - *prefetchArray* - is an array of `TargetPrefetch` objects for various mbox locations.
   - *targetParameters* - is the configured `TargetParameters` for the prefetch request.
   - If the prefetch is successful, `completion` is invoked with a nil value. If the prefetch is not successful, an error message is returned.
 
@@ -121,11 +121,11 @@ static func prefetchContent(prefetchObjectArray: [TargetPrefetch],    targetPara
             product: TargetProduct(productId: "24D334", categoryId:"Stationary")
         )
         Target.prefetchContent(
-            prefetchObjectArray: [
+            [
                 TargetPrefetch(name: "mboxName1", targetParameters: TargetParameters1),
                 TargetPrefetch(name: "mboxName2", targetParameters: TargetParameters2),
             ],
-            targetParameters: globalTargetParameters
+            with: globalTargetParameters
         ){ error in
             // do something with the callback response
         }
@@ -196,10 +196,10 @@ For mbox locations in the Target requests list that are not already prefetched, 
 #### Syntax 
 
 ```swift
-static func retrieveLocationContent(requests: [TargetRequest], targetParameters: TargetParameters?)
+static func retrieveLocationContent(_ requestArray: [TargetRequest], with targetParameters: TargetParameters?)
 ```
 
-  - *requests* : an array of `TargetRequest` objects to retrieve content
+  - *requestArray* : an array of `TargetRequest` objects to retrieve content
   - *targetParameters* : a `TargetParameters` object containing parameters for all locations in the requests array
 
 #### Example
@@ -232,7 +232,7 @@ static func retrieveLocationContent(requests: [TargetRequest], targetParameters:
         let request2 = TargetRequest(mboxName: "logo", defaultContent: "red", targetParameters: TargetParameters2) { _ in
             // do something with the received content
         }
-        Target.retrieveLocationContent(requests: [request1, request2], targetParameters: globalTargetParameters)
+        Target.retrieveLocationContent([request1, request2], with: globalTargetParameters)
 ```
 
 ### Objective C

@@ -52,12 +52,12 @@ class TargetPublicAPITests: XCTestCase {
         }
 
         Target.prefetchContent(
-            prefetchObjectArray: [
+            [
                 TargetPrefetch(name: "Drink_1", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
                 TargetPrefetch(name: "Drink_2", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
             ],
-            targetParameters: TargetParameters(profileParameters: ["name": "Smith"]),
-            completion: nil
+            with: TargetParameters(profileParameters: ["name": "Smith"]),
+            nil
         )
         wait(for: [expectation], timeout: 1)
     }
@@ -65,7 +65,7 @@ class TargetPublicAPITests: XCTestCase {
     func testPrefetchContent_with_empty_PrefetchObjectArray() throws {
         let expectation = XCTestExpectation(description: "error callback")
         expectation.assertForOverFulfill = true
-        Target.prefetchContent(prefetchObjectArray: [], targetParameters: TargetParameters(profileParameters: ["name": "Smith"])) { error in
+        Target.prefetchContent([], with: TargetParameters(profileParameters: ["name": "Smith"])) { error in
             guard let error = error as? TargetError else {
                 return
             }
@@ -82,11 +82,11 @@ class TargetPublicAPITests: XCTestCase {
             EventHub.shared.dispatch(event: event.createResponseEvent(name: "", type: "", source: "", data: ["prefetcherror": "unexpected error"]))
         }
         Target.prefetchContent(
-            prefetchObjectArray: [
+            [
                 TargetPrefetch(name: "Drink_1", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
                 TargetPrefetch(name: "Drink_2", targetParameters: TargetParameters(profileParameters: ["mbox-parameter-key1": "mbox-parameter-value1"])),
             ],
-            targetParameters: TargetParameters(profileParameters: ["name": "Smith"])
+            with: TargetParameters(profileParameters: ["name": "Smith"])
         ) { error in
             guard let error = error as? TargetError else {
                 return
@@ -299,7 +299,7 @@ class TargetPublicAPITests: XCTestCase {
                 dispatchedRetrieveEvent = true
             }
         }
-        Target.retrieveLocationContent(requests: [], targetParameters: nil)
+        Target.retrieveLocationContent([], with: nil)
         XCTAssertFalse(dispatchedRetrieveEvent)
     }
 
@@ -317,7 +317,7 @@ class TargetPublicAPITests: XCTestCase {
             }
         }
 
-        Target.retrieveLocationContent(requests: [request], targetParameters: nil)
+        Target.retrieveLocationContent([request], with: nil)
 
         wait(for: [expectation], timeout: 1)
         XCTAssertFalse(dispatchedRetrieveEvent)
@@ -365,7 +365,7 @@ class TargetPublicAPITests: XCTestCase {
             expectation2.fulfill()
         }
 
-        Target.retrieveLocationContent(requests: [tr1, tr2], targetParameters: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"]))
+        Target.retrieveLocationContent([tr1, tr2], with: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"]))
 
         wait(for: [expectation1, expectation2], timeout: 1)
     }
