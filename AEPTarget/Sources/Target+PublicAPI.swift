@@ -29,7 +29,7 @@ import Foundation
     /// an error object, nil if the prefetch was successful or error description if the prefetch was unsuccessful.
     /// The prefetched mboxes are cached in memory for the current application session and returned when requested.
     /// - Parameters:
-    ///   - prefetchObjectArray: an array of AEPTargetPrefetch objects representing the desired mboxes to prefetch
+    ///   - prefetchArray: an array of AEPTargetPrefetch objects representing the desired mboxes to prefetch
     ///   - targetParameters: a TargetParameters object containing parameters for all the mboxes in the request array
     ///   - completion: the callback `closure` which will be called after the prefetch is complete.  The parameter in the callback will be nil if the prefetch completed successfully, or will contain error message otherwise
     @objc(prefetchContent:withParameters:callback:)
@@ -79,7 +79,7 @@ import Foundation
     /// Each object in the array contains a callback function, which will be invoked when content is available for
     /// its given mbox location.
     /// - Parameters:
-    ///   - requests:  An array of AEPTargetRequestObject objects to retrieve content
+    ///   - requestArray:  An array of AEPTargetRequestObject objects to retrieve content
     ///   - targetParameters: a TargetParameters object containing parameters for all locations in the requests array
     @objc(retrieveLocationContent:withParameters:)
     static func retrieveLocationContent(_ requestArray: [TargetRequest], with targetParameters: TargetParameters?) {
