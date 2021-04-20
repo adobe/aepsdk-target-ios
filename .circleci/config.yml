@@ -76,4 +76,5 @@ jobs:
       # code coverage
       - run:
           name: Upload Code Coverage Report
-          command: make codecov
+          command: make codecov_ || true
+ 
