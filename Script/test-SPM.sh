@@ -23,7 +23,7 @@ mkdir -p $PROJECT_NAME && cd $PROJECT_NAME
 swift package init
 
 # Create the Package.swift.
-echo "// swift-tools-version:5.3
+echo "// swift-tools-version:5.1
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 import PackageDescription
 let package = Package(
@@ -39,7 +39,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(name: \"AEPCore\", url: \"https://github.com/adobe/aepsdk-core-ios.git\", .branch(\"main\")),
+        .package(name: \"AEPCore\", url: \"https://github.com/adobe/aepsdk-core-ios.git\", .upToNextMajor(from:\"3.1.0\")),
         .package(name: \"AEPTarget\", path: \"../\")
     ],
     targets: [
@@ -49,6 +49,7 @@ let package = Package(
                 .product(name: \"AEPCore\", package: \"AEPCore\"),
                 .product(name: \"AEPIdentity\", package: \"AEPCore\"),
                 .product(name: \"AEPLifecycle\", package: \"AEPCore\"),
+                .product(name: \"AEPSignal\", package: \"AEPCore\"),
                 .product(name: \"AEPServices\", package: \"AEPCore\"),
                 .product(name: \"AEPTarget\", package: \"AEPTarget\"),
                 ])
