@@ -15,7 +15,7 @@ import Foundation
 enum TargetConstants {
     static let EXTENSION_NAME = "com.adobe.module.target"
     static let FRIENDLY_NAME = "Target"
-    static let EXTENSION_VERSION = "3.0.0"
+    static let EXTENSION_VERSION = "3.1.0"
     static let DATASTORE_NAME = EXTENSION_NAME
     static let DEFAULT_SESSION_TIMEOUT: Int = 30 * 60 // 30 mins
     static let DELIVERY_API_URL_BASE = "https://%@/rest/v1/delivery/?client=%@&sessionId=%@"

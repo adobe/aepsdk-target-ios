@@ -71,6 +71,10 @@ check-version:
 test-SPM-integration:
 	(sh ./script/test-SPM.sh)
 
+codecov:
+	(./script/codecov_downloader.sh)
+	(bash codecov -v -X s3 -c -D "./build/out" -J "AEPTarget")
+
 test-podspec:
 	(sh ./script/test-podspec.sh)
 
