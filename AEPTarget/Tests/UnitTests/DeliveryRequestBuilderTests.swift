@@ -613,7 +613,7 @@ private class MockedSystemInfoService: SystemInfoService {
     }
 
     func getApplicationBuildNumber() -> String? {
-        ""
+        "1.2"
     }
 
     func getApplicationVersionNumber() -> String? {

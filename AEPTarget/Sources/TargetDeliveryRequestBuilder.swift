@@ -182,7 +182,7 @@ enum TargetDeliveryRequestBuilder {
     private static func getTargetContext() -> TargetContext? {
         let deviceType: DeviceType = systemInfoService.getDeviceType() == AEPServices.DeviceType.PHONE ? .phone : .tablet
         let mobilePlatform = MobilePlatform(deviceName: systemInfoService.getDeviceName(), deviceType: deviceType, platformType: .ios)
-        let application = AppInfo(id: systemInfoService.getApplicationBundleId(), name: systemInfoService.getApplicationName(), version: systemInfoService.getApplicationVersion())
+        let application = AppInfo(id: systemInfoService.getApplicationBundleId(), name: systemInfoService.getApplicationName(), version: systemInfoService.getApplicationBuildNumber())
         let orientation: DeviceOrientation = systemInfoService.getCurrentOrientation() == AEPServices.DeviceOrientation.LANDSCAPE ? .landscape : .portrait
         let screen = Screen(colorDepth: TargetConstants.TargetRequestValue.COLOR_DEPTH_32, width: systemInfoService.getDisplayInformation().width, height: systemInfoService.getDisplayInformation().height, orientation: orientation)
         return TargetContext(channel: TargetConstants.TargetRequestValue.CHANNEL_MOBILE, userAgent: systemInfoService.getDefaultUserAgent(), mobilePlatform: mobilePlatform, application: application, screen: screen, timeOffsetInMinutes: Date().getUnixTimeInSeconds())

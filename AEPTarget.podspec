@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "AEPTarget"
-  s.version          = "3.1.0"
+  s.version          = "3.1.1"
   s.summary          = "Experience Platform Target extension for Adobe Experience Platform Mobile SDK. Written and maintained by Adobe."
   s.description      = <<-DESC
                         The Experience Platform Target extension provides APIs that allow use of the Target product in the Adobe Experience Platform SDK.
