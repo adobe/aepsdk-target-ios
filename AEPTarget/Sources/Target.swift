@@ -752,6 +752,9 @@ public class Target: NSObject, Extension {
 
     /// Saves the tntId and the edge host value derived from it to the Target data store.
     ///
+    /// The tntId has the format UUID.\<profile location hint\>. The edge host value can be derived from the profile location hint.
+    /// For example, if the tntId is 10abf6304b2714215b1fd39a870f01afc.28_20, then the edgeHost will be mboxedge28.tt.omtrdc.net.
+    ///
     /// If a valid tntId is provided and the privacy status is opted out or the provided tntId is same as the existing value, then the method returns with no further action.
     /// If nil value is provided for the tntId, then both tntId and edge host values are removed from the Target data store.
     ///
@@ -770,7 +773,7 @@ public class Target: NSObject, Extension {
         }
 
         if
-            let locationHintRange = tntId?.range(of: "(?<=[0-9A-Za-z-]\\.)([\\d][^\\D]*)(?=_)", options: .regularExpression),
+            let locationHintRange = tntId?.range(of: "(?<=[0-9A-Fa-f-]\\.)([\\d][^\\D]*)(?=_)", options: .regularExpression),
             let locationHint = tntId?[locationHintRange],
             !locationHint.isEmpty
         {

@@ -150,7 +150,7 @@ import Foundation
     /// - Parameter id: a string pointer containing the value of the third party id (custom visitor id)
     static func setThirdPartyId(_ id: String?) {
         let eventData = [TargetConstants.EventDataKeys.THIRD_PARTY_ID: id ?? ""]
-        let event = Event(name: TargetConstants.EventName.SET_THIRDPARTY_ID, type: EventType.target, source: EventSource.requestIdentity, data: eventData)
+        let event = Event(name: TargetConstants.EventName.SET_THIRD_PARTY_ID, type: EventType.target, source: EventSource.requestIdentity, data: eventData)
         MobileCore.dispatch(event: event)
     }
 
@@ -158,7 +158,7 @@ import Foundation
     /// This ID will be reset  when the `resetExperience()` API is called.
     /// - Parameter completion:  the callback `closure` will be invoked to return the thirdPartyId value or `nil` if no third-party ID is set
     static func getThirdPartyId(_ completion: @escaping (String?, Error?) -> Void) {
-        let event = Event(name: TargetConstants.EventName.GET_THIRDPARTY_ID, type: EventType.target, source: EventSource.requestIdentity, data: nil)
+        let event = Event(name: TargetConstants.EventName.GET_THIRD_PARTY_ID, type: EventType.target, source: EventSource.requestIdentity, data: nil)
         MobileCore.dispatch(event: event) { responseEvent in
             guard let responseEvent = responseEvent else {
                 let error = "Request to get third party id failed, \(TargetError.ERROR_TIMEOUT)"
