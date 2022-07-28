@@ -2,82 +2,103 @@
 - [Table of Contents](#table-of-contents)
 - [Target API reference](#target-api-reference)
   - [prefetchContent](#prefetchcontent)
-    - [Swift](#swift)
-      - [Syntax](#syntax)
-      - [Example](#example)
-    - [Objective C](#objective-c)
-      - [Syntax](#syntax-1)
-      - [Example](#example-1)
+    - [Swift](#swift-prefetchcontent)
+      - [Syntax](#swift-syntax-prefetchcontent)
+      - [Example](#swift-example-prefetchcontent)
+    - [Objective C](#objc-prefetchcontent)
+      - [Syntax](#objc-syntax-prefetchcontent)
+      - [Example](#objc-example-prefetchcontent)
   - [retrieveLocationContent](#retrievelocationcontent)
-    - [Swift](#swift-1)
-      - [Syntax](#syntax-2)
-      - [Example](#example-2)
-    - [Objective C](#objective-c-1)
-      - [Syntax](#syntax-3)
-      - [Example](#example-3)
+    - [Swift](#swift-retrievelocationcontent)
+      - [Syntax](#swift-syntax-retrievelocationcontent)
+      - [Example](#swift-example-retrievelocationcontent)
+    - [Objective C](#objc-retrievelocationcontent)
+      - [Syntax](#objc-syntax-retrievelocationcontent)
+      - [Example](#objc-example-retrievelocationcontent)
   - [setThirdPartyId](#setthirdpartyid)
-    - [Swift](#swift-2)
-      - [Syntax](#syntax-4)
-      - [Example](#example-4)
-    - [Objective C](#objective-c-2)
-      - [Syntax](#syntax-5)
-      - [Example](#example-5)
+    - [Swift](#swift-setthirdpartyid)
+      - [Syntax](#swift-syntax-setthirdpartyid)
+      - [Example](#swift-example-setthirdpartyid)
+    - [Objective C](#objc-setthirdpartyid)
+      - [Syntax](#objc-syntax-setthirdpartyid)
+      - [Example](#objc-example-setthirdpartyid)
   - [getThirdPartyId](#getthirdpartyid)
-    - [Swift](#swift-3)
-      - [Syntax](#syntax-6)
-      - [Example](#example-6)
-    - [Objective C](#objective-c-3)
-      - [Syntax](#syntax-7)
-      - [Example](#example-7)
+    - [Swift](#swift-getthirdpartyid)
+      - [Syntax](#swift-syntax-getthirdpartyid)
+      - [Example](#swift-example-getthirdpartyid)
+    - [Objective C](#objc-getthirdpartyid)
+      - [Syntax](#objc-syntax-getthirdpartyid)
+      - [Example](#objc-example-getthirdpartyid)
+  - [setTntId](#settntid)
+    - [Swift](#swift-settntid)
+      - [Syntax](#swift-syntax-settntid)
+      - [Example](#swift-example-settntid)
+   - [Objective C](#objc-settntid)
+      - [Syntax](#objc-syntax-settntid)
+      - [Example](#objc-example-settntid)
   - [getTntId](#gettntid)
-    - [Swift](#swift-4)
-      - [Syntax](#syntax-8)
-      - [Example](#example-8)
-    - [Objective C](#objective-c-4)
-      - [Syntax](#syntax-9)
-      - [Example](#example-9)
+    - [Swift](#swift-gettntid)
+      - [Syntax](#swift-syntax-gettntid)
+      - [Example](#swift-example-gettntid)
+    - [Objective C](#objc-gettntid)
+      - [Syntax](#objc-syntax-gettntid)
+      - [Example](#objc-example-gettntid)
+  - [setSessionId](#setsessionid)
+    - [Swift](#swift-setsessionid)
+      - [Syntax](#swift-syntax-setsessionid)
+      - [Example](#swift-example-setsessionid)
+   - [Objective C](#objc-setsessionid)
+      - [Syntax](#objc-syntax-setsessionid)
+      - [Example](#objc-example-setsessionid)
+  - [getSessionId](#getsessionid)
+    - [Swift](#swift-getsessionid)
+      - [Syntax](#swift-syntax-getsessionid)
+      - [Example](#swift-example-getsessionid)
+    - [Objective C](#objc-getsessionid)
+      - [Syntax](#objc-syntax-getsessionid)
+      - [Example](#objc-example-getsessionid)
   - [resetExperience](#resetexperience)
-    - [Swift](#swift-5)
-      - [Syntax](#syntax-10)
-      - [Example](#example-10)
-    - [Objective C](#objective-c-5)
-      - [Syntax](#syntax-11)
-      - [Example](#example-11)
+    - [Swift](#swift-resetexperience)
+      - [Syntax](#swift-syntax-resetexperience)
+      - [Example](#swift-example-resetexperience)
+    - [Objective C](#objc-resetexperience)
+      - [Syntax](#objc-syntax-resetexperience)
+      - [Example](#objc-example-resetexperience)
   - [clearPrefetchCache](#clearprefetchcache)
-    - [Swift](#swift-6)
-      - [Syntax](#syntax-12)
-      - [Example](#example-12)
-    - [Objective C](#objective-c-6)
-      - [Syntax](#syntax-13)
-      - [Example](#example-13)
+    - [Swift](#swift-clearprefetchcache)
+      - [Syntax](#swift-syntax-clearprefetchcache)
+      - [Example](#swift-example-clearprefetchcache)
+    - [Objective C](#objc-clearprefetchcache)
+      - [Syntax](#objc-syntax-clearprefetchcache)
+      - [Example](#objc-example-clearprefetchcache)
   - [setPreviewRestartDeepLink](#setpreviewrestartdeeplink)
-    - [Swift](#swift-7)
-      - [Syntax](#syntax-14)
-      - [Example](#example-14)
-    - [Objective C](#objective-c-7)
-      - [Syntax](#syntax-15)
-      - [Example](#example-15)
+    - [Swift](#swift-setpreviewrestartdeeplink)
+      - [Syntax](#swift-syntax-setpreviewrestartdeeplink)
+      - [Example](#swift-example-setpreviewrestartdeeplink)
+    - [Objective C](#objc-setpreviewrestartdeeplink)
+      - [Syntax](#objc-syntax-setpreviewrestartdeeplink)
+      - [Example](#objc-example-setpreviewrestartdeeplink)
   - [displayedLocations](#displayedlocations)
-    - [Swift](#swift-8)
-      - [Syntax](#syntax-16)
-      - [Example](#example-16)
-    - [Objective C](#objective-c-8)
-      - [Syntax](#syntax-17)
-      - [Example](#example-17)
+    - [Swift](#swift-displayedlocations)
+      - [Syntax](#swift-syntax-displayedlocations)
+      - [Example](#swift-example-displayedlocations)
+    - [Objective C](#objc-displayedlocations)
+      - [Syntax](#objc-syntax-displayedlocations)
+      - [Example](#objc-example-displayedlocations)
   - [clickedLocation](#clickedlocation)
-    - [Swift](#swift-9)
-      - [Syntax](#syntax-18)
-      - [Example](#example-18)
-    - [Objective C](#objective-c-9)
-      - [Syntax](#syntax-19)
-      - [Example](#example-19)
-  - [Viaual preview](#viaual-preview)
-    - [Swift](#swift-10)
-      - [Syntax](#syntax-20)
-      - [Example](#example-20)
-    - [Objective C](#objective-c-10)
-      - [Syntax](#syntax-21)
-      - [Example](#example-21)
+    - [Swift](#swift-clickedlocation)
+      - [Syntax](#swift-syntax-clickedlocation)
+      - [Example](#swift-example-clickedlocation)
+    - [Objective C](#objc-clickedlocation)
+      - [Syntax](#objc-syntax-clickedlocation)
+      - [Example](#objc-example-clickedlocation)
+  - [Visual preview](#visual-preview)
+    - [Swift](#swift-visual-preview)
+      - [Syntax](#swift-syntax-visual-preview)
+      - [Example](#swift-example-visual-preview)
+    - [Objective C](#objc-visual-preview)
+      - [Syntax](#objc-syntax-visual-preview)
+      - [Example](#objc-example-visual-preview)
 
 # Target API reference
 This document details all the APIs provided by Target, along with sample code snippets on how to properly use the APIs.
@@ -325,14 +346,14 @@ static func retrieveLocationContent(_ requestArray: [TargetRequest], with target
 
 This API sets the custom visitor ID for Target.
 
-    This ID is preserved between app upgrades, is saved and restored during the standard application backup process, and is removed at uninstall or when the resetExperience API is used.
+    This ID is preserved between app upgrades, is saved and restored during the standard application backup process, and is removed at uninstall, upon privacy status update to opted out or when the resetExperience API is used.
 
 ### Swift 
 
 #### Syntax 
 
 ```swift
-static func setThirdPartyId(_ id: String)
+static func setThirdPartyId(_ id: String?)
 ```
 
   - *id* : a `String` that contains the custom visitor ID to be set in Target.
@@ -356,7 +377,7 @@ Target.setThirdPartyId("third-party-id")
 #### Example
 
 ```objectivec
-[ACPTarget setThirdPartyId:@"third-party-id"];
+[AEPMobileTarget setThirdPartyId:@"third-party-id"];
 ```
 
 ## getThirdPartyId
@@ -376,7 +397,7 @@ static func getThirdPartyId(_ completion: @escaping (String?, Error?) -> Void)
 #### Example
 
 ```swift
-ACPTarget.getThirdPartyId({id, err in
+Target.getThirdPartyId({id, err in
     // read Target thirdPartyId
 })
 ```
@@ -399,11 +420,53 @@ ACPTarget.getThirdPartyId({id, err in
     }];
 ```
 
+## setTntId
+
+This API sets the Target user identifier.
+
+The provided Tnt Id is persisted in the SDK and attached to subsequent Target requests. It is used to derive the edge host value in the SDK, which is also persisted and used in future Target requests.
+
+If the provided Tnt Id is nil or empty or if the privacy status is opted out, the SDK will remove the Tnt Id and edge host values from persistence.
+
+    This ID is preserved between app upgrades, is saved and restored during the standard application backup process, and is removed at uninstall, upon privacy status update to opted out or when the resetExperience API is used.
+
+### Swift 
+
+#### Syntax 
+
+```swift
+static func setTntId(_ id: String?)
+```
+
+  - *id* : a `String` that contains the Target user identifier to be set in the SDK.
+
+#### Example
+
+```swift
+Target.setTntId("f741a5d5-09c0-4931-bf53-b9e568c5f782.35_0")
+```
+
+### Objective C
+
+#### Syntax 
+
+```objectivec
++ (void) setTntId: (NSString* _Nullable) id;
+```
+
+  - *id* : a NSString that contains the Target user identifier to be set in the SDK.
+
+#### Example
+
+```objectivec
+[AEPMobileTarget setTntId:@"f741a5d5-09c0-4931-bf53-b9e568c5f782.35_0"];
+```
+
 ## getTntId
 
-This API gets the Target user identifier. Target returns the tntId with a successful call to `prefetchContent`, which is then persisted in the SDK.
+This API gets the Target user identifier. 
 
-    This ID is preserved between app upgrades, is saved and restored during the standard application backup process, and is removed at uninstall or when the resetExperience API is used.
+The tntId is returned in the network response from Target after a successful call to `prefetchContent` API or `retrieveLocationContent` API, which is then persisted in the SDK. The persisted tntId is used in subsequent Target requests until a different tntId is returned from Target or a new tntId is set using `sentTntId` API.
 
 ### Swift 
 
@@ -413,13 +476,13 @@ This API gets the Target user identifier. Target returns the tntId with a succes
 static func getTntId(_ completion: @escaping (String?, Error?) -> Void)
 ```
 
-  - *completion* : invoked with the `tntId` value. If no Target ID was set, this value will be `nil`.
+  - *completion* : invoked with the `tntId` value. If no Target Id was set or if there was an error retrieving it, this value will be `nil`.
 
 #### Example
 
 ```swift
     Target.getTntId { id, err in
-        // read target's tntId        
+        // read Target's tntId        
     }
 ```
 
@@ -428,16 +491,98 @@ static func getTntId(_ completion: @escaping (String?, Error?) -> Void)
 #### Syntax 
 
 ```objectivec
-+ (void) getTntId: (nonnull void (^) (NSString* __nullable thirdPartyId, NSError * _nullable error)) completion;
++ (void) getTntId: (void (^ _Nonnull) (NSString* _Nullable tntId, NSError* _Nullable error)) completion;
 ```
 
-  - *completion* : invoked with the `tntId` value. If no Target ID was set, this value will be `nil`.
+  - *completion* : invoked with the `tntId` value. If no Target Id was set or if there was an error retrieving it, this value will be `nil`.
 
 #### Example
 
 ```objectivec
-    [AEPMobileTarget getTntId:^(NSString *tntID, NSError *error){
-        // read target's tntId 
+    [AEPMobileTarget getTntId:^(NSString *tntId, NSError *error){
+        // read Target's tntId 
+    }];
+```
+
+## setSessionId
+
+This API sets the Target session identifier.
+
+The provided session Id is persisted in the SDK for a period defined by `target.sessionTimeout` configuration setting. If the provided sessionId is nil or empty or if the privacy status is opted out, the SDK will remove the session Id value from persistence.
+
+    This ID is preserved between app upgrades, is saved and restored during the standard application backup process, and is removed at uninstall, upon privacy status update to opted out or when the resetExperience API is used.
+
+### Swift 
+
+#### Syntax 
+
+```swift
+static func setSessionId(_ id: String?)
+```
+
+  - *id* : a `String` that contains the Target session identifier to be set in the SDK.
+
+#### Example
+
+```swift
+Target.setSessionId("5568c1a2-ece1-42d1-b807-930623998ec3")
+```
+
+### Objective C
+
+#### Syntax 
+
+```objectivec
++ (void) setSessionId: (NSString* _Nullable) id;
+```
+
+  - *id* : a NSString that contains the Target session identifier to be set in the SDK.
+
+#### Example
+
+```objectivec
+[AEPMobileTarget setSessionId:@"5568c1a2-ece1-42d1-b807-930623998ec3"];
+```
+
+## getSessionId
+
+This API gets the Target session identifier. 
+
+The session Id is generated locally in the SDK upon initial Target request and persisted for a period defined by `target.sessionTimeout` configuration setting. If the session timeout happens upon a subsequent Target request, a new sessionId will be generated for use in the request and persisted in the SDK.
+
+### Swift 
+
+#### Syntax 
+
+```swift
+static func getSessionId(_ completion: @escaping (String?, Error?) -> Void)
+```
+
+  - *completion* : invoked with the Target `sessionId` value or `nil` if there was an error retrieving it.
+
+#### Example
+
+```swift
+    Target.getTntId { id, err in
+        // read Target sessionId        
+    }
+```
+
+### Objective C
+
+#### Syntax 
+
+```objectivec
++ (void) getSessionId: (void (^ _Nonnull) (NSString* _Nullable sessionId, NSError* _Nullable error)) completion;
+```
+
+  - *completion* : invoked with the Target `sessionId` value or `nil` if there was an error retrieving it.
+
+#### Example
+
+```objectivec
+    [AEPMobileTarget getSessionId:^(NSString *sessionId, NSError *error){
+        // read Target sessionId 
     }];
 ```
 
