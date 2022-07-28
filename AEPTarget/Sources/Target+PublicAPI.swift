@@ -248,7 +248,7 @@ import Foundation
     /// Gets the Target user identifier.
     ///
     /// The tntId is returned in the network response from Target after a successful call to `prefetchContent` API or `retrieveLocationContent` API, which is then persisted in the SDK.
-    /// The persisted tntId is used in subsequent Target requests until a different tntId is returned from Target or a new tntId is set using `sentTntId` API.
+    /// The persisted tntId is used in subsequent Target requests until a different tntId is returned from Target or a new tntId is set using `setTntId` API.
     ///
     /// This ID is preserved between app upgrades, is saved and restored during the standard application
     /// backup process, and is removed at uninstall or when AEPTarget.resetExperience is called.

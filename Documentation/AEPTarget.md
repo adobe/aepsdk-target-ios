@@ -346,7 +346,7 @@ static func retrieveLocationContent(_ requestArray: [TargetRequest], with target
 
 This API sets the custom visitor ID for Target.
 
-    This ID is preserved between app upgrades, is saved and restored during the standard application backup process, and is removed at uninstall, upon privacy status update to opted out or when the resetExperience API is used.
+    This ID is preserved between app upgrades, is saved and restored during the standard application backup process, and is removed at uninstall, upon privacy status update to opted out, or when the resetExperience API is used.
 
 ### Swift 
 
@@ -428,7 +428,7 @@ The provided Tnt Id is persisted in the SDK and attached to subsequent Target re
 
 If the provided Tnt Id is nil or empty or if the privacy status is opted out, the SDK will remove the Tnt Id and edge host values from persistence.
 
-    This ID is preserved between app upgrades, is saved and restored during the standard application backup process, and is removed at uninstall, upon privacy status update to opted out or when the resetExperience API is used.
+    This ID is preserved between app upgrades, is saved and restored during the standard application backup process, and is removed at uninstall, upon privacy status update to opted out, or when the resetExperience API is used.
 
 ### Swift 
 
@@ -466,7 +466,7 @@ Target.setTntId("f741a5d5-09c0-4931-bf53-b9e568c5f782.35_0")
 
 This API gets the Target user identifier. 
 
-The tntId is returned in the network response from Target after a successful call to `prefetchContent` API or `retrieveLocationContent` API, which is then persisted in the SDK. The persisted tntId is used in subsequent Target requests until a different tntId is returned from Target or a new tntId is set using `sentTntId` API.
+The tntId is returned in the network response from Target after a successful call to `prefetchContent` API or `retrieveLocationContent` API, which is then persisted in the SDK. The persisted tntId is used in subsequent Target requests until a different tntId is returned from Target or a new tntId is set using `setTntId` API.
 
 ### Swift 
 
@@ -510,7 +510,7 @@ This API sets the Target session identifier.
 
 The provided session Id is persisted in the SDK for a period defined by `target.sessionTimeout` configuration setting. If the provided sessionId is nil or empty or if the privacy status is opted out, the SDK will remove the session Id value from persistence.
 
-    This ID is preserved between app upgrades, is saved and restored during the standard application backup process, and is removed at uninstall, upon privacy status update to opted out or when the resetExperience API is used.
+    This ID is preserved between app upgrades, is saved and restored during the standard application backup process, and is removed at uninstall, upon privacy status update to opted out, or when the resetExperience API is used.
 
 ### Swift 
 
@@ -563,7 +563,7 @@ static func getSessionId(_ completion: @escaping (String?, Error?) -> Void)
 #### Example
 
 ```swift
-    Target.getTntId { id, err in
+    Target.getSessionId { id, err in
         // read Target sessionId        
     }
 ```
