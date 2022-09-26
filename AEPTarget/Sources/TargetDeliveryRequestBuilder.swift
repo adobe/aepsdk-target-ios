@@ -81,7 +81,7 @@ enum TargetDeliveryRequestBuilder {
 
         // Set parameters
         let parameters = targetParameters?.parameters?.filter { $0.key != TargetConstants.EventDataKeys.AT_PROPERTY }
-        let mboxParameters = merge(newDictionary: lifecycleContextData, to: parameters)
+        let mboxParameters = Dictionary.merge(lifecycleContextData, to: parameters)
 
         // Set mbox
         let mbox: Mbox
@@ -117,7 +117,7 @@ enum TargetDeliveryRequestBuilder {
 
         // Set parameters
         let parameters = targetParameters?.parameters?.filter { $0.key != TargetConstants.EventDataKeys.AT_PROPERTY }
-        let mboxParameters = merge(newDictionary: lifecycleContextData, to: targetParameters?.parameters)
+        let mboxParameters = Dictionary.merge(lifecycleContextData, to: parameters)
 
         let mboxName = cachedMboxJson[TargetConstants.TargetJson.Mbox.NAME] as? String ?? ""
 
@@ -194,10 +194,10 @@ enum TargetDeliveryRequestBuilder {
         var mboxes = [Mbox]()
 
         for (index, prefetch) in targetPrefetchArray.enumerated() {
-            let parameters = merge(newDictionary: globalParameters?.parameters, to: prefetch.targetParameters?.parameters)?
+            let parameters = Dictionary.merge(globalParameters?.parameters, to: prefetch.targetParameters?.parameters)?
                 .filter { $0.key != TargetConstants.EventDataKeys.AT_PROPERTY }
-            let parametersWithLifecycleData = merge(newDictionary: lifecycleDataDict, to: parameters)
-            let profileParameters = merge(newDictionary: globalParameters?.profileParameters, to: prefetch.targetParameters?.profileParameters)
+            let parametersWithLifecycleData = Dictionary.merge(lifecycleDataDict, to: parameters)
+            let profileParameters = Dictionary.merge(globalParameters?.profileParameters, to: prefetch.targetParameters?.profileParameters)
             let order = getOrder(globalOrder: globalParameters?.order, order: prefetch.targetParameters?.order)
             let product = getProduct(product: prefetch.targetParameters?.product, globalProduct: globalParameters?.product)
             let mbox = Mbox(name: prefetch.name, index: index, parameters: parametersWithLifecycleData, profileParameters: profileParameters, order: order, product: product)
@@ -212,31 +212,16 @@ enum TargetDeliveryRequestBuilder {
         var mboxes = [Mbox]()
 
         for (index, request) in targetRequestArray.enumerated() {
-            let parameters = merge(newDictionary: globalParameters?.parameters, to: request.targetParameters?.parameters)?
+            let parameters = Dictionary.merge(globalParameters?.parameters, to: request.targetParameters?.parameters)?
                 .filter { $0.key != TargetConstants.EventDataKeys.AT_PROPERTY }
-            let parametersWithLifecycleData = merge(newDictionary: lifecycleDataDict, to: parameters)
-            let profileParameters = merge(newDictionary: globalParameters?.profileParameters, to: request.targetParameters?.profileParameters)
+            let parametersWithLifecycleData = Dictionary.merge(lifecycleDataDict, to: parameters)
+            let profileParameters = Dictionary.merge(globalParameters?.profileParameters, to: request.targetParameters?.profileParameters)
             let order = getOrder(globalOrder: globalParameters?.order, order: request.targetParameters?.order)
             let product = getProduct(product: request.targetParameters?.product, globalProduct: globalParameters?.product)
             let mbox = Mbox(name: request.name, index: index, parameters: parametersWithLifecycleData, profileParameters: profileParameters, order: order, product: product)
             mboxes.append(mbox)
         }
         return Mboxes(mboxes: mboxes)
-    }
-
-    /// Merges the given dictionaries, and only keeps values from the new dictionary for duplicated keys.
-    /// - Parameters:
-    ///   - newDictionary: the new dictionary
-    ///   - dictionary: the original dictionary
-    /// - Returns: a new dictionary with combined key-value pairs
-    private static func merge(newDictionary: [String: String]?, to dictionary: [String: String]?) -> [String: String]? {
-        guard let newDictionary = newDictionary else {
-            return dictionary
-        }
-        guard let dictionary = dictionary else {
-            return newDictionary
-        }
-        return dictionary.merging(newDictionary) { _, new in new }
     }
 
     private static func getOrder(globalOrder: TargetOrder?, order: TargetOrder?) -> Order? {

@@ -18,4 +18,14 @@ extension TargetProduct {
     func toInternalProduct() -> Product {
         return Product(id: productId, categoryId: categoryId)
     }
+
+    static func from(dictionary: [String: Any]?) -> TargetProduct? {
+        guard
+            let dictionary = dictionary,
+            let jsonData = try? JSONSerialization.data(withJSONObject: dictionary)
+        else {
+            return nil
+        }
+        return try? JSONDecoder().decode(TargetProduct.self, from: jsonData)
+    }
 }

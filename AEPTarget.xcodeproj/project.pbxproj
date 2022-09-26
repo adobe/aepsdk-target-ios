@@ -23,6 +23,8 @@
 /* Begin PBXBuildFile section */
 		091AB3E0286B7F9600E43F23 /* TargetSessionIdFunctionalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091AB3DF286B7F9600E43F23 /* TargetSessionIdFunctionalTests.swift */; };
 		091AB3E2288636F400E43F23 /* TargetTntIdFunctionalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091AB3E1288636F400E43F23 /* TargetTntIdFunctionalTests.swift */; };
+		0932CAF228DC5D3800BE99E2 /* Dictionary+Target.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0932CAF128DC5D3800BE99E2 /* Dictionary+Target.swift */; };
+		0932CAF428DD0D2200BE99E2 /* TargetRawRequestsFunctionalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0932CAF328DD0D2200BE99E2 /* TargetRawRequestsFunctionalTests.swift */; };
 		21BB6EAE22D5AC72C15DB97C /* Pods_AEPTargetTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 639B326C68E1444919C98676 /* Pods_AEPTargetTests.framework */; };
 		54A53C0BFA0D61EF50B9E5C5 /* Pods_AEPTargetDemoApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 45A74BEED420E4145D1D72CC /* Pods_AEPTargetDemoApp.framework */; };
 		780DF565258924B70033F107 /* URL+Target.swift in Sources */ = {isa = PBXBuildFile; fileRef = 780DF564258924B70033F107 /* URL+Target.swift */; };
@@ -164,6 +166,8 @@
 /* Begin PBXFileReference section */
 		091AB3DF286B7F9600E43F23 /* TargetSessionIdFunctionalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetSessionIdFunctionalTests.swift; sourceTree = "<group>"; };
 		091AB3E1288636F400E43F23 /* TargetTntIdFunctionalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetTntIdFunctionalTests.swift; sourceTree = "<group>"; };
+		0932CAF128DC5D3800BE99E2 /* Dictionary+Target.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+Target.swift"; sourceTree = "<group>"; };
+		0932CAF328DD0D2200BE99E2 /* TargetRawRequestsFunctionalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetRawRequestsFunctionalTests.swift; sourceTree = "<group>"; };
 		1F937F0708662CB013507FEA /* Pods-AEPTarget.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPTarget.debug.xcconfig"; path = "Target Support Files/Pods-AEPTarget/Pods-AEPTarget.debug.xcconfig"; sourceTree = "<group>"; };
 		22CDBB0E77B419D5D7E526F3 /* Pods-AEPTarget.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPTarget.release.xcconfig"; path = "Target Support Files/Pods-AEPTarget/Pods-AEPTarget.release.xcconfig"; sourceTree = "<group>"; };
 		2781B11116AD0207B40F67F0 /* Pods_AEPTargetDemoObjCApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AEPTargetDemoObjCApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -341,6 +345,7 @@
 				BB0C91492575F72200F635B8 /* TargetState.swift */,
 				BB0C915A25775F1100F635B8 /* TargetError.swift */,
 				780DF564258924B70033F107 /* URL+Target.swift */,
+				0932CAF128DC5D3800BE99E2 /* Dictionary+Target.swift */,
 				78B36A5D25C87B3500D6D25F /* Preview */,
 			);
 			path = Sources;
@@ -432,6 +437,7 @@
 				BB861103261B663B00A39187 /* TargetFunctionalTests.swift */,
 				091AB3DF286B7F9600E43F23 /* TargetSessionIdFunctionalTests.swift */,
 				091AB3E1288636F400E43F23 /* TargetTntIdFunctionalTests.swift */,
+				0932CAF328DD0D2200BE99E2 /* TargetRawRequestsFunctionalTests.swift */,
 			);
 			path = FunctionalTests;
 			sourceTree = "<group>";
@@ -877,6 +883,7 @@
 				7885141425532281008E6999 /* Target.swift in Sources */,
 				924101CF25FFCF5C00DA88D2 /* TargetRequest+Internal.swift in Sources */,
 				BB9C871A25623723007AEF8B /* TargetOrder+Internal.swift in Sources */,
+				0932CAF228DC5D3800BE99E2 /* Dictionary+Target.swift in Sources */,
 				780DF56A258924C40033F107 /* TargetPreviewManager.swift in Sources */,
 				786C00DE25C1D95300F26D34 /* TargetPreviewManagerFloatingButtonDelegate.swift in Sources */,
 				BB47C01225547DAE00EC6FB5 /* TargetRequest.swift in Sources */,
@@ -897,6 +904,7 @@
 				BB8FF11F2602A72C006C80D9 /* TestableNetworkService.swift in Sources */,
 				927284B8260D17E200F91BC1 /* TargetFunctionalTestsBase.swift in Sources */,
 				091AB3E0286B7F9600E43F23 /* TargetSessionIdFunctionalTests.swift in Sources */,
+				0932CAF428DD0D2200BE99E2 /* TargetRawRequestsFunctionalTests.swift in Sources */,
 				BB8FF0EE2602A705006C80D9 /* TargetIntegrationTests.swift in Sources */,
 				BBC428DB26166360006E4A3F /* MockNetworkService.swift in Sources */,
 				BB278D382613A5E70081C3C9 /* TargetV4MigratorTests.swift in Sources */,

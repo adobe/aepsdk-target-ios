@@ -29,11 +29,6 @@ extension Event {
         data?[TargetConstants.EventDataKeys.AT_PROPERTY] as? String ?? ""
     }
 
-    /// Reads the Target `at_property` from the event data
-    var propertyToken: String {
-        return data?[TargetConstants.EventDataKeys.AT_PROPERTY] as? String ?? ""
-    }
-
     /// Returns true if this event is a prefetch request event
     var isPrefetchEvent: Bool {
         data?[TargetConstants.EventDataKeys.PREFETCH_REQUESTS] != nil
@@ -57,6 +52,11 @@ extension Event {
     /// Returns true if the event is location clicked request event
     var isLocationClickedEvent: Bool {
         data?[TargetConstants.EventDataKeys.IS_LOCATION_CLICKED] as? Bool ?? false
+    }
+
+    /// Returns true if the event is a raw execute or notification event
+    var isRawEvent: Bool {
+        data?[TargetConstants.EventDataKeys.IS_RAW_EVENT] as? Bool ?? false
     }
 
     /// Returns true if this event is a reset experience request event

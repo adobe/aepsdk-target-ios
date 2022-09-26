@@ -1584,4 +1584,242 @@ class TargetIntegrationTests: XCTestCase {
         )
         wait(for: [notificationExpectation], timeout: 2)
     }
+    
+    func testExecuteRawRequest() {
+        let responseString = """
+            {
+              "status": 200,
+              "id": {
+                "tntId": "DE03D4AD-1FFE-421F-B2F2-303BF26822C1.35_0",
+                "marketingCloudVisitorId": "61055260263379929267175387965071996926"
+              },
+              "requestId": "01d4a408-6978-48f7-95c6-03f04160b257",
+              "client": "acopprod3",
+              "edgeHost": "mboxedge35.tt.omtrdc.net",
+              "execute": {
+                "mboxes": [
+                  {
+                    "index": 0,
+                    "name": "t_test_01",
+                    "options": [
+                      {
+                        "content": "someContent1",
+                        "type": "html"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 0,
+                    "name": "t_test_02",
+                    "options": [
+                      {
+                        "content": "someContent2",
+                        "type": "html"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+        """
+        let validResponse = HTTPURLResponse(url: URL(string: "https://acopprod3.tt.omtrdc.net/rest/v1/delivery")!, statusCode: 200, httpVersion: nil, headerFields: nil)
+
+        // init mobile SDK, register extensions
+        let initExpectation = XCTestExpectation(description: "Init extensions expectation")
+        MobileCore.setLogLevel(.trace)
+        MobileCore.registerExtensions([Target.self, Identity.self, Lifecycle.self]) {
+            initExpectation.fulfill()
+        }
+        wait(for: [initExpectation], timeout: 1)
+
+        // update the configuration shared state
+        MobileCore.updateConfigurationWith(configDict: [
+            "experienceCloud.org": "orgid",
+            "experienceCloud.server": "test.com",
+            "global.privacy": "optedin",
+            "target.clientCode": "acopprod3",
+        ])
+
+        let targetRequestExpectation = XCTestExpectation(description: "Target raw execute request expectation")
+        let mockNetworkService = TestableNetworkService()
+        ServiceProvider.shared.networkService = mockNetworkService
+        mockNetworkService.mock { request in
+            if request.url.absoluteString.contains("https://acopprod3.tt.omtrdc.net/rest/v1/delivery/?client=acopprod3&sessionId=") {
+                return (data: responseString.data(using: .utf8), response: validResponse, error: nil)
+            }
+            return nil
+        }
+        
+        let rawRequest1: [String: Any] = [
+            "name": "t_test_01",
+            "parameters": [
+                "mbox_parameter_key1": "mbox_parameter_value1"
+            ]
+        ]
+
+        let rawRequest2: [String: Any] = [
+            "name": "t_test_02",
+            "parameters": [
+                "mbox_parameter_key2": "mbox_parameter_value2"
+            ]
+        ]
+        
+        Target.executeRawRequest([rawRequest1, rawRequest2]) { response, err in
+            if let err = err {
+                XCTFail("Received error in execute response: \(err)")
+                return
+            }
+            guard let response = response,
+                  !response.isEmpty else {
+                XCTFail("Received null or empty execute response")
+                return
+            }
+            XCTAssertEqual(2, response.count)
+            XCTAssertNotNil(response[0])
+            XCTAssertEqual("t_test_01", response[0]["name"] as? String)
+            let optionsArray_0 = response[0]["options"] as? [[String: Any]]
+            XCTAssertEqual(1, optionsArray_0?.count)
+            XCTAssertEqual("someContent1", optionsArray_0?[0]["content"] as? String)
+            
+            XCTAssertEqual("t_test_02", response[1]["name"] as? String)
+            XCTAssertNotNil(response[1])
+            let optionsArray_1 = response[1]["options"] as? [[String: Any]]
+            XCTAssertEqual(1, optionsArray_1?.count)
+            XCTAssertEqual("someContent2", optionsArray_1?[0]["content"] as? String)
+            
+            targetRequestExpectation.fulfill()
+        }
+        wait(for: [targetRequestExpectation], timeout: 2)
+    }
+    
+    func testSendRawNotification() {
+        let responseString = """
+            {
+              "status": 200,
+              "id": {
+                "tntId": "DE03D4AD-1FFE-421F-B2F2-303BF26822C1.35_0",
+                "marketingCloudVisitorId": "61055260263379929267175387965071996926"
+              },
+              "requestId": "01d4a408-6978-48f7-95c6-03f04160b257",
+              "client": "acopprod3",
+              "edgeHost": "mboxedge35.tt.omtrdc.net",
+              "execute": {
+                "mboxes": [
+                  {
+                    "index": 0,
+                    "name": "mboxName1",
+                    "options": [
+                      {
+                        "content": {
+                          "key1": "value1"
+                        },
+                        "type": "json"
+                      }
+                    ],
+                    "metrics": [
+                      {
+                        "type": "click",
+                        "eventToken": "QPaLjCeI9qKCBUylkRQKBg==",
+                        "analytics": {
+                            "payload": {
+                                "pe": "tnt",
+                                "tnta": "285408:1:0|32767|1"
+                            }
+                        }
+                      }
+                    ],
+                    "analytics": {
+                      "payload": {
+                        "pe": "tnt",
+                        "tnta": "285408:1:0|2|1"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+        """
+        let validResponse = HTTPURLResponse(url: URL(string: "https://acopprod3.tt.omtrdc.net/rest/v1/delivery")!, statusCode: 200, httpVersion: nil, headerFields: nil)
+
+        // init mobile SDK, register extensions
+        let initExpectation = XCTestExpectation(description: "Init extensions expectation")
+        MobileCore.setLogLevel(.trace)
+        MobileCore.registerExtensions([Target.self, Analytics.self, Identity.self, Lifecycle.self]) {
+            initExpectation.fulfill()
+        }
+        wait(for: [initExpectation], timeout: 1)
+
+        // update the configuration shared state
+        MobileCore.updateConfigurationWith(configDict: [
+            "experienceCloud.org": "orgid",
+            "experienceCloud.server": "test.com",
+            "global.privacy": "optedin",
+            "target.clientCode": "acopprod3",
+            "analytics.server": "test.analytics.net",
+            "analytics.rsids": "abc",
+            "analytics.batchLimit": 0,
+            "analytics.aamForwardingEnabled": true,
+            "analytics.backdatePreviousSessionInfo": true,
+            "analytics.offlineEnabled": false,
+            "analytics.launchHitDelay": 0,
+        ])
+        
+        Analytics.clearQueue()
+        sleep(2)
+
+        let targetNotificationExpectation = XCTestExpectation(description: "Target raw notification request expectation")
+        targetNotificationExpectation.assertForOverFulfill = true
+        
+        let mockNetworkService = TestableNetworkService()
+        ServiceProvider.shared.networkService = mockNetworkService
+        mockNetworkService.mock { request in
+            if request.url.absoluteString.contains("https://acopprod3.tt.omtrdc.net/rest/v1/delivery/?client=acopprod3&sessionId=") {
+                return (data: responseString.data(using: .utf8), response: validResponse, error: nil)
+            }
+            
+            if request.url.absoluteString.contains("https://mboxedge35.tt.omtrdc.net/rest/v1/delivery/?client=acopprod3&sessionId=") {
+                targetNotificationExpectation.fulfill()
+                return nil
+            }
+
+            if request.url.absoluteString.contains("https://test.analytics.net/b/ss/abc/0") {
+                targetNotificationExpectation.fulfill()
+                return (data: nil,
+                        response: HTTPURLResponse(url: URL(string: "https://test.analytics.net/b/ss/abc/0")!,
+                                                  statusCode: 200,
+                                                  httpVersion: nil,
+                                                  headerFields: nil),
+                        error: nil)
+            }
+            return nil
+        }
+        
+        let targetRequestExpectation = XCTestExpectation(description: "Target raw execute request expectation")
+        
+        let rawRequest1: [String: Any] = [
+            "name": "mboxName1"
+        ]
+        Target.executeRawRequest([rawRequest1]) { response, err in
+            if let err = err {
+                XCTFail("Received error in execute response: \(err)")
+                return
+            }
+            guard let response = response,
+                  !response.isEmpty else {
+                XCTFail("Received null or empty execute response")
+                return
+            }
+            targetRequestExpectation.fulfill()
+        }
+        wait(for: [targetRequestExpectation], timeout: 2)
+        
+        let notification: [String: Any] = [
+            "name": "mboxName1",
+            "tokens": [
+                "QPaLjCeI9qKCBUylkRQKBg=="
+            ]
+        ]
+        Target.sendRawNotification(notification)
+        wait(for: [targetNotificationExpectation], timeout: 2)
+    }
 }

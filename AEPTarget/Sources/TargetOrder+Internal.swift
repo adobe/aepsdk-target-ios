@@ -15,4 +15,14 @@ extension TargetOrder {
     func toInternalOrder() -> Order {
         return Order(id: orderId, total: total, purchasedProductIds: purchasedProductIds)
     }
+
+    static func from(dictionary: [String: Any]?) -> TargetOrder? {
+        guard
+            let dictionary = dictionary,
+            let jsonData = try? JSONSerialization.data(withJSONObject: dictionary)
+        else {
+            return nil
+        }
+        return try? JSONDecoder().decode(TargetOrder.self, from: jsonData)
+    }
 }

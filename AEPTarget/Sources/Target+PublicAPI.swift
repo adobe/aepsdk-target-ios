@@ -392,4 +392,93 @@ import Foundation
             return
         }
     }
+
+    /// Retrieves Target response for an array of mbox locations.
+    ///
+    /// It issues a batch request to the configured Target server for the provided locations in the array. If the location name is not present for one or more items in the execute array, no execute request will be sent to Adobe Target.
+    ///
+    /// - Parameters:
+    ///   - executeArray: A dictionary containing notification data for a given location name.
+    ///   - completion: the callback which will be invoked with the Target response data or error message after the execute request is completed.
+    @objc(executeRawRequest:completion:)
+    static func executeRawRequest(_ executeArray: [[String: Any]], _ completion: @escaping ([[String: Any]]?, Error?) -> Void) {
+        if executeArray.isEmpty {
+            Log.error(label: LOG_TAG, "Failed to execute raw Target request, the provided execute array is empty.")
+            completion(nil, AEPError.invalidRequest)
+            return
+        }
+
+        var targetExecuteArray = [[String: Any]]()
+        for request in executeArray {
+            var mboxRequest = [String: Any]()
+            guard let mboxName = request[TargetConstants.EventDataKeys.MBOX_NAME] as? String,
+                !mboxName.isEmpty
+            else {
+                Log.error(label: LOG_TAG, "Failed to execute raw Target request, the execute array contains nil or empty mbox name.")
+                completion(nil, AEPError.invalidRequest)
+                return
+            }
+            mboxRequest[TargetConstants.EventDataKeys.MBOX_NAME] = mboxName
+            mboxRequest[TargetConstants.EventDataKeys.REQUEST_TARGET_PARAMETERS] = TargetParameters.from(dictionary: request.filter {
+                [
+                    TargetConstants.EventDataKeys.MBOX_PARAMETERS,
+                    TargetConstants.EventDataKeys.PROFILE_PARAMETERS,
+                    TargetConstants.EventDataKeys.ORDER_PARAMETERS,
+                    TargetConstants.EventDataKeys.PRODUCT_PARAMETERS,
+                ].contains($0.key) })?.asDictionary()
+            mboxRequest[TargetConstants.EventDataKeys.TARGET_RESPONSE_PAIR_ID] = ""
+            mboxRequest[TargetConstants.EventDataKeys.TARGET_DEFAULT_CONTENT] = ""
+            targetExecuteArray.append(mboxRequest)
+        }
+
+        let eventData = [
+            TargetConstants.EventDataKeys.LOAD_REQUESTS: targetExecuteArray,
+            TargetConstants.EventDataKeys.IS_RAW_EVENT: true,
+        ] as [String: Any]
+        let event = Event(name: TargetConstants.EventName.TARGET_RAW_EXECUTE_REQUEST, type: EventType.target, source: EventSource.requestContent, data: eventData)
+
+        MobileCore.dispatch(event: event) { responseEvent in
+            guard let responseEvent = responseEvent else {
+                completion(nil, TargetError(message: TargetError.ERROR_TIMEOUT))
+                return
+            }
+
+            if let error = responseEvent.data?[TargetConstants.EventDataKeys.EXECUTE_ERROR] as? String {
+                completion(nil, TargetError(message: error))
+                return
+            }
+
+            guard let executeResponseArray = responseEvent.data?[TargetConstants.EventDataKeys.EXECUTE_MBOXES] as? [[String: Any]] else {
+                let error = "Unable to handle response, raw execute response data is not available."
+                completion(nil, TargetError(message: error))
+                return
+            }
+
+            completion(executeResponseArray, nil)
+        }
+    }
+
+    /// Sends a notification request to Target using the provided raw notification data for a given location name.
+    ///
+    /// If the location name or notification token is not present in the provided data, no notification request will be sent to Adobe Target.
+    /// The notification token for click notification can be retrieved from a previous `executeRawRequest` API call, used to get the location content, provided click metrics are enabled for the location.
+    ///
+    /// - Parameters:
+    ///   - notification: A dictionary containing notification data for a given location name.
+    @objc(sendRawNotification:)
+    static func sendRawNotification(_ notification: [String: Any]) {
+        if notification.isEmpty {
+            Log.error(label: LOG_TAG, "Failed to send raw Target notification, provided notification dictionary is empty.")
+            return
+        }
+
+        let eventData = [
+            TargetConstants.EventDataKeys.IS_LOCATION_CLICKED: true,
+            TargetConstants.EventDataKeys.IS_RAW_EVENT: true,
+            TargetConstants.EventDataKeys.NOTIFICATION: notification,
+        ] as [String: Any]
+
+        let event = Event(name: TargetConstants.EventName.TARGET_RAW_NOTIFICATION, type: EventType.target, source: EventSource.requestContent, data: eventData)
+        MobileCore.dispatch(event: event)
+    }
 }

@@ -176,11 +176,15 @@ enum TargetConstants {
         static let IDENTITY_RESPONSE = "TargetResponseIdentity"
         static let TARGET_RESPONSE = "TargetResponse"
         static let TARGET_REQUEST_RESPONSE = "TargetRequestResponse"
+        static let TARGET_RAW_EXECUTE_REQUEST = "TargetRawExecuteRequest"
+        static let TARGET_RAW_EXECUTE_RESPONSE = "TargetRawExecuteResponse"
+        static let TARGET_RAW_NOTIFICATION = "TargetRawNotification"
         static let ANALYTICS_FOR_TARGET_REQUEST_EVENT_NAME = "AnalyticsForTargetRequest"
     }
 
     enum EventDataKeys {
         static let TARGET_PARAMETERS = "targetparams"
+        static let REQUEST_TARGET_PARAMETERS = "targetParameters"
         static let PREFETCH_REQUESTS = "prefetch"
         static let PREFETCH_ERROR = "prefetcherror"
         static let PREFETCH_RESULT = "prefetchresult"
@@ -195,14 +199,23 @@ enum TargetConstants {
         static let IS_LOCATION_DISPLAYED = "islocationdisplayed"
         static let IS_LOCATION_CLICKED = "islocationclicked"
         static let MBOX_PARAMETERS = "parameters"
-        static let ORDER_PARAMETERS = "orderparameters"
-        static let PRODUCT_PARAMETERS = "productparameters"
-        static let PROFILE_PARAMETERS = "profileparameters"
+        static let ORDER_PARAMETERS = "order"
+        static let PRODUCT_PARAMETERS = "product"
+        static let PROFILE_PARAMETERS = "profileParameters"
         static let AT_PROPERTY = "at_property"
         static let TARGET_CONTENT = "content"
         static let TARGET_DATA_PAYLOAD = "data"
         static let TARGET_RESPONSE_PAIR_ID = "responsePairId"
+        static let TARGET_DEFAULT_CONTENT = "defaultContent"
         static let TARGET_RESPONSE_EVENT_ID = "responseEventId"
+        static let EXECUTE_MBOXES = "executemboxes"
+        static let EXECUTE_ERROR = "executeerror"
+        static let NOTIFICATION = "notification"
+        static let NOTIFICATION_ID = "id"
+        static let NOTIFICATION_TIMESTAMP = "timestamp"
+        static let NOTIFICATION_TOKENS = "tokens"
+        static let IS_RAW_EVENT = "israwevent"
+
         // shared sate
         static let TNT_ID = "tntid"
         static let PREVIEW_INITIATED = "ispreviewinitiated"
@@ -299,5 +312,6 @@ enum TargetConstants {
 
     enum NetworkConnection {
         static let DEFAULT_CONNECTION_TIMEOUT_SEC = TimeInterval(5)
+        static let CONNECTION_RESPONSE_MESSAGE_NO_ERROR = "no error"
     }
 }
