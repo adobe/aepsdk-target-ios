@@ -443,8 +443,7 @@ import Foundation
                 return
             }
 
-            let responseError = responseEvent.error
-            if !responseError.isEmpty {
+            if let responseError = responseEvent.error, !responseError.isEmpty {
                 completion(nil, TargetError(message: responseError))
                 return
             }

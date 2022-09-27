@@ -638,10 +638,7 @@ public class Target: NSObject, Extension {
 
         let response = TargetDeliveryResponse(responseJson: responseDict)
 
-        if
-            let connectionResponseCode = connection.responseCode,
-           connectionResponseCode != 200
-        {
+        if let connectionResponseCode = connection.responseCode, connectionResponseCode != 200 {
             if let responseError = response.errorMessage {
                 if responseError.contains(TargetError.ERROR_NOTIFICATION_TAG) {
                     targetState.clearNotifications()

@@ -70,7 +70,7 @@ extension Event {
     }
 
     /// Returns error message in the response event
-    var error: String {
-        data?[TargetConstants.EventDataKeys.RESPONSE_ERROR] as? String ?? ""
+    var error: String? {
+        data?[TargetConstants.EventDataKeys.RESPONSE_ERROR] as? String
     }
 }
