@@ -671,7 +671,7 @@ public class Target: NSObject, Extension {
         if let data = data {
             eventData[TargetConstants.EventDataKeys.EXECUTE_MBOXES] = data
         } else {
-            eventData[TargetConstants.EventDataKeys.EXECUTE_ERROR] = error ?? ""
+            eventData[TargetConstants.EventDataKeys.RESPONSE_ERROR] = error ?? ""
         }
 
         let responseEvent = event.createResponseEvent(name: TargetConstants.EventName.TARGET_RAW_EXECUTE_RESPONSE,
