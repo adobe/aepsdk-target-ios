@@ -403,18 +403,18 @@ import Foundation
     @objc(executeRawRequest:completion:)
     static func executeRawRequest(_ executeArray: [[String: Any]], _ completion: @escaping ([[String: Any]]?, Error?) -> Void) {
         if executeArray.isEmpty {
-            Log.error(label: LOG_TAG, "Failed to execute raw Target request, the provided execute array is empty.")
+            Log.warning(label: LOG_TAG, "Failed to execute raw Target request, the provided execute array is empty.")
             completion(nil, AEPError.invalidRequest)
             return
         }
 
-        var targetExecuteArray = [[String: Any]]()
+        var targetExecuteArray: [[String: Any]] = []
         for request in executeArray {
-            var mboxRequest = [String: Any]()
+            var mboxRequest: [String: Any] = [:]
             guard let mboxName = request[TargetConstants.EventDataKeys.MBOX_NAME] as? String,
                 !mboxName.isEmpty
             else {
-                Log.error(label: LOG_TAG, "Failed to execute raw Target request, the execute array contains nil or empty mbox name.")
+                Log.warning(label: LOG_TAG, "Failed to execute raw Target request, the execute array contains nil or empty mbox name.")
                 completion(nil, AEPError.invalidRequest)
                 return
             }
@@ -461,14 +461,14 @@ import Foundation
     /// Sends a notification request to Target using the provided raw notification data for a given location name.
     ///
     /// If the location name or notification token is not present in the provided data, no notification request will be sent to Adobe Target.
-    /// The notification token for click notification can be retrieved from a previous `executeRawRequest` API call, used to get the location content, provided click metrics are enabled for the location.
+    /// If click metrics are enabled for the location, the click notification token can be retrieved from the response of a previous `executeRawRequest` API call.
     ///
     /// - Parameters:
     ///   - notification: A dictionary containing notification data for a given location name.
     @objc(sendRawNotification:)
     static func sendRawNotification(_ notification: [String: Any]) {
         if notification.isEmpty {
-            Log.error(label: LOG_TAG, "Failed to send raw Target notification, provided notification dictionary is empty.")
+            Log.warning(label: LOG_TAG, "Failed to send raw Target notification, provided notification dictionary is empty.")
             return
         }
 

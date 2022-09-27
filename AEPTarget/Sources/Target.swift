@@ -24,7 +24,7 @@ public class Target: NSObject, Extension {
         return ServiceProvider.shared.networkService
     }
 
-    private var isInPreviewMode: Bool {
+    private var inPreviewMode: Bool {
         if let previewParameters = previewManager.previewParameters, !previewParameters.isEmpty {
             return true
         }
@@ -186,7 +186,7 @@ public class Target: NSObject, Extension {
     /// Handle prefetch content request
     /// - Parameter event: an event of type target and  source request content is dispatched by the `EventHub`
     private func prefetchContent(_ event: Event) {
-        if isInPreviewMode {
+        if inPreviewMode {
             dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Target prefetch can't be used while in preview mode")
             return
         }
@@ -273,7 +273,7 @@ public class Target: NSObject, Extension {
 
         let timestamp = Int64(event.timestamp.timeIntervalSince1970 * 1000.0)
 
-        if !isInPreviewMode {
+        if !inPreviewMode {
             Log.debug(label: Target.LOG_TAG, "Current cached mboxes : \(targetState.prefetchedMboxJsonDicts.keys.description), size: \(targetState.prefetchedMboxJsonDicts.count)")
             requestsToSend = processCachedTargetRequest(event: event, batchRequests: targetRequests, timeStamp: timestamp)
         }
@@ -374,7 +374,7 @@ public class Target: NSObject, Extension {
     /// - If the mbox is either not prefetched or loaded previously.
     /// - If the clicked token is empty or nil for the loaded mbox.
     private func clickedLocation(_ event: Event) {
-        if isInPreviewMode {
+        if inPreviewMode {
             Log.warning(label: Target.LOG_TAG, "Target location clicked notification can't be sent while in preview mode")
             return
         }
@@ -437,17 +437,15 @@ public class Target: NSObject, Extension {
     }
 
     private func rawClickedLocation(_ event: Event) {
-        if isInPreviewMode {
+        if inPreviewMode {
             Log.warning(label: Target.LOG_TAG, "Raw Target notification cannot be sent while in preview mode.")
             return
         }
 
         guard let notificationData = event.data?[TargetConstants.EventDataKeys.NOTIFICATION] as? [String: Any] else {
-            Log.warning(label: Target.LOG_TAG, "Unable to handle raw Target notification request, event data is nil.")
+            Log.warning(label: Target.LOG_TAG, "Unable to handle raw Target notification request, notification data is nil.")
             return
         }
-
-        let targetParameters = event.targetParameters
 
         // bail out if the target configuration is not available or if the privacy is opted-out
         if let error = prepareForTargetRequest() {
@@ -455,6 +453,7 @@ public class Target: NSObject, Extension {
             return
         }
 
+        let targetParameters = event.targetParameters
         let lifecycleSharedState = getSharedState(extensionName: TargetConstants.Lifecycle.EXTENSION_NAME, event: event)?.value
         let identitySharedState = getSharedState(extensionName: TargetConstants.Identity.EXTENSION_NAME, event: event)?.value
 
@@ -465,7 +464,7 @@ public class Target: NSObject, Extension {
         let timestamp = notificationData[TargetConstants.EventDataKeys.NOTIFICATION_TIMESTAMP] as? Int64 ?? Int64(event.timestamp.timeIntervalSince1970 * 1000.0)
 
         guard let mboxName = notificationData[TargetConstants.EventDataKeys.MBOX_NAME] as? String,
-            !mboxName.isEmpty
+              !mboxName.isEmpty
         else {
             Log.error(label: Target.LOG_TAG, "Failed to send raw Target notification, the provided mbox name is nil or empty.")
             return
@@ -502,12 +501,12 @@ public class Target: NSObject, Extension {
         )
         targetState.addNotification(notification)
 
-        let error = sendTargetRequest(event, targetParameters: nil, lifecycleData: lifecycleSharedState, identityData: identitySharedState) { connection in
+        let error = sendTargetRequest(event, targetParameters: nil, lifecycleData: lifecycleSharedState, identityData: identitySharedState){ connection in
             self.processNotificationResponse(event: event, connection: connection)
         }
 
-        if let err = error {
-            Log.warning(label: Target.LOG_TAG, err)
+        if let error = error {
+            Log.warning(label: Target.LOG_TAG, error)
         }
     }
 
@@ -581,7 +580,7 @@ public class Target: NSObject, Extension {
 
         if let tntId = response.tntId { targetState.updateTntId(tntId) }
         if let edgeHost = response.edgeHost { targetState.updateEdgeHost(edgeHost) }
-        createSharedState(data: targetState.generateSharedState(), event: nil)
+        createSharedState(data: targetState.generateSharedState(), event: event)
 
         var mboxesDictionary = [String: [String: Any]]()
         if let mboxes = response.executeMboxes {
@@ -639,7 +638,8 @@ public class Target: NSObject, Extension {
 
         let response = TargetDeliveryResponse(responseJson: responseDict)
 
-        if connection.responseCode != 200 {
+        if let connectionResponseCode = connection.responseCode,
+           connectionResponseCode != 200 {
             if let responseError = response.errorMessage {
                 if responseError.contains(TargetError.ERROR_NOTIFICATION_TAG) {
                     targetState.clearNotifications()
@@ -648,7 +648,7 @@ public class Target: NSObject, Extension {
             } else {
                 error = connection.error?.localizedDescription ?? error
             }
-            Log.debug(label: Target.LOG_TAG, "Target raw execute request failed with response code: \(String(describing: connection.responseCode)) and error: \(String(describing: error)))")
+            Log.debug(label: Target.LOG_TAG, "Target raw execute request failed with response code: \(connectionResponseCode) and error: \(error ?? ""))")
             return
         }
 
@@ -657,7 +657,7 @@ public class Target: NSObject, Extension {
 
         if let tntId = response.tntId { targetState.updateTntId(tntId) }
         if let edgeHost = response.edgeHost { targetState.updateEdgeHost(edgeHost) }
-        createSharedState(data: targetState.generateSharedState(), event: nil)
+        createSharedState(data: targetState.generateSharedState(), event: event)
 
         responseData = response.executeMboxes
     }
@@ -667,7 +667,7 @@ public class Target: NSObject, Extension {
 
         var eventData = [String: Any]()
         if let data = data {
-            eventData[TargetConstants.EventDataKeys.EXECUTE_MBOXES] = data as Any
+            eventData[TargetConstants.EventDataKeys.EXECUTE_MBOXES] = data
         } else {
             eventData[TargetConstants.EventDataKeys.EXECUTE_ERROR] = error ?? ""
         }
