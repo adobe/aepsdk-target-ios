@@ -68,4 +68,9 @@ extension Event {
     var isClearPrefetchCache: Bool {
         data?[TargetConstants.EventDataKeys.CLEAR_PREFETCH_CACHE] as? Bool ?? false
     }
+
+    /// Returns error message in the response event
+    var error: String {
+        data?[TargetConstants.EventDataKeys.RESPONSE_ERROR] as? String ?? ""
+    }
 }

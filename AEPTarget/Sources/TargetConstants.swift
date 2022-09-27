@@ -209,7 +209,7 @@ enum TargetConstants {
         static let TARGET_DEFAULT_CONTENT = "defaultContent"
         static let TARGET_RESPONSE_EVENT_ID = "responseEventId"
         static let EXECUTE_MBOXES = "executemboxes"
-        static let EXECUTE_ERROR = "executeerror"
+        static let RESPONSE_ERROR = "responseerror"
         static let NOTIFICATION = "notification"
         static let NOTIFICATION_ID = "id"
         static let NOTIFICATION_TIMESTAMP = "timestamp"

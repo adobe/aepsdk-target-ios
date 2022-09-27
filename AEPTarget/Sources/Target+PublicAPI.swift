@@ -443,8 +443,9 @@ import Foundation
                 return
             }
 
-            if let error = responseEvent.data?[TargetConstants.EventDataKeys.EXECUTE_ERROR] as? String {
-                completion(nil, TargetError(message: error))
+            let responseError = responseEvent.error
+            if !responseError.isEmpty {
+                completion(nil, TargetError(message: responseError))
                 return
             }
 

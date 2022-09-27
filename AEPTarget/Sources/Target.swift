@@ -501,7 +501,7 @@ public class Target: NSObject, Extension {
         )
         targetState.addNotification(notification)
 
-        let error = sendTargetRequest(event, targetParameters: nil, lifecycleData: lifecycleSharedState, identityData: identitySharedState){ connection in
+        let error = sendTargetRequest(event, targetParameters: nil, lifecycleData: lifecycleSharedState, identityData: identitySharedState) { connection in
             self.processNotificationResponse(event: event, connection: connection)
         }
 
@@ -638,8 +638,10 @@ public class Target: NSObject, Extension {
 
         let response = TargetDeliveryResponse(responseJson: responseDict)
 
-        if let connectionResponseCode = connection.responseCode,
-           connectionResponseCode != 200 {
+        if
+            let connectionResponseCode = connection.responseCode,
+           connectionResponseCode != 200
+        {
             if let responseError = response.errorMessage {
                 if responseError.contains(TargetError.ERROR_NOTIFICATION_TAG) {
                     targetState.clearNotifications()
