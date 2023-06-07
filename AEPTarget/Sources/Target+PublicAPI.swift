@@ -17,9 +17,9 @@ import Foundation
 @objc public extension Target {
     /// true if the response content event listener is already registered, false otherwise
     #if DEBUG
-        static var isResponseListenerRegister: Bool = false
+    static var isResponseListenerRegister: Bool = false
     #else
-        private static var isResponseListenerRegister: Bool = false
+    private static var isResponseListenerRegister: Bool = false
     #endif
 
     /// `Dictionary` to keep track of pending target request

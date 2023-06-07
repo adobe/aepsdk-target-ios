@@ -608,6 +608,10 @@ class DeliveryRequestBuilderTests: XCTestCase {
 }
 
 private class MockedSystemInfoService: SystemInfoService {
+    func getSystemLocaleName() -> String {
+        ""
+    }
+    
     func getProperty(for _: String) -> String? {
         ""
     }

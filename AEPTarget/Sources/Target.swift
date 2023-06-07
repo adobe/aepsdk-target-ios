@@ -17,7 +17,6 @@ import Foundation
 @objc(AEPMobileTarget)
 public class Target: NSObject, Extension {
     static let LOG_TAG = "Target"
-
     private(set) var targetState: TargetState
 
     private var networkService: Networking {
@@ -34,15 +33,10 @@ public class Target: NSObject, Extension {
     // MARK: - Extension
 
     public var name = TargetConstants.EXTENSION_NAME
-
     public var friendlyName = TargetConstants.FRIENDLY_NAME
-
     public static var extensionVersion = TargetConstants.EXTENSION_VERSION
-
     public var metadata: [String: String]?
-
     public var runtime: ExtensionRuntime
-
     var previewManager: PreviewManager = TargetPreviewManager()
 
     public required init?(runtime: ExtensionRuntime) {
@@ -207,11 +201,13 @@ public class Target: NSObject, Extension {
         let lifecycleSharedState = getSharedState(extensionName: TargetConstants.Lifecycle.EXTENSION_NAME, event: event)?.value
         let identitySharedState = getSharedState(extensionName: TargetConstants.Identity.EXTENSION_NAME, event: event)?.value
 
-        let error = sendTargetRequest(event,
-                                      prefetchRequests: targetPrefetchArray,
-                                      targetParameters: event.targetParameters,
-                                      lifecycleData: lifecycleSharedState,
-                                      identityData: identitySharedState) { connection in
+        let error = sendTargetRequest(
+            event,
+            prefetchRequests: targetPrefetchArray,
+            targetParameters: event.targetParameters,
+            lifecycleData: lifecycleSharedState,
+            identityData: identitySharedState
+        ) { connection in
             // Clear notification
             self.targetState.clearNotifications()
 
@@ -285,11 +281,13 @@ public class Target: NSObject, Extension {
             return
         }
 
-        let error = sendTargetRequest(event,
-                                      batchRequests: requestsToSend,
-                                      targetParameters: targetParameters,
-                                      lifecycleData: lifecycleSharedState,
-                                      identityData: identitySharedState) { connection in
+        let error = sendTargetRequest(
+            event,
+            batchRequests: requestsToSend,
+            targetParameters: targetParameters,
+            lifecycleData: lifecycleSharedState,
+            identityData: identitySharedState
+        ) { connection in
             self.processTargetRequestResponse(batchRequests: requestsToSend, event: event, connection: connection)
         }
 
@@ -993,15 +991,17 @@ public class Target: NSObject, Extension {
     private func dispatchMboxContent(event: Event, content: String, data: [String: Any]?, responsePairId: String) {
         Log.trace(label: Target.LOG_TAG, "dispatchMboxContent - " + TargetError.ERROR_TARGET_EVENT_DISPATCH_MESSAGE)
 
-        let responseEvent = Event(name: TargetConstants.EventName.TARGET_REQUEST_RESPONSE,
-                                  type: EventType.target,
-                                  source: EventSource.responseContent,
-                                  data: [
-                                      TargetConstants.EventDataKeys.TARGET_CONTENT: content,
-                                      TargetConstants.EventDataKeys.TARGET_DATA_PAYLOAD: data as Any,
-                                      TargetConstants.EventDataKeys.TARGET_RESPONSE_PAIR_ID: responsePairId,
-                                      TargetConstants.EventDataKeys.TARGET_RESPONSE_EVENT_ID: event.id.uuidString,
-                                  ])
+        let responseEvent = Event(
+            name: TargetConstants.EventName.TARGET_REQUEST_RESPONSE,
+            type: EventType.target,
+            source: EventSource.responseContent,
+            data: [
+                TargetConstants.EventDataKeys.TARGET_CONTENT: content,
+                TargetConstants.EventDataKeys.TARGET_DATA_PAYLOAD: data as Any,
+                TargetConstants.EventDataKeys.TARGET_RESPONSE_PAIR_ID: responsePairId,
+                TargetConstants.EventDataKeys.TARGET_RESPONSE_EVENT_ID: event.id.uuidString,
+            ]
+        )
         dispatch(event: responseEvent)
     }
 

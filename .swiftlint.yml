@@ -3,7 +3,7 @@ included: # paths to include during linting. `--path` is ignored if present.
 
 line_length: 1000
 function_body_length: 500
-type_body_length: 800
+type_body_length: 850
 disabled_rules: # rule identifiers to exclude from running
   - identifier_name
   - force_cast
@@ -20,3 +20,5 @@ disabled_rules: # rule identifiers to exclude from running
   - type_name
   - large_tuple
   - trailing_comma
+analyzer_rules:
+  - unused_import
