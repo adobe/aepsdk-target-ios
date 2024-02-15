@@ -150,13 +150,21 @@ class TargetPreviewManagerTests: XCTestCase {
     /// fullscreen message is shown
     ///
     func testFetchWebViewHappyPath() {
+        let mockButton = MockFloatingButton()
+        mockUIService.floatingButton = mockButton
         setupPreviewMode()
+        // Button shown and hidden once via the setupPreviewMode
+        XCTAssertEqual(mockButton.showCalledCount, 1)
+        XCTAssertEqual(mockButton.dismissCalledCount, 1)
         let mockMessage = MockFullscreenMessage()
         mockUIService.fullscreenMessage = mockMessage
         targetPreviewManager.fetchWebView()
         XCTAssertTrue(mockNetworkService.connectAsyncCalled)
         XCTAssertTrue(mockUIService.createFullscreenMessageCalled)
         XCTAssertTrue(mockMessage.showCalled)
+        // Button is hidden when webview is shown
+        XCTAssertEqual(mockButton.dismissCalledCount, 2)
+        mockButton.verify(expectedInvocations: [.show, .dismiss, .dismiss])
     }
 
     ///
@@ -173,7 +181,13 @@ class TargetPreviewManagerTests: XCTestCase {
     /// exits early (create and show message not called)
     ///
     func testFetchWebViewEmptyResponse() {
+        let mockButton = MockFloatingButton()
+        mockUIService.floatingButton = mockButton
         setupPreviewMode()
+        // Button shown and hidden once via the setupPreviewMode
+        XCTAssertEqual(mockButton.showCalledCount, 1)
+        XCTAssertEqual(mockButton.dismissCalledCount, 1)
+        
         let httpConnectionWithEmptyResponse = HttpConnection(data: nil, response: nil, error: nil)
         mockNetworkService.expectedResponse = httpConnectionWithEmptyResponse
         let mockMessage = MockFullscreenMessage()
@@ -183,6 +197,8 @@ class TargetPreviewManagerTests: XCTestCase {
         // Called once via the setupPreviewMode but not in the fetchWebView call
         XCTAssertEqual(mockUIService.createFullscreenMessageCallCount, 1)
         XCTAssertFalse(mockMessage.showCalled)
+        XCTAssertEqual(mockButton.showCalledCount, 1)
+        XCTAssertEqual(mockButton.dismissCalledCount, 1)
     }
 
     ///
@@ -195,7 +211,12 @@ class TargetPreviewManagerTests: XCTestCase {
     /// Tests previewConfirmedWithUrl happy path with confirm scheme
     /// Makes sure that the message is dismissed, previewLifecycle event is dispatched, method returns true, verifies the preview parameters are correct
     func testPreviewConfirmedWithUrlHappyPathConfirm() {
+        let mockButton = MockFloatingButton()
+        mockUIService.floatingButton = mockButton
         setupPreviewMode()
+        // Button shown and hidden once via the setupPreviewMode
+        XCTAssertEqual(mockButton.showCalledCount, 1)
+        XCTAssertEqual(mockButton.dismissCalledCount, 1)
         let fullscreenMessage = MockFullscreenMessage()
         mockUIService.fullscreenMessage = fullscreenMessage
         let url = URL(string: TargetTestConstants.TEST_CONFIRM_DEEPLINK)
@@ -210,6 +231,9 @@ class TargetPreviewManagerTests: XCTestCase {
         verifyQaModeParams(targetPreviewManager.previewParameters ?? "")
         XCTAssertTrue(mockUIService.createFullscreenMessageCalled)
         XCTAssertTrue(fullscreenMessage.dismissCalled)
+        // floating button is dismissed and shown again when webview is hidden
+        XCTAssertEqual(mockButton.showCalledCount, 2)
+        mockButton.verify(expectedInvocations: [.show, .dismiss, .show])
     }
 
     ///
@@ -219,9 +243,12 @@ class TargetPreviewManagerTests: XCTestCase {
     func testPreviewConfirmedWithUrlHappyPathCancel() {
         let fullscreenMessage = MockFullscreenMessage()
         mockUIService.fullscreenMessage = fullscreenMessage
-        let button = MockFloatingButton()
-        mockUIService.floatingButton = button
+        let mockButton = MockFloatingButton()
+        mockUIService.floatingButton = mockButton
         setupPreviewMode()
+        // Button shown and hidden once via the setupPreviewMode
+        XCTAssertEqual(mockButton.showCalledCount, 1)
+        XCTAssertEqual(mockButton.dismissCalledCount, 1)
         let url = URL(string: TargetTestConstants.TEST_CANCEL_DEEPLINK)
         var eventDispatched = false
         targetPreviewManager.previewConfirmedWithUrl(url!, message: fullscreenMessage, previewLifecycleEventDispatcher: { event in
@@ -236,7 +263,9 @@ class TargetPreviewManagerTests: XCTestCase {
         XCTAssertNil(targetPreviewManager.previewToken)
         XCTAssertTrue(mockUIService.createFullscreenMessageCalled)
         XCTAssertTrue(fullscreenMessage.dismissCalled)
-        XCTAssertTrue(button.dismissCalled)
+        // floating button is dismissed when webview is hidden
+        XCTAssertEqual(mockButton.dismissCalledCount, 2)
+        mockButton.verify(expectedInvocations: [.show, .dismiss, .dismiss])
     }
 
     ///
@@ -258,23 +287,32 @@ class TargetPreviewManagerTests: XCTestCase {
     func testPreviewConfirmedWithUrlNoSchemeMatch() {
         let fullscreenMessage = MockFullscreenMessage()
         mockUIService.fullscreenMessage = fullscreenMessage
-        let button = MockFloatingButton()
-        mockUIService.floatingButton = button
+        let mockButton = MockFloatingButton()
+        mockUIService.floatingButton = mockButton
         setupPreviewMode()
+        // Button shown and hidden once via the setupPreviewMode
+        XCTAssertEqual(mockButton.showCalledCount, 1)
+        XCTAssertEqual(mockButton.dismissCalledCount, 1)
         let incorrectSchemeUrl = URL(string: "bbbinapp://confirm")
         targetPreviewManager.previewConfirmedWithUrl(incorrectSchemeUrl!, message: fullscreenMessage, previewLifecycleEventDispatcher: { _ in
             XCTFail()
         })
 
         XCTAssertFalse(fullscreenMessage.dismissCalled)
-        XCTAssertFalse(button.dismissCalled)
+        XCTAssertEqual(mockButton.showCalledCount, 1)
+        XCTAssertEqual(mockButton.dismissCalledCount, 1)
     }
 
     ///
     /// Tests previewConfirmedWithUrl happy path, when restart url is set
     ///
     func testPreviewConfirmedWithUrlRestartUrlSet() {
+        let mockButton = MockFloatingButton()
+        mockUIService.floatingButton = mockButton
         setupPreviewMode()
+        // Button shown and hidden once via the setupPreviewMode
+        XCTAssertEqual(mockButton.showCalledCount, 1)
+        XCTAssertEqual(mockButton.dismissCalledCount, 1)
         targetPreviewManager.setRestartDeepLink(TargetTestConstants.TEST_RESTART_URL)
         let fullscreenMessage = MockFullscreenMessage()
         mockUIService.fullscreenMessage = fullscreenMessage
@@ -290,6 +328,9 @@ class TargetPreviewManagerTests: XCTestCase {
         verifyQaModeParams(targetPreviewManager.previewParameters ?? "")
         XCTAssertTrue(mockUIService.createFullscreenMessageCalled)
         XCTAssertTrue(fullscreenMessage.dismissCalled)
+        // floating button is shown when webview is hidden
+        XCTAssertEqual(mockButton.showCalledCount, 2)
+        mockButton.verify(expectedInvocations: [.show, .dismiss, .show])
 
         XCTAssertTrue(mockUrlOpener.openUrlCalled)
         XCTAssertEqual(mockUrlOpener.openUrlParam?.absoluteString, TargetTestConstants.TEST_RESTART_URL)

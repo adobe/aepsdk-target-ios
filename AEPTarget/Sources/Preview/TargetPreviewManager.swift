@@ -109,6 +109,7 @@ class TargetPreviewManager: PreviewManager {
             }
 
             message.dismiss()
+            state.previewButton?.show()
         }
     }
 
@@ -176,6 +177,7 @@ class TargetPreviewManager: PreviewManager {
             return
         }
 
+        state.previewButton?.dismiss()
         state.fullscreenMessage = ServiceProvider.shared.uiService.createFullscreenMessage(payload: webViewHtml, listener: fullscreenMessageDelegate ?? self, isLocalImageUsed: false)
         state.fullscreenMessage?.show()
     }
