@@ -10,7 +10,7 @@
 The `AEPTarget` helps test, personalize, and optimize mobile app experiences based on user behavior and mobile context. You can deliver interactions that engage and convert through iterative testing and rules-based and AI-powered personalization.  
 
 ## Requirements
-- Xcode 14.1 (or newer)
+- Xcode 15 (or newer)
 - Swift 5.1 (or newer)
 
 ## Installation
@@ -42,7 +42,7 @@ Alternatively, if your project has a `Package.swift` file, you can add AEPTarget
 
 ```
 dependencies: [
-    .package(url: "https://github.com/adobe/aepsdk-target-ios.git", .upToNextMajor(from: "4.0.0")),
+    .package(url: "https://github.com/adobe/aepsdk-target-ios.git", .upToNextMajor(from: "5.0.0")),
 ],
 targets: [
     .target(name: "YourTarget",

@@ -11,7 +11,7 @@
  */
 
 enum TargetTestConstants {
-    static let EXTENSION_VERSION = "4.0.3"
+    static let EXTENSION_VERSION = "5.0.0"
     // preview parameters
     static let PREVIEW_MESSAGE_ID = "target-preview-message-id"
     static let PREVIEW_PARAMETERS = "at_preview_params"

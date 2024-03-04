@@ -10,6 +10,7 @@
  governing permissions and limitations under the License.
  */
 import Foundation
+
 @objc(AEPTargetRequestObject)
 public class TargetRequest: NSObject, Codable {
     @objc public let name: String
