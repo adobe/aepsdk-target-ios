@@ -164,7 +164,7 @@ class TargetPreviewManagerTests: XCTestCase {
         XCTAssertTrue(mockMessage.showCalled)
         // Button is hidden when webview is shown
         XCTAssertEqual(mockButton.dismissCalledCount, 2)
-        mockButton.verify(expectedInvocations: [.show, .dismiss, .dismiss])
+        mockButton.verify(expectedInvocations: [.SHOW, .DISMISS, .DISMISS])
     }
 
     ///
@@ -233,7 +233,7 @@ class TargetPreviewManagerTests: XCTestCase {
         XCTAssertTrue(fullscreenMessage.dismissCalled)
         // floating button is dismissed and shown again when webview is hidden
         XCTAssertEqual(mockButton.showCalledCount, 2)
-        mockButton.verify(expectedInvocations: [.show, .dismiss, .show])
+        mockButton.verify(expectedInvocations: [.SHOW, .DISMISS, .SHOW])
     }
 
     ///
@@ -265,7 +265,7 @@ class TargetPreviewManagerTests: XCTestCase {
         XCTAssertTrue(fullscreenMessage.dismissCalled)
         // floating button is dismissed when webview is hidden
         XCTAssertEqual(mockButton.dismissCalledCount, 2)
-        mockButton.verify(expectedInvocations: [.show, .dismiss, .dismiss])
+        mockButton.verify(expectedInvocations: [.SHOW, .DISMISS, .DISMISS])
     }
 
     ///
@@ -330,7 +330,7 @@ class TargetPreviewManagerTests: XCTestCase {
         XCTAssertTrue(fullscreenMessage.dismissCalled)
         // floating button is shown when webview is hidden
         XCTAssertEqual(mockButton.showCalledCount, 2)
-        mockButton.verify(expectedInvocations: [.show, .dismiss, .show])
+        mockButton.verify(expectedInvocations: [.SHOW, .DISMISS, .SHOW])
 
         XCTAssertTrue(mockUrlOpener.openUrlCalled)
         XCTAssertEqual(mockUrlOpener.openUrlParam?.absoluteString, TargetTestConstants.TEST_RESTART_URL)

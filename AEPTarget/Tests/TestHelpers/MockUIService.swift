@@ -27,18 +27,18 @@ class MockFullscreenMessage: FullscreenPresentable {
 }
 
 class MockFloatingButton: FloatingButtonPresentable {
-    enum invocation {
-        case show
-        case dismiss
+    enum Invocation {
+        case SHOW
+        case DISMISS
     }
-    private var invocations: [invocation] = []
+    private var invocations: [Invocation] = []
 
     var showCalled = false
     var showCalledCount = 0
     func show() {
         showCalled = true
         showCalledCount += 1
-        invocations.append(.show)
+        invocations.append(.SHOW)
     }
 
     var dismissCalled = false
@@ -46,7 +46,7 @@ class MockFloatingButton: FloatingButtonPresentable {
     func dismiss() {
         dismissCalled = true
         dismissCalledCount += 1
-        invocations.append(.dismiss)
+        invocations.append(.DISMISS)
     }
 
     var setButtonImageCalled = false
@@ -59,7 +59,7 @@ class MockFloatingButton: FloatingButtonPresentable {
         setInitialCalled = true
     }
     
-    func verify(expectedInvocations: [invocation], file: StaticString = #file, line: UInt = #line) {
+    func verify(expectedInvocations: [Invocation], file: StaticString = #file, line: UInt = #line) {
         if invocations != expectedInvocations {
             XCTFail("Expected \(expectedInvocations), but got \(invocations)", file: file, line: line)
         }
