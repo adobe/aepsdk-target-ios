@@ -224,6 +224,7 @@ enum TargetConstants {
         static let NOTIFICATION_TOKENS = "tokens"
         static let ENVIRONMENT_ID = "environmentId"
         static let IS_RAW_EVENT = "israwevent"
+        static let API_TIMEOUT = "api.timeout"
 
         // shared sate
         static let TNT_ID = "tntid"

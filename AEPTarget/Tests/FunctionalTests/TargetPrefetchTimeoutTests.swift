@@ -15,8 +15,11 @@
 @testable import AEPTarget
 import XCTest
 
-/// Tests that the `target.timeout` configuration value is correctly forwarded to the
-/// `NetworkRequest` used in `Target.prefetchContent`.
+/// Unit tests for the timeout parameter introduced in `Target.prefetchContent(_:with:timeout:_:)`.
+///
+/// Each test exercises exactly one decision point of the change:
+///  - Guard conditions in the new timeout overload (before MobileCore.dispatch is reached)
+///  - `calculateTimeout` priority: explicit API value > `target.timeout` config > 5-second default
 class TargetPrefetchTimeoutTests: TargetFunctionalTestsBase {
 
     // MARK: - Helpers
@@ -49,12 +52,20 @@ class TargetPrefetchTimeoutTests: TargetFunctionalTestsBase {
         }
     """
 
-    private func makePrefetchEvent() -> Event {
+    /// Returns a prefetch `Event` with the given optional `apiTimeout` stored in its data,
+    /// mirroring exactly what `Target.prefetchContent(_:with:timeout:_:)` dispatches.
+    private func makePrefetchEvent(apiTimeout: TimeInterval? = nil) -> Event {
         let prefetchDataArray: [[String: Any]?] = [
             TargetPrefetch(name: "mbox1"),
         ].map { $0.asDictionary() }
-        let data: [String: Any] = ["prefetch": prefetchDataArray]
-        return Event(name: "", type: "", source: "", data: data)
+        var data: [String: Any] = ["prefetch": prefetchDataArray]
+        if let apiTimeout = apiTimeout {
+            data[TargetConstants.EventDataKeys.API_TIMEOUT] = apiTimeout
+        }
+        return Event(name: TargetConstants.EventName.PREFETCH_REQUESTS,
+                     type: EventType.target,
+                     source: EventSource.requestContent,
+                     data: data)
     }
 
     private func setupSharedStates(for event: Event) {
@@ -64,93 +75,98 @@ class TargetPrefetchTimeoutTests: TargetFunctionalTestsBase {
         target.onRegistered()
     }
 
-    // MARK: - Public API timeout parameter tests
+    /// Captures the first `NetworkRequest` made when the given event is processed by the extension.
+    private func capturedNetworkRequest(for event: Event) -> NetworkRequest? {
+        setupSharedStates(for: event)
 
-    /// Calling the new timeout overload with an empty prefetch array must return
-    /// ERROR_EMPTY_PREFETCH_LIST synchronously — before MobileCore.dispatch is reached.
-    func testPrefetchContent_WithTimeout_EmptyArray_ReturnsEmptyListError() {
-        var receivedError: Error?
-        Target.prefetchContent([], with: nil, timeout: 5) { receivedError = $0 }
-        XCTAssertEqual(TargetError.ERROR_EMPTY_PREFETCH_LIST, receivedError.map { String(describing: $0) })
+        let mockNetworkService = TestableNetworkService()
+        ServiceProvider.shared.networkService = mockNetworkService
+
+        var capturedRequest: NetworkRequest?
+        mockNetworkService.mock { request in
+            capturedRequest = request
+            let validResponse = HTTPURLResponse(
+                url: URL(string: "https://acopprod3.tt.omtrdc.net/rest/v1/delivery")!,
+                statusCode: 200, httpVersion: nil, headerFields: nil)
+            return (data: self.successResponseString.data(using: .utf8), response: validResponse, error: nil)
+        }
+
+        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
+            XCTFail("Expected requestContent event listener to be registered")
+            return nil
+        }
+
+        XCTAssertTrue(target.readyForEvent(event))
+        eventListener(event)
+        return capturedRequest
     }
 
-    /// Calling the original no-timeout overload with an empty array must also return
-    /// ERROR_EMPTY_PREFETCH_LIST — verifying the delegation to the new overload didn't
-    /// break the guard.
+    // MARK: - Guard condition tests (new timeout overload)
+
+    /// The new timeout overload must return `ERROR_EMPTY_PREFETCH_LIST` immediately for an empty
+    /// array — before reaching `MobileCore.dispatch`. This verifies the guard inside the new
+    /// overload itself still fires correctly.
+    func testPrefetchContent_WithExplicitTimeout_EmptyArray_ReturnsEmptyListError() {
+        var receivedError: Error?
+        Target.prefetchContent([], with: nil, timeout: 5) { receivedError = $0 }
+        XCTAssertEqual(TargetError.ERROR_EMPTY_PREFETCH_LIST, receivedError.map { String(describing: $0) },
+                       "Empty array should return ERROR_EMPTY_PREFETCH_LIST before MobileCore.dispatch is called")
+    }
+
+    /// The original no-timeout overload delegates to the new one; the same guard must still fire.
     func testPrefetchContent_WithoutTimeout_EmptyArray_ReturnsEmptyListError() {
         var receivedError: Error?
         Target.prefetchContent([], with: nil) { receivedError = $0 }
-        XCTAssertEqual(TargetError.ERROR_EMPTY_PREFETCH_LIST, receivedError.map { String(describing: $0) })
+        XCTAssertEqual(TargetError.ERROR_EMPTY_PREFETCH_LIST, receivedError.map { String(describing: $0) },
+                       "Delegation to the timeout overload must not lose the empty-array guard")
     }
 
-    // MARK: - Network timeout value tests
+    // MARK: - calculateTimeout priority tests
 
-    /// When `target.timeout` is set in configuration, the network request must use that value
-    /// for both `connectTimeout` and `readTimeout`.
-    func testPrefetchContent_NetworkRequestUsesConfiguredTimeout() {
-        let configuredTimeoutSeconds = 10
-        mockConfigSharedState["target.timeout"] = configuredTimeoutSeconds
+    /// When the event carries an explicit finite API timeout, `calculateTimeout` must use it for
+    /// the network request — overriding whatever `target.timeout` is in configuration.
+    func testCalculateTimeout_ExplicitApiTimeout_OverridesConfig() {
+        let explicitTimeout: TimeInterval = 12
+        mockConfigSharedState["target.timeout"] = 3   // config says 3 s — should be ignored
 
-        let prefetchEvent = makePrefetchEvent()
-        setupSharedStates(for: prefetchEvent)
+        let event = makePrefetchEvent(apiTimeout: explicitTimeout)
+        let request = capturedNetworkRequest(for: event)
 
-        let mockNetworkService = TestableNetworkService()
-        ServiceProvider.shared.networkService = mockNetworkService
-
-        var capturedRequest: NetworkRequest?
-        mockNetworkService.mock { request in
-            capturedRequest = request
-            let validResponse = HTTPURLResponse(url: URL(string: "https://acopprod3.tt.omtrdc.net/rest/v1/delivery")!, statusCode: 200, httpVersion: nil, headerFields: nil)
-            return (data: self.successResponseString.data(using: .utf8), response: validResponse, error: nil)
-        }
-
-        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
-            XCTFail("Expected requestContent event listener to be registered")
-            return
-        }
-
-        XCTAssertTrue(target.readyForEvent(prefetchEvent))
-        eventListener(prefetchEvent)
-
-        XCTAssertNotNil(capturedRequest, "Network request should have been made")
-        XCTAssertEqual(TimeInterval(configuredTimeoutSeconds), capturedRequest?.connectTimeout,
-                       "connectTimeout should match target.timeout configuration value")
-        XCTAssertEqual(TimeInterval(configuredTimeoutSeconds), capturedRequest?.readTimeout,
-                       "readTimeout should match target.timeout configuration value")
+        XCTAssertNotNil(request, "A network request should have been made")
+        XCTAssertEqual(explicitTimeout, request?.connectTimeout,
+                       "Explicit API timeout should override target.timeout config for connectTimeout")
+        XCTAssertEqual(explicitTimeout, request?.readTimeout,
+                       "Explicit API timeout should override target.timeout config for readTimeout")
     }
 
-    /// When `target.timeout` is absent from configuration, the network request must fall back
-    /// to `TargetConstants.NetworkConnection.DEFAULT_CONNECTION_TIMEOUT_SEC` (5 seconds).
-    func testPrefetchContent_NetworkRequestUsesDefaultTimeout_WhenNotConfigured() {
-        // Explicitly remove target.timeout to simulate it being absent
+    /// When the event carries `.infinity` (the sentinel emitted by the no-timeout public API),
+    /// `calculateTimeout` must fall back to `target.timeout` from configuration.
+    func testCalculateTimeout_InfinityApiTimeout_FallsBackToConfig() {
+        let configuredTimeout = 8
+        mockConfigSharedState["target.timeout"] = configuredTimeout
+
+        let event = makePrefetchEvent(apiTimeout: .infinity)
+        let request = capturedNetworkRequest(for: event)
+
+        XCTAssertNotNil(request, "A network request should have been made")
+        XCTAssertEqual(TimeInterval(configuredTimeout), request?.connectTimeout,
+                       "Infinity sentinel should cause calculateTimeout to use target.timeout config")
+        XCTAssertEqual(TimeInterval(configuredTimeout), request?.readTimeout,
+                       "Infinity sentinel should cause calculateTimeout to use target.timeout config")
+    }
+
+    /// When the event carries no API timeout at all and `target.timeout` is absent from config,
+    /// `calculateTimeout` must fall back to the SDK default of 5 seconds.
+    func testCalculateTimeout_NoApiTimeout_NoConfig_UsesSdkDefault() {
         mockConfigSharedState.removeValue(forKey: "target.timeout")
 
-        let prefetchEvent = makePrefetchEvent()
-        setupSharedStates(for: prefetchEvent)
+        let event = makePrefetchEvent()   // no apiTimeout stored in event data
+        let request = capturedNetworkRequest(for: event)
 
-        let mockNetworkService = TestableNetworkService()
-        ServiceProvider.shared.networkService = mockNetworkService
-
-        var capturedRequest: NetworkRequest?
-        mockNetworkService.mock { request in
-            capturedRequest = request
-            let validResponse = HTTPURLResponse(url: URL(string: "https://acopprod3.tt.omtrdc.net/rest/v1/delivery")!, statusCode: 200, httpVersion: nil, headerFields: nil)
-            return (data: self.successResponseString.data(using: .utf8), response: validResponse, error: nil)
-        }
-
-        guard let eventListener: EventListener = mockRuntime.listeners["com.adobe.eventType.target-com.adobe.eventSource.requestContent"] else {
-            XCTFail("Expected requestContent event listener to be registered")
-            return
-        }
-
-        XCTAssertTrue(target.readyForEvent(prefetchEvent))
-        eventListener(prefetchEvent)
-
-        XCTAssertNotNil(capturedRequest, "Network request should have been made")
-        XCTAssertEqual(5.0, capturedRequest?.connectTimeout,
-                       "connectTimeout should be the 5-second default when target.timeout is not configured")
-        XCTAssertEqual(5.0, capturedRequest?.readTimeout,
-                       "readTimeout should be the 5-second default when target.timeout is not configured")
+        XCTAssertNotNil(request, "A network request should have been made")
+        XCTAssertEqual(5.0, request?.connectTimeout,
+                       "Missing config should fall back to the 5-second SDK default")
+        XCTAssertEqual(5.0, request?.readTimeout,
+                       "Missing config should fall back to the 5-second SDK default")
     }
-
 }

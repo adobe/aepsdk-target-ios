@@ -33,27 +33,35 @@ import Foundation
     /// the prefetches made in this request. The callback will be executed when the prefetch has been completed, returning
     /// an error object, nil if the prefetch was successful or error description if the prefetch was unsuccessful.
     /// The prefetched mboxes are cached in memory for the current application session and returned when requested.
+    ///
+    /// The timeout for this call is governed by the `target.timeout` configuration value (default 5 seconds).
+    /// Use `prefetchContent(_:with:timeout:_:)` to supply an explicit timeout.
     /// - Parameters:
     ///   - prefetchArray: an array of AEPTargetPrefetch objects representing the desired mboxes to prefetch
     ///   - targetParameters: a TargetParameters object containing parameters for all the mboxes in the request array
-    ///   - timeout: the timeout interval (in seconds) to wait for the prefetch response. Defaults to 1 second.
     ///   - completion: the callback `closure` which will be called after the prefetch is complete.  The parameter in the callback will be nil if the prefetch completed successfully, or will contain error message otherwise
     @objc(prefetchContent:withParameters:callback:)
     static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters? = nil, _ completion: ((Error?) -> Void)?) {
-        prefetchContent(prefetchArray, with: targetParameters, timeout: 1, completion)
+        // Pass .infinity as sentinel — the Target extension will resolve the real timeout from
+        // target.timeout configuration (default 5 s), keeping the EventHub timer in sync with
+        // the network call and avoiding the previous hardcoded 1-second race condition.
+        prefetchContent(prefetchArray, with: targetParameters, timeout: .infinity, completion)
     }
 
-    /// Prefetch multiple Target mboxes simultaneously.
+    /// Prefetch multiple Target mboxes simultaneously with an explicit timeout.
     ///
     /// Executes a prefetch request to your configured Target server with the TargetPrefetchObject list provided
     /// in the prefetchObjectArray parameter. This prefetch request will use the provided parameters for all of
     /// the prefetches made in this request. The callback will be executed when the prefetch has been completed, returning
     /// an error object, nil if the prefetch was successful or error description if the prefetch was unsuccessful.
     /// The prefetched mboxes are cached in memory for the current application session and returned when requested.
+    ///
+    /// The supplied `timeout` overrides both the EventHub response deadline and the network-level connect/read
+    /// timeout used for the underlying Target delivery API call.
     /// - Parameters:
     ///   - prefetchArray: an array of AEPTargetPrefetch objects representing the desired mboxes to prefetch
     ///   - targetParameters: a TargetParameters object containing parameters for all the mboxes in the request array
-    ///   - timeout: the timeout interval (in seconds) to wait for the prefetch response. Defaults to 1 second.
+    ///   - timeout: the timeout interval (in seconds) to wait for the prefetch response.
     ///   - completion: the callback `closure` which will be called after the prefetch is complete.  The parameter in the callback will be nil if the prefetch completed successfully, or will contain error message otherwise
     @objc(prefetchContent:withParameters:timeout:callback:)
     static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters? = nil, timeout: TimeInterval, _ completion: ((Error?) -> Void)?) {
@@ -68,7 +76,6 @@ import Foundation
         for prefetch in prefetchArray {
             if let dict = prefetch.asDictionary() {
                 prefetchDataArray.append(dict)
-
             } else {
                 Log.error(label: Target.LOG_TAG, "Failed to prefetch Target request (the provided prefetch object can't be converted to [String: Any] dictionary), prefetch => \(prefetch)")
                 completion(TargetError(message: TargetError.ERROR_INVALID_REQUEST))
@@ -80,6 +87,9 @@ import Foundation
         if let targetParametersDict = targetParameters?.asDictionary() {
             eventData[TargetConstants.EventDataKeys.TARGET_PARAMETERS] = targetParametersDict
         }
+        // Store the caller-supplied timeout in event data so the Target extension can apply the
+        // same value to the network-level connect/read timeout, keeping both timers in sync.
+        eventData[TargetConstants.EventDataKeys.API_TIMEOUT] = timeout
 
         let event = Event(name: TargetConstants.EventName.PREFETCH_REQUESTS, type: EventType.target, source: EventSource.requestContent, data: eventData)
 
