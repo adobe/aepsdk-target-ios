@@ -31,10 +31,12 @@ This API sends a prefetch request to your configured Target server with the pref
 
 ```swift
 static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters? = nil, _ completion: ((Error?) -> Void)?)
+static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters? = nil, timeout: TimeInterval, _ completion: ((Error?) -> Void)?)
 ```
 
   - *prefetchArray* - is an array of `TargetPrefetch` objects for various mbox locations.
   - *targetParameters* - is the configured `TargetParameters` for the prefetch request.
+  - *timeout* - (optional) the maximum time in seconds to wait for the prefetch response. Defaults to 1 second when not specified.
   - If the prefetch is successful, `completion` is invoked with a nil value. If the prefetch is not successful, an error message is returned.
 
 #### Example

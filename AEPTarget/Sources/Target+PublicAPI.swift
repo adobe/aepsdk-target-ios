@@ -36,9 +36,27 @@ import Foundation
     /// - Parameters:
     ///   - prefetchArray: an array of AEPTargetPrefetch objects representing the desired mboxes to prefetch
     ///   - targetParameters: a TargetParameters object containing parameters for all the mboxes in the request array
+    ///   - timeout: the timeout interval (in seconds) to wait for the prefetch response. Defaults to 1 second.
     ///   - completion: the callback `closure` which will be called after the prefetch is complete.  The parameter in the callback will be nil if the prefetch completed successfully, or will contain error message otherwise
     @objc(prefetchContent:withParameters:callback:)
     static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters? = nil, _ completion: ((Error?) -> Void)?) {
+        prefetchContent(prefetchArray, with: targetParameters, timeout: 1, completion)
+    }
+
+    /// Prefetch multiple Target mboxes simultaneously.
+    ///
+    /// Executes a prefetch request to your configured Target server with the TargetPrefetchObject list provided
+    /// in the prefetchObjectArray parameter. This prefetch request will use the provided parameters for all of
+    /// the prefetches made in this request. The callback will be executed when the prefetch has been completed, returning
+    /// an error object, nil if the prefetch was successful or error description if the prefetch was unsuccessful.
+    /// The prefetched mboxes are cached in memory for the current application session and returned when requested.
+    /// - Parameters:
+    ///   - prefetchArray: an array of AEPTargetPrefetch objects representing the desired mboxes to prefetch
+    ///   - targetParameters: a TargetParameters object containing parameters for all the mboxes in the request array
+    ///   - timeout: the timeout interval (in seconds) to wait for the prefetch response. Defaults to 1 second.
+    ///   - completion: the callback `closure` which will be called after the prefetch is complete.  The parameter in the callback will be nil if the prefetch completed successfully, or will contain error message otherwise
+    @objc(prefetchContent:withParameters:timeout:callback:)
+    static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters? = nil, timeout: TimeInterval, _ completion: ((Error?) -> Void)?) {
         let completion = completion ?? { _ in }
 
         guard !prefetchArray.isEmpty else {
@@ -65,7 +83,7 @@ import Foundation
 
         let event = Event(name: TargetConstants.EventName.PREFETCH_REQUESTS, type: EventType.target, source: EventSource.requestContent, data: eventData)
 
-        MobileCore.dispatch(event: event) { responseEvent in
+        MobileCore.dispatch(event: event, timeout: timeout) { responseEvent in
             guard let responseEvent = responseEvent else {
                 completion(TargetError(message: TargetError.ERROR_TIMEOUT))
                 return
