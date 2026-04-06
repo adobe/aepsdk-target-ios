@@ -36,7 +36,9 @@ static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParame
 
   - *prefetchArray* - is an array of `TargetPrefetch` objects for various mbox locations.
   - *targetParameters* - is the configured `TargetParameters` for the prefetch request.
-  - *timeout* - (optional) the maximum time in seconds to wait for the prefetch response. Defaults to 1 second when not specified.
+  - *timeout* - the network request timeout in seconds for this prefetch call. When provided, it takes precedence over any other timeout configuration. When not provided, the timeout is resolved in the following order:
+    1. The `target.timeout` value configured in the Adobe Experience Platform Launch/Tags property.
+    2. The SDK default of 5 seconds.
   - If the prefetch is successful, `completion` is invoked with a nil value. If the prefetch is not successful, an error message is returned.
 
 #### Example
@@ -78,13 +80,19 @@ static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParame
 #### Syntax 
 
 ```objectivec
-+ (void) prefetchContent: (nonnull NSArray<AEPTargetPrefetchObject*>*) targetPrefetchObjectArray 
-         withParameters: (nullable AEPTargetParameters*) targetParameters 
++ (void) prefetchContent: (nonnull NSArray<AEPTargetPrefetchObject*>*) targetPrefetchObjectArray
+         withParameters: (nullable AEPTargetParameters*) targetParameters
+         callback: (nullable void (^) (NSError* _Nullable error)) completion;
+
++ (void) prefetchContent: (nonnull NSArray<AEPTargetPrefetchObject*>*) targetPrefetchObjectArray
+         withParameters: (nullable AEPTargetParameters*) targetParameters
+         timeout: (NSTimeInterval) timeout
          callback: (nullable void (^) (NSError* _Nullable error)) completion;
 ```
 
   - *prefetchObjectArray* : is an array of `TargetPrefetch` objects for various mbox locations.
   - *targetParameters* : is the configured `TargetParameters` for the prefetch request.
+  - *timeout* : the network request timeout in seconds for this prefetch call. When provided, it takes precedence over any other timeout configuration. When not provided, the timeout falls back to the `target.timeout` configuration value, or the SDK default of 5 seconds if not configured.
   - If the prefetch is successful, `completion` is invoked with a nil value. If the prefetch is not successful, an error message is returned.
 
 #### Example
