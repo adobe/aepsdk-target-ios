@@ -54,21 +54,21 @@ enum TargetResponseConstants {
 
         /// ---- id -----
         static let TNT_ID = "tntId"
-        /// ---- id -----
+        // ---- id -----
 
         static let EDGE_HOST = "edgeHost"
         static let PREFETCH = "prefetch"
 
         /// ---- prefetch -----
         static let MBOXES = "mboxes"
-        /// ---- prefetch -----
+        // ---- prefetch -----
 
         /// ---- prefetch - mboxes - mbox -----
         static let MBOX_NAME = "name"
-        /// ---- prefetch - mboxes - mbox -----
+        // ---- prefetch - mboxes - mbox -----
 
         /// ---- execute - mboxes - mbox -----
         static let EXECUTE = "execute"
-        /// ---- execute - mboxes - mbox -----
+        // ---- execute - mboxes - mbox -----
     }
 }
