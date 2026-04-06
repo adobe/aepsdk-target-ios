@@ -278,7 +278,7 @@ public class Target: NSObject, Extension {
             requestsToSend = processCachedTargetRequest(event: event, batchRequests: targetRequests, timeStamp: timestamp)
         }
 
-        if requestsToSend.isEmpty && targetState.notifications.isEmpty {
+        if requestsToSend.isEmpty, targetState.notifications.isEmpty {
             Log.warning(label: Target.LOG_TAG, "Unable to process the batch requests, requests and notifications are empty")
             return
         }

@@ -15,7 +15,7 @@ import AEPServices
 import Foundation
 
 @objc public extension Target {
-    /// true if the response content event listener is already registered, false otherwise
+    // true if the response content event listener is already registered, false otherwise
     #if DEBUG
     static var isResponseListenerRegister: Bool = false
     #else
