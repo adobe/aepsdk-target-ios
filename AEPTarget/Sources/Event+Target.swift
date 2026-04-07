@@ -79,6 +79,12 @@ extension Event {
         data?[TargetConstants.EventDataKeys.ENVIRONMENT_ID] as? Int64 ?? 0
     }
 
+    /// Reads the API timeout from the event data, if provided by the caller.
+    /// A value of `Double.infinity` means no explicit timeout was given — the extension should fall back to config.
+    var apiTimeout: TimeInterval? {
+        data?[TargetConstants.EventDataKeys.API_TIMEOUT] as? TimeInterval
+    }
+
     /// Returns error message in the response event
     var error: String? {
         guard let error = data?[TargetConstants.EventDataKeys.RESPONSE_ERROR] as? String else {

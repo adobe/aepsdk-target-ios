@@ -16,7 +16,7 @@ import Foundation
 struct TargetDeliveryResponse {
     let responseJson: [String: Any]
 
-    // Exists in Error response
+    /// Exists in Error response
     var errorMessage: String? {
         responseJson[TargetResponseConstants.JSONKeys.MESSAGE] as? String
     }
@@ -52,22 +52,22 @@ enum TargetResponseConstants {
         static let MESSAGE = "message"
         static let ID = "id"
 
-        // ---- id -----
+        /// ---- id -----
         static let TNT_ID = "tntId"
         // ---- id -----
 
         static let EDGE_HOST = "edgeHost"
         static let PREFETCH = "prefetch"
 
-        // ---- prefetch -----
+        /// ---- prefetch -----
         static let MBOXES = "mboxes"
         // ---- prefetch -----
 
-        // ---- prefetch - mboxes - mbox -----
+        /// ---- prefetch - mboxes - mbox -----
         static let MBOX_NAME = "name"
         // ---- prefetch - mboxes - mbox -----
 
-        // ---- execute - mboxes - mbox -----
+        /// ---- execute - mboxes - mbox -----
         static let EXECUTE = "execute"
         // ---- execute - mboxes - mbox -----
     }

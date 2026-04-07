@@ -25,6 +25,7 @@ struct ContentView: View {
     @State var notificationTokens: [(String, String)] = []
     @State var griffonUrl: String = TestConstants.GRIFFON_URL
     @State var fullscreenMessage: FullscreenPresentable?
+    let targetParameters = TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["profile_parameter_key": "profile_parameter_value"], order: TargetOrder(id: "223d24411", total: 445.12, purchasedProductIds: ["ppId1"]), product: TargetProduct(productId: "764334", categoryId: "Footwear"))
     
     var body: some View {
         ScrollView {
@@ -127,32 +128,34 @@ struct ContentView: View {
     func prefetch() {
         Target.prefetchContent(
             [
-                TargetPrefetch(name: "aep-loc-1", targetParameters: nil),
-                TargetPrefetch(name: "aep-loc-2", targetParameters: nil),
+                TargetPrefetch(name: "sdk_smoke_tests_target", targetParameters: nil),
+                TargetPrefetch(name: "aep-loc-2", targetParameters: self.targetParameters),
             ],
+            with: self.targetParameters,
             nil
         )
     }
 
     func getLocations1() {
-        Target.retrieveLocationContent([TargetRequest(mboxName: "aep-loc-1", defaultContent: "DefaultValue1", targetParameters: nil, contentCallback: { content in
-                print("------")
-                print("Content: \(content ?? "")")
-            }),
+        Target.retrieveLocationContent([TargetRequest(mboxName: "sdk_smoke_tests_target", defaultContent: "DefaultValue1", targetParameters: nil, contentCallback: { content in
+            print("------")
+            print("Content: \(content ?? "")")
+        }),
                                         TargetRequest(mboxName: "aep-loc-2", defaultContent: "DefaultValue2", targetParameters: nil, contentCallback: { content in
-                print("------")
-                print("Content: \(content ?? "")")
-            }),
-                                        TargetRequest(mboxName: "aep-loc-x", defaultContent: "DefaultValuex", targetParameters: nil, contentCallback: { content in
-               print("------")
-               print("Content: \(content ?? "")")
-           })],
-                                       with: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"], order: TargetOrder(id: "id1", total: 1.0, purchasedProductIds: ["ppId1"]), product: TargetProduct(productId: "pId1", categoryId: "cId1")))
+            print("------")
+            print("Content: \(content ?? "")")
+        }),
+                                        TargetRequest(mboxName: "sdk_smoke_tests_target_a4t", defaultContent: "DefaultValuex", targetParameters: self.targetParameters, contentCallback: { content in
+            print("------")
+            print("Content: \(content ?? "")")
+        })],
+                                       with: self.targetParameters
+        )
     }
 
     func getLocations2() {
         Target.retrieveLocationContent([
-            TargetRequest(mboxName: "aep-loc-1", defaultContent: "DefaultValue1", targetParameters: nil, contentWithDataCallback: { content, data in
+            TargetRequest(mboxName: "sdk_smoke_tests_target", defaultContent: "DefaultValue1", targetParameters: nil, contentWithDataCallback: { content, data in
                 print("------")
                 print("Content: \(content ?? "")")
 
@@ -183,11 +186,11 @@ struct ContentView: View {
     }
 
     func locationDisplayed() {
-        Target.displayedLocations(["aep-loc-1", "aep-loc-2"], targetParameters: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"], order: TargetOrder(id: "id1", total: 1.0, purchasedProductIds: ["ppId1"]), product: TargetProduct(productId: "pId1", categoryId: "cId1")))
+        Target.displayedLocations(["sdk_smoke_tests_target", "aep-loc-2", "sdk_smoke_tests_target_a4t"], targetParameters: self.targetParameters)
     }
 
     func locationClicked() {
-        Target.clickedLocation("aep-loc-1", targetParameters: TargetParameters(parameters: ["mbox_parameter_key": "mbox_parameter_value"], profileParameters: ["name": "Smith"], order: TargetOrder(id: "id1", total: 1.0, purchasedProductIds: ["ppId1"]), product: TargetProduct(productId: "pId1", categoryId: "cId1")))
+        Target.clickedLocation("sdk_smoke_tests_target_a4t", targetParameters: self.targetParameters)
     }
 
     func resetExperience() {
@@ -250,13 +253,13 @@ struct ContentView: View {
     func executeRawRequest() {
         Target.executeRawRequest([
             "property": [
-                "token": "ccc7cdb3-c67a-6126-10b3-65d7f4d32b69"
+                "token": ""
             ],
             "execute": [
                 "mboxes": [
                     [
                         "index": 0,
-                        "name": "aep-loc-1",
+                        "name": "sdk_smoke_tests_target",
                         "parameters": [
                             "mbox_parameter_key1": "mbox_parameter_value1"
                         ]
