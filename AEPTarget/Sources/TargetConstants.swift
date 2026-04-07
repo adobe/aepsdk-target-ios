@@ -224,8 +224,9 @@ enum TargetConstants {
         static let NOTIFICATION_TOKENS = "tokens"
         static let ENVIRONMENT_ID = "environmentId"
         static let IS_RAW_EVENT = "israwevent"
+        static let API_TIMEOUT = "api.timeout"
 
-        // shared sate
+        /// shared state
         static let TNT_ID = "tntid"
         static let PREVIEW_INITIATED = "ispreviewinitiated"
         static let DEEPLINK = "deeplink"
@@ -268,9 +269,9 @@ enum TargetConstants {
         static let EXTENSION_NAME = "com.adobe.module.configuration"
         enum SharedState {
             enum Keys {
-                // Core Extension
+                /// Core Extension
                 static let GLOBAL_CONFIG_PRIVACY = "global.privacy"
-                // Target Extension
+                /// Target Extension
                 static let TARGET_CLIENT_CODE = "target.clientCode"
                 static let TARGET_PREVIEW_ENABLED = "target.previewEnabled"
                 static let TARGET_NETWORK_TIMEOUT = "target.timeout"
