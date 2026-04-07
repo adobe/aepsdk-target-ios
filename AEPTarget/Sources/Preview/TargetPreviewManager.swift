@@ -47,8 +47,8 @@ class TargetPreviewManager: PreviewManager {
     typealias httpResponseConstants = HttpConnectionConstants.ResponseCodes
     typealias httpHeaderConstants = HttpConnectionConstants.Header
 
-    public weak var floatingButtonDelegate: FloatingButtonDelegate?
-    public weak var fullscreenMessageDelegate: FullscreenMessageDelegate?
+    weak var floatingButtonDelegate: FloatingButtonDelegate?
+    weak var fullscreenMessageDelegate: FullscreenMessageDelegate?
 
     private var urlOpeningService: URLOpening {
         ServiceProvider.shared.urlService
@@ -162,11 +162,7 @@ class TargetPreviewManager: PreviewManager {
         return state.token
     }
 
-    ///
-
     // MARK: - Private helper functions and variables
-
-    ///
 
     ///
     /// Creates and shows the message using the PreviewManagerState

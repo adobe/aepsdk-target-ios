@@ -107,9 +107,7 @@ enum TargetDeliveryRequestBuilder {
             return nil
         }
 
-        let notification = Notification(id: id, timestamp: timestamp, type: TargetConstants.TargetJson.MetricType.DISPLAY, mbox: mbox, tokens: tokens, parameters: mboxParameters, profileParameters: targetParameters?.profileParameters, order: targetParameters?.order?.toInternalOrder(), product: targetParameters?.product?.toInternalProduct())
-
-        return notification
+        return Notification(id: id, timestamp: timestamp, type: TargetConstants.TargetJson.MetricType.DISPLAY, mbox: mbox, tokens: tokens, parameters: mboxParameters, profileParameters: targetParameters?.profileParameters, order: targetParameters?.order?.toInternalOrder(), product: targetParameters?.product?.toInternalProduct())
     }
 
     static func getClickedNotification(cachedMboxJson: [String: Any?], targetParameters: TargetParameters?, timestamp: Int64, lifecycleContextData: [String: String]?) -> Notification? {

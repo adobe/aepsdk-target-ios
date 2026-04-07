@@ -201,12 +201,14 @@ public class Target: NSObject, Extension {
         let lifecycleSharedState = getSharedState(extensionName: TargetConstants.Lifecycle.EXTENSION_NAME, event: event)?.value
         let identitySharedState = getSharedState(extensionName: TargetConstants.Identity.EXTENSION_NAME, event: event)?.value
 
+        let resolvedTimeout = calculateTimeout(apiTimeout: event.apiTimeout)
         let error = sendTargetRequest(
             event,
             prefetchRequests: targetPrefetchArray,
             targetParameters: event.targetParameters,
             lifecycleData: lifecycleSharedState,
-            identityData: identitySharedState
+            identityData: identitySharedState,
+            timeout: resolvedTimeout
         ) { connection in
             // Clear notification
             self.targetState.clearNotifications()
@@ -276,7 +278,7 @@ public class Target: NSObject, Extension {
             requestsToSend = processCachedTargetRequest(event: event, batchRequests: targetRequests, timeStamp: timestamp)
         }
 
-        if requestsToSend.isEmpty && targetState.notifications.isEmpty {
+        if requestsToSend.isEmpty, targetState.notifications.isEmpty {
             Log.warning(label: Target.LOG_TAG, "Unable to process the batch requests, requests and notifications are empty")
             return
         }
@@ -676,12 +678,33 @@ public class Target: NSObject, Extension {
         return lifecycleContextData
     }
 
+    /// Resolves the effective timeout to use for both the EventHub response deadline and the
+    /// network-level connect/read timeout.
+    ///
+    /// Priority order:
+    ///  1. Explicit caller value from the API (anything that is not `.infinity`)
+    ///  2. `target.timeout` from the active configuration shared state
+    ///  3. SDK default — `TargetConstants.NetworkConnection.DEFAULT_CONNECTION_TIMEOUT_SEC` (5 s)
+    ///
+    /// - Parameter apiTimeout: The raw timeout stored in the request event data, or `nil` when the
+    ///   event was created by an internal path that doesn't carry a caller-supplied timeout.
+    /// - Returns: The final `TimeInterval` to use for both the EventHub and network layers.
+    private func calculateTimeout(apiTimeout: TimeInterval?) -> TimeInterval {
+        // An explicit finite value from the caller always wins.
+        if let apiTimeout = apiTimeout, apiTimeout != .infinity {
+            return apiTimeout
+        }
+        // Fall back to the configuration value, which maps to target.timeout (default 5 s).
+        return targetState.networkTimeout
+    }
+
     private func sendTargetRequest(_ event: Event,
                                    batchRequests: [TargetRequest]? = nil,
                                    prefetchRequests: [TargetPrefetch]? = nil,
                                    targetParameters: TargetParameters? = nil,
                                    lifecycleData: [String: Any]? = nil,
                                    identityData: [String: Any]? = nil,
+                                   timeout: TimeInterval? = nil,
                                    completionHandler: ((HttpConnection) -> Void)?)
     -> String? {
         let tntId = targetState.tntId
@@ -705,7 +728,8 @@ public class Target: NSObject, Extension {
         }
 
         let eventHubSharedState = getSharedState(extensionName: TargetConstants.EventHub.EXTENSION_NAME, event: event)?.value
-        let timeout = targetState.networkTimeout
+        // Use the caller-supplied timeout when available; fall back to the config/default value.
+        let timeout = timeout ?? targetState.networkTimeout
         let headers = [
             TargetConstants.HEADER_CONTENT_TYPE: TargetConstants.HEADER_CONTENT_TYPE_JSON,
             TargetConstants.HEADER_X_EXC_SDK: getSdkInfo(eventHubData: eventHubSharedState),
