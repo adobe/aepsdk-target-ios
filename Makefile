@@ -17,10 +17,10 @@ lint:
 	./Pods/SwiftLint/swiftlint lint
 
 check-format:
-	swiftformat --lint AEPTarget/Sources --swiftversion 5.1
+	swiftformat --lint AEPTarget/Sources --swiftversion 5.10
 	
 format:
-	swiftformat AEPTarget/Sources --swiftversion 5.1
+	swiftformat AEPTarget/Sources --swiftversion 5.10
 
 pod-install:
 	(pod install --repo-update)
@@ -90,7 +90,7 @@ test-podspec:
 	(sh ./script/test-podspec.sh)
 
 pod-lint:
-	(pod lib lint --allow-warnings --verbose --swift-version=5.1)
+	(pod lib lint --allow-warnings --verbose --swift-version=5.10)
 
 # used to test update-versions.sh script locally
 test-update-version:
