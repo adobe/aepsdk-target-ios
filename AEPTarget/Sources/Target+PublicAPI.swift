@@ -42,8 +42,9 @@ import Foundation
     ///   - prefetchArray: an array of AEPTargetPrefetch objects representing the desired mboxes to prefetch
     ///   - targetParameters: a TargetParameters object containing parameters for all the mboxes in the request array
     ///   - completion: the callback `closure` which will be called after the prefetch is complete.  The parameter in the callback will be nil if the prefetch completed successfully, or will contain error message otherwise
+    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     @objc(prefetchContent:withParameters:callback:)
-    static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters? = nil, _ completion: ((Error?) -> Void)?) {
+    @preconcurrency static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters? = nil, _ completion: (@Sendable (Error?) -> Void)?) {
         // Pass .infinity as sentinel — the Target extension will resolve the real timeout from
         // target.timeout configuration (default 5 s), keeping the EventHub timer in sync with
         // the network call and avoiding the previous hardcoded 1-second race condition.
@@ -65,8 +66,9 @@ import Foundation
     ///   - targetParameters: a TargetParameters object containing parameters for all the mboxes in the request array
     ///   - timeout: the timeout interval (in seconds) to wait for the prefetch response.
     ///   - completion: the callback `closure` which will be called after the prefetch is complete.  The parameter in the callback will be nil if the prefetch completed successfully, or will contain error message otherwise
+    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     @objc(prefetchContent:withParameters:timeout:callback:)
-    static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters? = nil, timeout: TimeInterval, _ completion: ((Error?) -> Void)?) {
+    @preconcurrency static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters? = nil, timeout: TimeInterval, _ completion: (@Sendable (Error?) -> Void)?) {
         let completion = completion ?? { _ in }
 
         guard !prefetchArray.isEmpty else {
@@ -187,7 +189,8 @@ import Foundation
     /// Gets the custom visitor ID for Target
     /// This ID will be reset  when the `resetExperience()` API is called.
     /// - Parameter completion:  the callback `closure` will be invoked to return the thirdPartyId value or `nil` if no third-party ID is set
-    static func getThirdPartyId(_ completion: @escaping (String?, Error?) -> Void) {
+    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
+    @preconcurrency static func getThirdPartyId(_ completion: @escaping @Sendable (String?, Error?) -> Void) {
         let event = Event(name: TargetConstants.EventName.GET_THIRD_PARTY_ID, type: EventType.target, source: EventSource.requestIdentity, data: nil)
         MobileCore.dispatch(event: event) { responseEvent in
             guard let responseEvent = responseEvent else {
@@ -233,7 +236,8 @@ import Foundation
     /// If the session timeout happens upon a subsequent Target request, a new session ID will be generated for use in the request and persisted in the SDK.
     ///
     /// - Parameter completion: the callback `closure` invoked with the current session ID, or `nil` if there was an error retrieving it.
-    static func getSessionId(_ completion: @escaping (String?, Error?) -> Void) {
+    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
+    @preconcurrency static func getSessionId(_ completion: @escaping @Sendable (String?, Error?) -> Void) {
         let event = Event(name: TargetConstants.EventName.GET_SESSION_ID, type: EventType.target, source: EventSource.requestIdentity, data: nil)
         MobileCore.dispatch(event: event) { responseEvent in
             guard let responseEvent = responseEvent else {
@@ -281,7 +285,8 @@ import Foundation
     /// The persisted tnt ID is used in subsequent Target requests until a different tnt ID is returned from Target, or a new tnt ID is set using `setTntId` API.
     ///
     /// - Parameter completion:  the callback `closure` invoked with the current tnt ID, or `nil` if there was an error retrieving it.
-    static func getTntId(_ completion: @escaping (String?, Error?) -> Void) {
+    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
+    @preconcurrency static func getTntId(_ completion: @escaping @Sendable (String?, Error?) -> Void) {
         let event = Event(name: TargetConstants.EventName.GET_TNT_ID, type: EventType.target, source: EventSource.requestIdentity, data: nil)
         MobileCore.dispatch(event: event) { responseEvent in
             guard let responseEvent = responseEvent else {
@@ -428,8 +433,9 @@ import Foundation
     /// - Parameters:
     ///   - request: a dictionary containing prefetch or execute request data in the Target v1 delivery API request format.
     ///   - completion: the callback which will be invoked with the Target response data or error message after the request is completed.
+    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     @objc(executeRawRequest:completion:)
-    static func executeRawRequest(_ request: [String: Any], _ completion: @escaping ([String: Any]?, Error?) -> Void) {
+    @preconcurrency static func executeRawRequest(_ request: [String: Any], _ completion: @escaping @Sendable ([String: Any]?, Error?) -> Void) {
         guard !request.isEmpty else {
             Log.warning(label: LOG_TAG, "Failed to execute raw Target request, the provided request dictionary is empty.")
             completion(nil, AEPError.invalidRequest)

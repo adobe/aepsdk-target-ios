@@ -17,8 +17,8 @@ public class TargetRequest: NSObject, Codable {
     @objc public let defaultContent: String
     @objc public let targetParameters: TargetParameters?
     @objc let responsePairId: String
-    @objc var contentCallback: ((String?) -> Void)?
-    @objc var contentWithDataCallback: ((String?, [String: Any]?) -> Void)?
+    @objc var contentCallback: (@Sendable (String?) -> Void)?
+    @objc var contentWithDataCallback: (@Sendable (String?, [String: Any]?) -> Void)?
 
     /// Instantiate a `TargetRequest` object
     /// - Parameters:
@@ -26,7 +26,8 @@ public class TargetRequest: NSObject, Codable {
     ///   - defaultContent: `String` default content for this request
     ///   - targetParameters: `TargetParameters` for this request
     ///   - contentCallback: which will get called with target mbox content
-    @objc public init(mboxName: String, defaultContent: String, targetParameters: TargetParameters? = nil, contentCallback: ((String?) -> Void)? = nil) {
+    // Callbacks run on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
+    @objc @preconcurrency public init(mboxName: String, defaultContent: String, targetParameters: TargetParameters? = nil, contentCallback: (@Sendable (String?) -> Void)? = nil) {
         name = mboxName
         self.defaultContent = defaultContent
         self.targetParameters = targetParameters
@@ -41,7 +42,8 @@ public class TargetRequest: NSObject, Codable {
     ///   - defaultContent: `String` default content for this request
     ///   - targetParameters: `TargetParameters` for this request
     ///   - contentWithDataCallback: which will get called with target mbox content, and an optional dictionary containing one or more of response tokens, analytics payload, and click metric analytics payload, if available.
-    @objc public init(mboxName: String, defaultContent: String, targetParameters: TargetParameters? = nil, contentWithDataCallback: ((String?, [String: Any]?) -> Void)? = nil) {
+    // Callbacks run on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
+    @objc @preconcurrency public init(mboxName: String, defaultContent: String, targetParameters: TargetParameters? = nil, contentWithDataCallback: (@Sendable (String?, [String: Any]?) -> Void)? = nil) {
         name = mboxName
         self.defaultContent = defaultContent
         self.targetParameters = targetParameters
