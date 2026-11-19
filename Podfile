@@ -33,7 +33,7 @@ def app_main
     pod 'AEPLifecycle'
     pod 'AEPSignal'
     pod 'AEPAnalytics', :git => 'https://github.com/adobe/aepsdk-analytics-ios.git', :branch => $dev_branch
-#    pod 'AEPAssurance'
+    pod 'AEPAssurance'
 end
 
 def app_dev
