@@ -51,13 +51,13 @@ enum TargetDeliveryRequestBuilder {
         }
 
         var property: Property?
-        if let propertyToken = propertyToken, !propertyToken.isEmpty {
+        if let propertyToken, !propertyToken.isEmpty {
             property = Property(token: propertyToken)
         }
 
         var qaMode: [String: AnyCodable]?
         if
-            let qaModeParameters = qaModeParameters,
+            let qaModeParameters,
             !qaModeParameters.isEmpty,
             let qaModeData = qaModeParameters.data(using: .utf8)
         {
@@ -84,11 +84,10 @@ enum TargetDeliveryRequestBuilder {
         let mboxParameters = Dictionary.merge(lifecycleContextData, to: parameters)
 
         // Set mbox
-        let mbox: NotificationMbox
-        if let mboxState = cachedMboxJson?[TargetConstants.TargetJson.Mbox.STATE] as? String, !mboxState.isEmpty {
-            mbox = NotificationMbox(name: mboxName, state: mboxState)
+        let mbox = if let mboxState = cachedMboxJson?[TargetConstants.TargetJson.Mbox.STATE] as? String, !mboxState.isEmpty {
+            NotificationMbox(name: mboxName, state: mboxState)
         } else {
-            mbox = NotificationMbox(name: mboxName)
+            NotificationMbox(name: mboxName)
         }
 
         // set token
@@ -169,7 +168,7 @@ enum TargetDeliveryRequestBuilder {
 
     static func getExperienceCloudInfo(identitySharedState: [String: Any]?) -> ExperienceCloudInfo {
         let analytics = AnalyticsInfo(logging: .client_side)
-        if let identitySharedState = identitySharedState {
+        if let identitySharedState {
             let audienceManager = AudienceManagerInfo(blob: identitySharedState[TargetConstants.Identity.SharedState.Keys.VISITOR_ID_BLOB] as? String, locationHint: identitySharedState[TargetConstants.Identity.SharedState.Keys.VISITOR_ID_LOCATION_HINT] as? String)
             return ExperienceCloudInfo(audienceManager: audienceManager, analytics: analytics)
         }
@@ -223,20 +222,20 @@ enum TargetDeliveryRequestBuilder {
     }
 
     private static func getOrder(globalOrder: TargetOrder?, order: TargetOrder?) -> Order? {
-        if let globalOrder = globalOrder {
+        if let globalOrder {
             return globalOrder.toInternalOrder()
         }
-        if let order = order {
+        if let order {
             return order.toInternalOrder()
         }
         return nil
     }
 
     private static func getProduct(product: TargetProduct?, globalProduct: TargetProduct?) -> Product? {
-        if let globalProduct = globalProduct {
+        if let globalProduct {
             return globalProduct.toInternalProduct()
         }
-        if let product = product {
+        if let product {
             return product.toInternalProduct()
         }
         return nil

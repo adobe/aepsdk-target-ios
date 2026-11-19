@@ -8,7 +8,15 @@ SIMULATOR_ARCHIVE_PATH = $(CURR_DIR)/build/ios_simulator.xcarchive/Products/Libr
 SIMULATOR_ARCHIVE_DSYM_PATH = $(CURR_DIR)/build/ios_simulator.xcarchive/dSYMs/
 IOS_ARCHIVE_PATH = $(CURR_DIR)/build/ios.xcarchive/Products/Library/Frameworks/
 IOS_ARCHIVE_DSYM_PATH = $(CURR_DIR)/build/ios.xcarchive/dSYMs/
-IOS_DESTINATION = 'platform=iOS Simulator,name=iPhone 16,OS=18.5'
+# CI variables - using values with defaults. Set defaults to values that are most useful for local development.
+IOS_DEVICE_NAME ?= iPhone 18 Pro
+# If OS version is not specified, uses the first device name match in the list of available simulators
+IOS_VERSION ?=
+ifeq ($(strip $(IOS_VERSION)),)
+	IOS_DESTINATION = "platform=iOS Simulator,name=$(IOS_DEVICE_NAME)"
+else
+	IOS_DESTINATION = "platform=iOS Simulator,name=$(IOS_DEVICE_NAME),OS=$(IOS_VERSION)"
+endif
 
 lint-autocorrect:
 	./Pods/SwiftLint/swiftlint --fix --format
@@ -17,10 +25,10 @@ lint:
 	./Pods/SwiftLint/swiftlint lint
 
 check-format:
-	swiftformat --lint AEPTarget/Sources --swiftversion 5.1
+	swiftformat --lint AEPTarget/Sources --swiftversion 5.10
 	
 format:
-	swiftformat AEPTarget/Sources --swiftversion 5.1
+	swiftformat AEPTarget/Sources --swiftversion 5.10
 
 pod-install:
 	(pod install --repo-update)
@@ -89,8 +97,24 @@ codecov:
 test-podspec:
 	(sh ./script/test-podspec.sh)
 
+# Builds the AEPTarget target in Swift 6 language mode. AEPTARGET_SWIFT_VERSION is
+# only referenced by the AEPTarget target, so dependency pods keep their own modes.
+build-swift6:
+	xcodebuild build -workspace $(PROJECT_NAME).xcworkspace -scheme $(PROJECT_NAME) -destination 'generic/platform=iOS Simulator' AEPTARGET_SWIFT_VERSION=6.0
+
+# Compiles a Swift 6 consumer that calls the public completion-handler APIs with
+# plain closures from @MainActor code (protects the @Sendable contract). The
+# consumer target is built in Swift 6 language mode; AEPTarget and its dependencies
+# keep their own declared language modes, matching a real Swift 6 app's build.
+test-swift6-consumer:
+	sh ./Script/test-swift6-consumer.sh
+
+# Compile-only build on the minimum supported toolchain (Xcode 15.3+/Swift 5.10).
+build-min-toolchain:
+	xcodebuild build -workspace $(PROJECT_NAME).xcworkspace -scheme $(PROJECT_NAME) -destination 'generic/platform=iOS Simulator'
+
 pod-lint:
-	(pod lib lint --allow-warnings --verbose --swift-version=5.1)
+	(pod lib lint --allow-warnings --verbose --swift-version=5.10)
 
 # used to test update-versions.sh script locally
 test-update-version:

@@ -34,7 +34,8 @@ public class Target: NSObject, Extension {
 
     public var name = TargetConstants.EXTENSION_NAME
     public var friendlyName = TargetConstants.FRIENDLY_NAME
-    public static var extensionVersion = TargetConstants.EXTENSION_VERSION
+    // Swift 6 flags public static vars as unsafe. It is never mutated by the SDK and stays a var to keep the public API unchanged.
+    public nonisolated(unsafe) static var extensionVersion = TargetConstants.EXTENSION_VERSION
     public var metadata: [String: String]?
     public var runtime: ExtensionRuntime
     var previewManager: PreviewManager = TargetPreviewManager()
@@ -173,7 +174,7 @@ public class Target: NSObject, Extension {
     }
 
     private func getDeliveryResponse(_ data: Data?) -> TargetDeliveryResponse? {
-        guard let data = data, let responseDict = try? JSONDecoder().decode([String: AnyCodable].self, from: data), let dict = AnyCodable.toAnyDictionary(dictionary: responseDict) else {
+        guard let data, let responseDict = try? JSONDecoder().decode([String: AnyCodable].self, from: data), let dict = AnyCodable.toAnyDictionary(dictionary: responseDict) else {
             return nil
         }
         return TargetDeliveryResponse(responseJson: dict)
@@ -224,16 +225,24 @@ public class Target: NSObject, Extension {
                 self.dispatchPrefetchErrorEvent(triggerEvent: event, errorMessage: "Target response parser initialization failed")
                 return
             }
-            if let tntId = deliveryResponse.tntId { self.setTntIdInternal(tntId: tntId) }
-            if let edgeHost = deliveryResponse.edgeHost { self.targetState.updateEdgeHost(edgeHost) }
+            if let tntId = deliveryResponse.tntId {
+                self.setTntIdInternal(tntId: tntId)
+            }
+            if let edgeHost = deliveryResponse.edgeHost {
+                self.targetState.updateEdgeHost(edgeHost)
+            }
             self.createSharedState(data: self.targetState.generateSharedState(), event: event)
 
             if let mboxes = deliveryResponse.prefetchMboxes {
                 var mboxesDictionary = [String: [String: Any]]()
                 for mbox in mboxes {
-                    if let name = mbox[TargetResponseConstants.JSONKeys.MBOX_NAME] as? String { mboxesDictionary[name] = mbox }
+                    if let name = mbox[TargetResponseConstants.JSONKeys.MBOX_NAME] as? String {
+                        mboxesDictionary[name] = mbox
+                    }
                 }
-                if !mboxesDictionary.isEmpty { self.targetState.mergePrefetchedMboxJson(mboxesDictionary: mboxesDictionary) }
+                if !mboxesDictionary.isEmpty {
+                    self.targetState.mergePrefetchedMboxJson(mboxesDictionary: mboxesDictionary)
+                }
             }
 
             // Remove duplicate loaded mboxes
@@ -293,7 +302,7 @@ public class Target: NSObject, Extension {
             self.processTargetRequestResponse(batchRequests: requestsToSend, event: event, connection: connection)
         }
 
-        if let error = error {
+        if let error {
             Log.warning(label: Target.LOG_TAG, error)
         }
     }
@@ -464,8 +473,12 @@ public class Target: NSObject, Extension {
             return
         }
 
-        if let tntId = response.tntId { setTntIdInternal(tntId: tntId) }
-        if let edgeHost = response.edgeHost { targetState.updateEdgeHost(edgeHost) }
+        if let tntId = response.tntId {
+            setTntIdInternal(tntId: tntId)
+        }
+        if let edgeHost = response.edgeHost {
+            targetState.updateEdgeHost(edgeHost)
+        }
         createSharedState(data: targetState.generateSharedState(), event: event)
     }
 
@@ -502,14 +515,20 @@ public class Target: NSObject, Extension {
             return
         }
 
-        if let tntId = response.tntId { targetState.updateTntId(tntId) }
-        if let edgeHost = response.edgeHost { targetState.updateEdgeHost(edgeHost) }
+        if let tntId = response.tntId {
+            targetState.updateTntId(tntId)
+        }
+        if let edgeHost = response.edgeHost {
+            targetState.updateEdgeHost(edgeHost)
+        }
         createSharedState(data: targetState.generateSharedState(), event: event)
 
         var mboxesDictionary = [String: [String: Any]]()
         if let mboxes = response.executeMboxes {
             for mbox in mboxes {
-                if let name = mbox[TargetResponseConstants.JSONKeys.MBOX_NAME] as? String { mboxesDictionary[name] = mbox }
+                if let name = mbox[TargetResponseConstants.JSONKeys.MBOX_NAME] as? String {
+                    mboxesDictionary[name] = mbox
+                }
             }
             if !mboxesDictionary.isEmpty {
                 // save the loaded mboxes from target response to be used later on for notifications
@@ -560,7 +579,7 @@ public class Target: NSObject, Extension {
     }
 
     private func getTargetDeliveryURL(targetServer: String?, clientCode: String) -> String {
-        if let targetServer = targetServer, !targetServer.isEmpty {
+        if let targetServer, !targetServer.isEmpty {
             return String(format: TargetConstants.DELIVERY_API_URL_BASE, targetServer, clientCode, targetState.sessionId)
         }
 
@@ -572,7 +591,7 @@ public class Target: NSObject, Extension {
     }
 
     private func getSdkVersion(eventHubData: [String: Any]?) -> String {
-        guard let eventHubData = eventHubData else {
+        guard let eventHubData else {
             return ""
         }
 
@@ -585,11 +604,8 @@ public class Target: NSObject, Extension {
     private func getSdkInfo(eventHubData: [String: Any]?) -> String {
         let sdkBase = TargetConstants.HEADER_X_EXC_SDK_BASE_TARGET_MOBILE_IOS
 
-        guard let eventHubData = eventHubData else {
-            return sdkBase
-        }
-
-        guard let wrapper = eventHubData[TargetConstants.EventHub.SharedState.Keys.WRAPPER] as? [String: Any],
+        guard let eventHubData,
+              let wrapper = eventHubData[TargetConstants.EventHub.SharedState.Keys.WRAPPER] as? [String: Any],
               let wrapperFriendlyName = wrapper[TargetConstants.EventHub.SharedState.Keys.WRAPPER_FRIENDLY_NAME] as? String,
               wrapperFriendlyName != "None"
         else {
@@ -691,7 +707,7 @@ public class Target: NSObject, Extension {
     /// - Returns: The final `TimeInterval` to use for both the EventHub and network layers.
     private func calculateTimeout(apiTimeout: TimeInterval?) -> TimeInterval {
         // An explicit finite value from the caller always wins.
-        if let apiTimeout = apiTimeout, apiTimeout != .infinity {
+        if let apiTimeout, apiTimeout != .infinity {
             return apiTimeout
         }
         // Fall back to the configuration value, which maps to target.timeout (default 5 s).
@@ -744,7 +760,7 @@ public class Target: NSObject, Extension {
         networkService.connectAsync(networkRequest: request) { connection in
             Log.debug(label: Target.LOG_TAG, "Target response is received with code: \(connection.responseCode ?? -1) and data: \(connection.responseString ?? "").")
             self.targetState.updateSessionTimestamp()
-            if let completionHandler = completionHandler {
+            if let completionHandler {
                 completionHandler(connection)
             }
             self.startEvents()
@@ -825,7 +841,7 @@ public class Target: NSObject, Extension {
     ///     - tntId: string containing tntId to be set in the SDK.
     private func setTntIdInternal(tntId: String?) {
         // do not set identifier if privacy is opt-out and the id is not being cleared
-        if targetState.privacyStatusIsOptOut, let tntId = tntId, !tntId.isEmpty {
+        if targetState.privacyStatusIsOptOut, let tntId, !tntId.isEmpty {
             Log.debug(label: Target.LOG_TAG, "setTntIdInternal - Cannot update Target tntId due to opt out privacy status.")
             return
         }
@@ -856,7 +872,7 @@ public class Target: NSObject, Extension {
     /// - Parameters:
     ///     - thirdPartyId: `String` to  be set
     private func setThirdPartyIdInternal(thirdPartyId: String?) {
-        if targetState.privacyStatusIsOptOut, let thirdPartyId = thirdPartyId, !thirdPartyId.isEmpty {
+        if targetState.privacyStatusIsOptOut, let thirdPartyId, !thirdPartyId.isEmpty {
             Log.debug(label: Target.LOG_TAG, "setThirdPartyIdInternal - Cannot update Target thirdPartyId due to opt out privacy status.")
             return
         }
@@ -923,11 +939,10 @@ public class Target: NSObject, Extension {
         }
 
         // Give preference to property token passed in configuration over event data.
-        var property: Property?
-        if !targetState.propertyToken.isEmpty {
-            property = Property(token: targetState.propertyToken)
+        var property: Property? = if !targetState.propertyToken.isEmpty {
+            Property(token: targetState.propertyToken)
         } else {
-            property = event.getTypedData(for: TargetConstants.EventDataKeys.PROPERTY)
+            event.getTypedData(for: TargetConstants.EventDataKeys.PROPERTY)
         }
 
         var qaMode: [String: AnyCodable]?
@@ -1016,8 +1031,12 @@ public class Target: NSObject, Extension {
             return
         }
 
-        if let tntId = response.tntId { targetState.updateTntId(tntId) }
-        if let edgeHost = response.edgeHost { targetState.updateEdgeHost(edgeHost) }
+        if let tntId = response.tntId {
+            targetState.updateTntId(tntId)
+        }
+        if let edgeHost = response.edgeHost {
+            targetState.updateEdgeHost(edgeHost)
+        }
         createSharedState(data: targetState.generateSharedState(), event: event)
 
         responseData = response.responseJson
@@ -1033,7 +1052,7 @@ public class Target: NSObject, Extension {
         Log.trace(label: Target.LOG_TAG, "dispatchTargetRawResponse - Dispatching response event for Target raw request.")
 
         var eventData: [String: Any] = [:]
-        if let data = data {
+        if let data {
             eventData[TargetConstants.EventDataKeys.RESPONSE_DATA] = data
         } else {
             eventData[TargetConstants.EventDataKeys.RESPONSE_ERROR] = error ?? ""
@@ -1110,21 +1129,14 @@ public class Target: NSObject, Extension {
         for option in optionsArray {
             responseTokens = option?[TargetConstants.TargetJson.Option.RESPONSE_TOKENS] as? [String: Any]
 
-            guard let content = option?[TargetConstants.TargetJson.Option.CONTENT] else {
-                continue
-            }
-
-            guard let type = option?[TargetConstants.TargetJson.Option.TYPE] as? String, !type.isEmpty else {
+            guard let content = option?[TargetConstants.TargetJson.Option.CONTENT], let type = option?[TargetConstants.TargetJson.Option.TYPE] as? String, !type.isEmpty else {
                 continue
             }
 
             if TargetConstants.TargetJson.HTML == type, let contentString = content as? String {
                 contentBuilder.append(contentString)
             } else if TargetConstants.TargetJson.JSON == type, let anyContent = content {
-                guard let jsonData = try? JSONSerialization.data(withJSONObject: anyContent, options: .prettyPrinted) else {
-                    continue
-                }
-                guard let jsonString = String(data: jsonData, encoding: .utf8) else { continue }
+                guard let jsonData = try? JSONSerialization.data(withJSONObject: anyContent, options: .prettyPrinted), let jsonString = String(data: jsonData, encoding: .utf8) else { continue }
                 contentBuilder.append(jsonString)
             }
         }
@@ -1169,11 +1181,7 @@ public class Target: NSObject, Extension {
     ///     - json: dictionary containing a4t payload.
     /// - Returns: `Dictionary` containing a4t payload or nil.
     private func getAnalyticsForTargetPayload(json: [String: Any]) -> [String: String]? {
-        guard let analyticsJson = json[TargetConstants.TargetJson.ANALYTICS] as? [String: Any] else {
-            return nil
-        }
-
-        guard let payloadJson = analyticsJson[TargetConstants.TargetJson.ANALYTICS_PAYLOAD] as? [String: String] else {
+        guard let analyticsJson = json[TargetConstants.TargetJson.ANALYTICS] as? [String: Any], let payloadJson = analyticsJson[TargetConstants.TargetJson.ANALYTICS_PAYLOAD] as? [String: String] else {
             return nil
         }
 
@@ -1220,15 +1228,15 @@ public class Target: NSObject, Extension {
     -> [String: Any]? {
         var responsePayload: [String: Any] = [:]
 
-        if let responseTokens = responseTokens {
+        if let responseTokens {
             responsePayload[TargetConstants.TargetResponse.RESPONSE_TOKENS] = responseTokens
         }
 
-        if let analyticsPayload = analyticsPayload {
+        if let analyticsPayload {
             responsePayload[TargetConstants.TargetResponse.ANALYTICS_PAYLOAD] = analyticsPayload
         }
 
-        if let metricsAnalyticsPayload = metricsAnalyticsPayload {
+        if let metricsAnalyticsPayload {
             responsePayload[TargetConstants.TargetResponse.CLICK_METRIC_ANALYTICS_PAYLOAD] = metricsAnalyticsPayload
         }
 
