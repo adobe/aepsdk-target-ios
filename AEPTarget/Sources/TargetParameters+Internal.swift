@@ -16,7 +16,7 @@ extension TargetParameters {
     /// - Parameter dictionary: the event data used to build a `TargetParameters` object
     /// - Returns: `TargetParameters` object
     static func from(dictionary: [String: Any]?) -> TargetParameters? {
-        guard let dictionary = dictionary, let jsonData = try? JSONSerialization.data(withJSONObject: dictionary) else {
+        guard let dictionary, let jsonData = try? JSONSerialization.data(withJSONObject: dictionary) else {
             return nil
         }
         return try? JSONDecoder().decode(TargetParameters.self, from: jsonData)

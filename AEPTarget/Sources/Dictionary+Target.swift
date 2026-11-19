@@ -12,17 +12,17 @@
 
 import Foundation
 
-extension Dictionary where Key == String, Value == Any {
+extension [String: Any] {
     /// Merges the given dictionaries, and only keeps values from the new dictionary for duplicated keys.
     /// - Parameters:
     ///   - newDictionary: the new dictionary
     ///   - dictionary: the original dictionary
     /// - Returns: a new dictionary with combined key-value pairs
     static func merge(_ newDictionary: [String: String]?, to dictionary: [String: String]?) -> [String: String]? {
-        guard let newDictionary = newDictionary else {
+        guard let newDictionary else {
             return dictionary
         }
-        guard let dictionary = dictionary else {
+        guard let dictionary else {
             return newDictionary
         }
         return dictionary.merging(newDictionary) { _, new in new }

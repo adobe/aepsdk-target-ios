@@ -18,7 +18,7 @@ extension TargetOrder {
 
     static func from(dictionary: [String: Any]?) -> TargetOrder? {
         guard
-            let dictionary = dictionary,
+            let dictionary,
             let jsonData = try? JSONSerialization.data(withJSONObject: dictionary)
         else {
             return nil

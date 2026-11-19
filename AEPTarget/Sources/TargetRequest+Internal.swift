@@ -26,7 +26,7 @@ extension TargetRequest {
     /// - Parameter dictionaries: the event data used to build`TargetRequest` objects
     /// - Returns: an array of `TargetRequest` objects
     static func from(dictionaries: [[String: Any]]?) -> [TargetRequest]? {
-        guard let dictionaries = dictionaries else {
+        guard let dictionaries else {
             return nil
         }
         var requests = [TargetRequest]()

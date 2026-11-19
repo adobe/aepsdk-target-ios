@@ -32,7 +32,7 @@ struct TargetPreviewState {
         restartUrl = nil
         previewQueryParameters = nil
 
-        if let previewButton = previewButton {
+        if let previewButton {
             previewButton.dismiss()
             self.previewButton = nil
         }
@@ -97,11 +97,9 @@ class TargetPreviewManager: PreviewManager {
             state.reset()
             previewLifecycleEventDispatcher(createPreviewLifecycleEvent(isPreviewInitiated: false))
         case .confirm:
-            if let previewQueryParams = url.queryItemsDict, !previewQueryParams.isEmpty {
-                if let previewQueryParameters = previewQueryParams[previewManagerConstants.PREVIEW_PARAMETERS] {
-                    state.previewQueryParameters = previewQueryParameters.removingPercentEncoding
-                    previewLifecycleEventDispatcher(createPreviewLifecycleEvent(isPreviewInitiated: true))
-                }
+            if let previewQueryParams = url.queryItemsDict, !previewQueryParams.isEmpty, let previewQueryParameters = previewQueryParams[previewManagerConstants.PREVIEW_PARAMETERS] {
+                state.previewQueryParameters = previewQueryParameters.removingPercentEncoding
+                previewLifecycleEventDispatcher(createPreviewLifecycleEvent(isPreviewInitiated: true))
             }
 
             if let restartUrlString = state.restartUrl, let restartUrl = URL(string: restartUrlString) {
@@ -132,18 +130,18 @@ class TargetPreviewManager: PreviewManager {
         let defaultTimeout = TargetConstants.NetworkConnection.DEFAULT_CONNECTION_TIMEOUT_SEC
         let networkRequest = NetworkRequest(url: targetUrl, httpMethod: .get, httpHeaders: requestHeaders, connectTimeout: defaultTimeout, readTimeout: defaultTimeout)
         networkService.connectAsync(networkRequest: networkRequest, completionHandler: { [weak self] httpConnection in
-            guard let self = self else { return }
+            guard let self else { return }
             guard let responseString = httpConnection.responseString, !responseString.isEmpty else {
                 Log.warning(label: self.LOG_TAG, "Failed to fetch preview webview with connection status \(String(httpConnection.responseCode ?? 0)), response string was nil or empty")
-                self.state.fetchingWebView = false
+                state.fetchingWebView = false
                 return
             }
             if httpConnection.responseCode == httpResponseConstants.HTTP_OK {
-                self.state.webViewHtml = responseString
+                state.webViewHtml = responseString
                 Log.debug(label: self.LOG_TAG, "Successfully fetched webview for preview mode, response body \(responseString)")
-                self.createAndShowMessage()
+                createAndShowMessage()
             }
-            self.state.fetchingWebView = false
+            state.fetchingWebView = false
         })
     }
 
@@ -183,10 +181,7 @@ class TargetPreviewManager: PreviewManager {
     /// Uses the TargetPreviewState's endpoint, clientCode, and token values to build the url
     ///
     private var targetPreviewRequestUrl: URL? {
-        guard let host = state.endpoint, let clientCode = state.clientCode, let token = state.token else {
-            return nil
-        }
-        guard var url = URL(string: "https://" + host) else {
+        guard let host = state.endpoint, let clientCode = state.clientCode, let token = state.token, var url = URL(string: "https://" + host) else {
             return nil
         }
         url.appendPathComponent("ui")

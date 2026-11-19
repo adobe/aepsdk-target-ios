@@ -20,7 +20,7 @@ public class TargetRequest: NSObject, Codable {
     @objc var contentCallback: (@Sendable (String?) -> Void)?
     @objc var contentWithDataCallback: (@Sendable (String?, [String: Any]?) -> Void)?
 
-    // Callbacks run on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
+    /// Callbacks run on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     /// Instantiate a `TargetRequest` object
     /// - Parameters:
     ///   - mboxName: `String` mbox name for this request
@@ -36,7 +36,7 @@ public class TargetRequest: NSObject, Codable {
         responsePairId = UUID().uuidString
     }
 
-    // Callbacks run on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
+    /// Callbacks run on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     /// Instantiate a `TargetRequest` object
     /// - Parameters:
     ///   - mboxName: `String` mbox name for this request

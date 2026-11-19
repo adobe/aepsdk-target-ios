@@ -138,7 +138,7 @@ class TargetState {
     ///  If the given configuration shared state contains a new client code, the stored `edge host` will be set with an empty String.
     /// - Parameter configuration: the shared state of the `Configuration`
     func updateConfigurationSharedState(_ configuration: [String: Any]?) {
-        guard let configuration = configuration else {
+        guard let configuration else {
             return
         }
         if
@@ -173,7 +173,7 @@ class TargetState {
     func updateTntId(_ tntId: String?) {
         self.tntId = tntId
 
-        if let tntId = tntId, !tntId.isEmpty {
+        if let tntId, !tntId.isEmpty {
             dataStore.set(key: TargetConstants.DataStoreKeys.TNT_ID, value: tntId)
         } else {
             dataStore.remove(key: TargetConstants.DataStoreKeys.TNT_ID)
@@ -184,7 +184,7 @@ class TargetState {
     func updateThirdPartyId(_ thirdPartyId: String?) {
         self.thirdPartyId = thirdPartyId
 
-        if let thirdPartyId = thirdPartyId, !thirdPartyId.isEmpty {
+        if let thirdPartyId, !thirdPartyId.isEmpty {
             dataStore.set(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID, value: thirdPartyId)
         } else {
             dataStore.remove(key: TargetConstants.DataStoreKeys.THIRD_PARTY_ID)
@@ -198,7 +198,7 @@ class TargetState {
             return
         }
         storedEdgeHost = edgeHost
-        if let edgeHost = edgeHost, !edgeHost.isEmpty {
+        if let edgeHost, !edgeHost.isEmpty {
             dataStore.set(key: TargetConstants.DataStoreKeys.EDGE_HOST, value: edgeHost)
         } else {
             dataStore.remove(key: TargetConstants.DataStoreKeys.EDGE_HOST)
@@ -208,8 +208,12 @@ class TargetState {
     /// Generates a `Target` shared state with the stored TNT ID and third party id.
     func generateSharedState() -> [String: Any] {
         var eventData = [String: Any]()
-        if let tntId = tntId { eventData[TargetConstants.EventDataKeys.TNT_ID] = tntId }
-        if let thirdPartyId = thirdPartyId { eventData[TargetConstants.EventDataKeys.THIRD_PARTY_ID] = thirdPartyId }
+        if let tntId {
+            eventData[TargetConstants.EventDataKeys.TNT_ID] = tntId
+        }
+        if let thirdPartyId {
+            eventData[TargetConstants.EventDataKeys.THIRD_PARTY_ID] = thirdPartyId
+        }
         return eventData
     }
 

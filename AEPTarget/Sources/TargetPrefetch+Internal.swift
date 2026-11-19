@@ -26,7 +26,7 @@ extension TargetPrefetch {
     /// - Parameter dictionaries: the event data used to build`TargetPrefetch` objects
     /// - Returns: an array of `TargetPrefetch` objects
     static func from(dictionaries: [[String: Any]]?) -> [TargetPrefetch]? {
-        guard let dictionaries = dictionaries else {
+        guard let dictionaries else {
             return nil
         }
         var prefetches = [TargetPrefetch]()
