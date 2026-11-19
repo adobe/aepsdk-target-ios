@@ -8,7 +8,15 @@ SIMULATOR_ARCHIVE_PATH = $(CURR_DIR)/build/ios_simulator.xcarchive/Products/Libr
 SIMULATOR_ARCHIVE_DSYM_PATH = $(CURR_DIR)/build/ios_simulator.xcarchive/dSYMs/
 IOS_ARCHIVE_PATH = $(CURR_DIR)/build/ios.xcarchive/Products/Library/Frameworks/
 IOS_ARCHIVE_DSYM_PATH = $(CURR_DIR)/build/ios.xcarchive/dSYMs/
-IOS_DESTINATION = 'platform=iOS Simulator,name=iPhone 16,OS=18.5'
+# CI variables - using values with defaults. Set defaults to values that are most useful for local development.
+IOS_DEVICE_NAME ?= iPhone 18 Pro
+# If OS version is not specified, uses the first device name match in the list of available simulators
+IOS_VERSION ?=
+ifeq ($(strip $(IOS_VERSION)),)
+	IOS_DESTINATION = "platform=iOS Simulator,name=$(IOS_DEVICE_NAME)"
+else
+	IOS_DESTINATION = "platform=iOS Simulator,name=$(IOS_DEVICE_NAME),OS=$(IOS_VERSION)"
+endif
 
 lint-autocorrect:
 	./Pods/SwiftLint/swiftlint --fix --format
