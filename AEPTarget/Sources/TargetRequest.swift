@@ -20,13 +20,13 @@ public class TargetRequest: NSObject, Codable {
     @objc var contentCallback: (@Sendable (String?) -> Void)?
     @objc var contentWithDataCallback: (@Sendable (String?, [String: Any]?) -> Void)?
 
+    // Callbacks run on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     /// Instantiate a `TargetRequest` object
     /// - Parameters:
     ///   - mboxName: `String` mbox name for this request
     ///   - defaultContent: `String` default content for this request
     ///   - targetParameters: `TargetParameters` for this request
     ///   - contentCallback: which will get called with target mbox content
-    // Callbacks run on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     @objc @preconcurrency public init(mboxName: String, defaultContent: String, targetParameters: TargetParameters? = nil, contentCallback: (@Sendable (String?) -> Void)? = nil) {
         name = mboxName
         self.defaultContent = defaultContent
@@ -36,13 +36,13 @@ public class TargetRequest: NSObject, Codable {
         responsePairId = UUID().uuidString
     }
 
+    // Callbacks run on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     /// Instantiate a `TargetRequest` object
     /// - Parameters:
     ///   - mboxName: `String` mbox name for this request
     ///   - defaultContent: `String` default content for this request
     ///   - targetParameters: `TargetParameters` for this request
     ///   - contentWithDataCallback: which will get called with target mbox content, and an optional dictionary containing one or more of response tokens, analytics payload, and click metric analytics payload, if available.
-    // Callbacks run on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     @objc @preconcurrency public init(mboxName: String, defaultContent: String, targetParameters: TargetParameters? = nil, contentWithDataCallback: (@Sendable (String?, [String: Any]?) -> Void)? = nil) {
         name = mboxName
         self.defaultContent = defaultContent

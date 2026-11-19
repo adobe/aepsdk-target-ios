@@ -35,7 +35,7 @@ public class Target: NSObject, Extension {
     public var name = TargetConstants.EXTENSION_NAME
     public var friendlyName = TargetConstants.FRIENDLY_NAME
     // Swift 6 flags public static vars as unsafe. It is never mutated by the SDK and stays a var to keep the public API unchanged.
-    nonisolated(unsafe) public static var extensionVersion = TargetConstants.EXTENSION_VERSION
+    public nonisolated(unsafe) static var extensionVersion = TargetConstants.EXTENSION_VERSION
     public var metadata: [String: String]?
     public var runtime: ExtensionRuntime
     var previewManager: PreviewManager = TargetPreviewManager()

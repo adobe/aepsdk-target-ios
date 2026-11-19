@@ -20,14 +20,15 @@ import Foundation
     #if DEBUG
     nonisolated(unsafe) static var isResponseListenerRegister: Bool = false
     #else
-    nonisolated(unsafe) private static var isResponseListenerRegister: Bool = false
+    private nonisolated(unsafe) static var isResponseListenerRegister: Bool = false
     #endif
 
-    /// `Dictionary` to keep track of pending target request
     // The ThreadSafeDictionary already serializes access internally, so marking the static nonisolated(unsafe) is safe for Swift 6.
+    /// `Dictionary` to keep track of pending target request
     @nonobjc
-    nonisolated(unsafe) private static var pendingTargetRequest: ThreadSafeDictionary<String, TargetRequest> = ThreadSafeDictionary()
+    private nonisolated(unsafe) static var pendingTargetRequest: ThreadSafeDictionary<String, TargetRequest> = ThreadSafeDictionary()
 
+    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     /// Prefetch multiple Target mboxes simultaneously.
     ///
     /// Executes a prefetch request to your configured Target server with the TargetPrefetchObject list provided
@@ -42,7 +43,6 @@ import Foundation
     ///   - prefetchArray: an array of AEPTargetPrefetch objects representing the desired mboxes to prefetch
     ///   - targetParameters: a TargetParameters object containing parameters for all the mboxes in the request array
     ///   - completion: the callback `closure` which will be called after the prefetch is complete.  The parameter in the callback will be nil if the prefetch completed successfully, or will contain error message otherwise
-    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     @objc(prefetchContent:withParameters:callback:)
     @preconcurrency static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters? = nil, _ completion: (@Sendable (Error?) -> Void)?) {
         // Pass .infinity as sentinel — the Target extension will resolve the real timeout from
@@ -51,6 +51,7 @@ import Foundation
         prefetchContent(prefetchArray, with: targetParameters, timeout: .infinity, completion)
     }
 
+    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     /// Prefetch multiple Target mboxes simultaneously with an explicit timeout.
     ///
     /// Executes a prefetch request to your configured Target server with the TargetPrefetchObject list provided
@@ -66,7 +67,6 @@ import Foundation
     ///   - targetParameters: a TargetParameters object containing parameters for all the mboxes in the request array
     ///   - timeout: the timeout interval (in seconds) to wait for the prefetch response.
     ///   - completion: the callback `closure` which will be called after the prefetch is complete.  The parameter in the callback will be nil if the prefetch completed successfully, or will contain error message otherwise
-    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     @objc(prefetchContent:withParameters:timeout:callback:)
     @preconcurrency static func prefetchContent(_ prefetchArray: [TargetPrefetch], with targetParameters: TargetParameters? = nil, timeout: TimeInterval, _ completion: (@Sendable (Error?) -> Void)?) {
         let completion = completion ?? { _ in }
@@ -186,10 +186,10 @@ import Foundation
         MobileCore.dispatch(event: event)
     }
 
+    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     /// Gets the custom visitor ID for Target
     /// This ID will be reset  when the `resetExperience()` API is called.
     /// - Parameter completion:  the callback `closure` will be invoked to return the thirdPartyId value or `nil` if no third-party ID is set
-    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     @preconcurrency static func getThirdPartyId(_ completion: @escaping @Sendable (String?, Error?) -> Void) {
         let event = Event(name: TargetConstants.EventName.GET_THIRD_PARTY_ID, type: EventType.target, source: EventSource.requestIdentity, data: nil)
         MobileCore.dispatch(event: event) { responseEvent in
@@ -230,13 +230,13 @@ import Foundation
         MobileCore.dispatch(event: event)
     }
 
+    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     /// Gets the Target session identifier.
     ///
     /// The session ID is generated locally in the SDK upon initial Target request and persisted for a period defined by `target.sessionTimeout` configuration setting.
     /// If the session timeout happens upon a subsequent Target request, a new session ID will be generated for use in the request and persisted in the SDK.
     ///
     /// - Parameter completion: the callback `closure` invoked with the current session ID, or `nil` if there was an error retrieving it.
-    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     @preconcurrency static func getSessionId(_ completion: @escaping @Sendable (String?, Error?) -> Void) {
         let event = Event(name: TargetConstants.EventName.GET_SESSION_ID, type: EventType.target, source: EventSource.requestIdentity, data: nil)
         MobileCore.dispatch(event: event) { responseEvent in
@@ -279,13 +279,13 @@ import Foundation
         MobileCore.dispatch(event: event)
     }
 
+    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     /// Gets the Target user identifier.
     ///
     /// The tnt ID is returned in the network response from Target after a successful call to `prefetchContent` API or `retrieveLocationContent` API, which is then persisted in the SDK.
     /// The persisted tnt ID is used in subsequent Target requests until a different tnt ID is returned from Target, or a new tnt ID is set using `setTntId` API.
     ///
     /// - Parameter completion:  the callback `closure` invoked with the current tnt ID, or `nil` if there was an error retrieving it.
-    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     @preconcurrency static func getTntId(_ completion: @escaping @Sendable (String?, Error?) -> Void) {
         let event = Event(name: TargetConstants.EventName.GET_TNT_ID, type: EventType.target, source: EventSource.requestIdentity, data: nil)
         MobileCore.dispatch(event: event) { responseEvent in
@@ -428,12 +428,12 @@ import Foundation
         }
     }
 
+    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     /// Retrieves Target prefetch or execute response for mbox locations from the configured Target server.
     ///
     /// - Parameters:
     ///   - request: a dictionary containing prefetch or execute request data in the Target v1 delivery API request format.
     ///   - completion: the callback which will be invoked with the Target response data or error message after the request is completed.
-    // Completion runs on the SDK queue. Sendable tells Swift 6 apps not to assume main actor, and preconcurrency keeps old callers compiling.
     @objc(executeRawRequest:completion:)
     @preconcurrency static func executeRawRequest(_ request: [String: Any], _ completion: @escaping @Sendable ([String: Any]?, Error?) -> Void) {
         guard !request.isEmpty else {
