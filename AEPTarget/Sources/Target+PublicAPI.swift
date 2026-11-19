@@ -16,15 +16,17 @@ import Foundation
 
 @objc public extension Target {
     // true if the response content event listener is already registered, false otherwise
+    // Swift 6 flags shared statics as unsafe. This flag is only set while registering the response listener, so we opt out of the check in Debug and Release.
     #if DEBUG
-    static var isResponseListenerRegister: Bool = false
+    nonisolated(unsafe) static var isResponseListenerRegister: Bool = false
     #else
-    private static var isResponseListenerRegister: Bool = false
+    nonisolated(unsafe) private static var isResponseListenerRegister: Bool = false
     #endif
 
     /// `Dictionary` to keep track of pending target request
+    // The ThreadSafeDictionary already serializes access internally, so marking the static nonisolated(unsafe) is safe for Swift 6.
     @nonobjc
-    private static var pendingTargetRequest: ThreadSafeDictionary<String, TargetRequest> = ThreadSafeDictionary()
+    nonisolated(unsafe) private static var pendingTargetRequest: ThreadSafeDictionary<String, TargetRequest> = ThreadSafeDictionary()
 
     /// Prefetch multiple Target mboxes simultaneously.
     ///
