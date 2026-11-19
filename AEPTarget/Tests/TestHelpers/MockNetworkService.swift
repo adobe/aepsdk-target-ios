@@ -14,7 +14,8 @@
 @testable import AEPServices
 
 class MockNetworkService: Networking {
-    static var request: NetworkRequest?
+    // Swift 6 flags test statics as unsafe. Tests set and read it serially, so we opt out of the check.
+    nonisolated(unsafe) static var request: NetworkRequest?
     func connectAsync(networkRequest request: NetworkRequest, completionHandler _: ((HttpConnection) -> Void)?) {
         MockNetworkService.request = request
     }

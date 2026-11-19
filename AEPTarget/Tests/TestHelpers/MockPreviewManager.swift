@@ -30,7 +30,8 @@ class MockTargetPreviewManager: PreviewManager {
         self.deepLink = deepLink
     }
 
-    static var previewConfirmedWithUrlCalled = false
+    // Swift 6 flags test statics as unsafe. Tests set and read it serially, so we opt out of the check.
+    nonisolated(unsafe) static var previewConfirmedWithUrlCalled = false
     var previewConfirmedWithUrlReturnVal = false
     func previewConfirmedWithUrl(_: URL, message _: FullscreenPresentable, previewLifecycleEventDispatcher _: (Event) -> Void) {
         MockTargetPreviewManager.previewConfirmedWithUrlCalled = true
